@@ -1,0 +1,69 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "aoc-base",
+      "description": "Base preset used when triggered from aoc. User preset named 'aoc' should inherit this and specify GCC/Clang compiler that can build the project",
+      "hidden": true,
+      "binaryDir": "build-aoc",
+      "inherits": [
+        "cmake-conan",
+        "ninja",
+        "gcc-clang-flags",
+        "configure-flags"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "cmake-conan",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/cmake-conan/conan_provider.cmake"
+      }
+    },
+    {
+      "name": "compile-commands-json",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "ninja",
+      "hidden": true,
+      "generator": "Ninja"
+    },
+    {
+      "name": "gcc-clang-flags",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_GCC_CLANG": "-Wall -Wextra -Werror"
+      }
+    },
+    {
+      "name": "msvc-flags",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_MSVC": "/W4 /WX /EHsc"
+      }
+    },
+    {
+      "name": "configure-flags",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_MSVC} $env{PRESET_CXX_FLAGS_GCC_CLANG}"
+      }
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "output-on-failure",
+      "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

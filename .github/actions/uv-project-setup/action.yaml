@@ -1,0 +1,78 @@
+name: mise + uv project setup
+description: Setup tools for uv project and install dependencies
+inputs:
+  cache-mode:
+    description: "Mode of operation regarding cache: 'prepare' or 'use'"
+    required: false
+    default: use
+  directory:
+    description: Directory containing uv project.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare variables
+      id: init
+      env:
+        CACHE_MODE: ${{ inputs.cache-mode }}
+        DIRECTORY: ${{ inputs.directory }}
+      run: "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - name: uv cache restore
+      id: cache-restore
+      uses: actions/cache/restore@v4.2.3
+      with:
+        fail-on-cache-miss: ${{ steps.init.outputs.fail-on-cache-miss }}
+        key: ${{ steps.init.outputs.cache-key }}
+        path: ${{ steps.init.outputs.cache-paths }}
+        restore-keys: ${{ steps.init.outputs.cache-restore-keys }}
+
+    - if: steps.cache-restore.outputs.cache-hit != 'true'
+      name: Install uv dependencies
+
+      env:
+        DIRECTORIES: ${{ steps.init.outputs.uv-install-directories }}
+      run: |
+        set -x
+        for dir in $DIRECTORIES; do
+          echo "::group::Install uv dependencies: $dir"
+          pushd "$dir"
+          uv sync --locked
+          popd
+          echo "::endgroup::"
+        done
+
+        first_dir_with_uv=$(echo $DIRECTORIES | cut -d ' ' -f 1)
+        echo "::group::Prune uv cache"
+        pushd "$first_dir_with_uv"
+        # --ci switch removes build-system dependencies, unless they are pinned to specific version
+        #uv cache prune --ci
+        uv cache prune
+        popd
+        echo "::endgroup::"
+      shell: bash
+
+    - name: Save cache
+      if: steps.init.outputs.save-cache == 'true' && steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4.2.3
+      with:
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+        path: ${{ steps.init.outputs.cache-paths }}
+
+    - name: Ensure dependencies are installed properly
+      #if: steps.cache-restore.outputs.cache-hit != 'true'
+
+      env:
+        DIRECTORIES: ${{ steps.init.outputs.uv-install-directories }}
+      run: |
+        set -x
+        for dir in $DIRECTORIES; do
+          echo "::group::Ensure dependencies: $dir"
+          pushd "$dir"
+          uv sync --locked --offline
+          popd
+          echo "::endgroup::"
+        done
+      shell: bash

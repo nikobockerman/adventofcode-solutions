@@ -1,0 +1,42 @@
+name: Mise + uv - run task
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: Directory containing uv project and mise task
+        required: true
+        type: string
+      task:
+        description: Task to run
+        required: true
+        type: string
+permissions:
+  contents: read
+
+jobs:
+  task:
+    name: Run mise task with uv - ${{ inputs.task }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore mise project
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: ${{ inputs.directory }}
+
+      - name: Restore uv project
+        uses: ./.github/actions/uv-project-setup
+        with:
+          directory: ${{ inputs.directory }}
+
+      - name: Run task - ${{ inputs.task }}
+
+        env:
+          MISE_TASK: ${{ inputs.task }}
+        run: mise run "${MISE_TASK}"
+        shell: bash
+        working-directory: ${{ inputs.directory }}

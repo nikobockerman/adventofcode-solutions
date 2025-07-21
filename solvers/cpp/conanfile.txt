@@ -1,0 +1,10 @@
+[requires]
+fmt/11.2.0
+spdlog/1.15.3
+gtest/1.16.0
+
+[generators]
+CMakeDeps
+
+[layout]
+cmake_layout

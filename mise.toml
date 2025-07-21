@@ -1,0 +1,131 @@
+[tools]
+"npm:prettier" = "latest"
+
+[vars]
+DEFAULT_YEAR = "{{ get_env(name='YEAR', default='2024') }}"
+
+[tasks."aoc:all"]
+description = "Run all solvers"
+run = """mise exec -- uv run aoc all "${usage_verbose:-0}" "${usage_dry_run:-false}" "${usage_solver}" """
+usage = """
+flag "--solver <solver>" {
+  choices "cpp" "python" "rust"
+}
+flag "-v --verbose" count=#true var=#true
+flag "--dry-run"
+"""
+dir = "aoc-main"
+shell = "sh -c"
+
+[tasks."aoc:one"]
+description = "Run solvers for one part"
+run = """mise exec -- uv run aoc one "${usage_verbose:-0}" "${usage_dry_run:-false}" "${usage_solver}" "${usage_year:-{{vars.DEFAULT_YEAR}}}" "$usage_day" "$usage_part" """
+usage = """
+arg "<day>" {
+  choices "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25"
+}
+arg "<part>" {
+  choices "1" "2"
+}
+flag "--solver <solver>" {
+  choices "cpp" "python" "rust"
+}
+flag "-y --year <year>"
+flag "-v --verbose" count=#true var=#true
+flag "--dry-run"
+"""
+dir = "aoc-main"
+shell = "sh -c"
+
+[tasks."aoc:day"]
+description = "Run all solvers for one day"
+run = """mise exec -- uv run aoc day "${usage_verbose:-0}" "${usage_dry_run:-false}" "${usage_solver}" "${usage_year:-{{vars.DEFAULT_YEAR}}}" "$usage_day" """
+usage = """
+arg "<day>" {
+  choices "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25"
+}
+flag "--solver <solver>" {
+  choices "cpp" "python" "rust"
+}
+flag "-y --year <year>"
+flag "-v --verbose" count=#true var=#true
+flag "--dry-run"
+"""
+dir = "aoc-main"
+shell = "sh -c"
+
+[tasks.check]
+depends = [
+  "check:prettier",
+  "check:renovateconfig",
+  "check:aoc-main",
+  "check:solver:cpp",
+  "check:solver:python",
+  "check:solver:rust",
+]
+
+[tasks."check:prettier"]
+run = """
+set -x
+excludesFile=$(git config --get core.excludesFile || true)
+if [ -z "$excludesFile" ]; then
+  if [ -z "$XDG_CONFIG_HOME" ]; then
+    excludesFile="$HOME/.config/git/ignore"
+  else
+    excludesFile="$XDG_CONFIG_HOME/git/ignore"
+  fi
+fi
+userIgnoreArg=""
+if [ -f "$excludesFile" ]; then
+  userIgnoreArg="--ignore-path=$excludesFile"
+fi
+prettier --ignore-path=.gitignore --ignore-path=.prettierignore "$userIgnoreArg" --check .
+"""
+
+[tasks."check:renovateconfig"]
+run = "renovate-config-validator --strict"
+tools."npm:renovate" = "latest"
+
+[tasks."check:aoc-main"]
+run = "mise run check"
+dir = "aoc-main"
+
+[tasks."check:solver:cpp"]
+run = "mise run check"
+dir = "solvers/cpp"
+
+[tasks."check:solver:python"]
+run = "mise run check"
+dir = "solvers/python"
+
+[tasks."check:solver:rust"]
+run = "mise run check"
+dir = "solvers/rust"
+
+[tasks.fix]
+depends = [
+  "fix:prettier",
+  "fix:aoc-main",
+  "fix:solver:cpp",
+  "fix:solver:python",
+  "fix:solver:rust",
+]
+
+[tasks."fix:prettier"]
+run = "prettier --write --cache-location .prettiercache ."
+
+[tasks."fix:aoc-main"]
+run = "mise run fix"
+dir = "aoc-main"
+
+[tasks."fix:solver:cpp"]
+run = "mise run fix"
+dir = "solvers/cpp"
+
+[tasks."fix:solver:python"]
+run = "mise run fix"
+dir = "solvers/python"
+
+[tasks."fix:solver:rust"]
+run = "mise run fix"
+dir = "solvers/rust"

@@ -1,0 +1,25 @@
+[tools]
+clang-format = "20"
+conan = "latest"
+
+[tasks.check]
+depends = [
+  "check:clang-format",
+]
+
+[tasks."check:clang-format"]
+run = '''
+files=$(git ls-files | grep -E '\.hpp$|\.cpp$')
+clang-format -n -Werror --verbose $files
+'''
+
+[tasks.fix]
+depends = [
+  "fix:clang-format",
+]
+
+[tasks."fix:clang-format"]
+run = '''
+files=$(git ls-files | grep -E '\.hpp$|\.cpp$')
+clang-format -i $files
+'''

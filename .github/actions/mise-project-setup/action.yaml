@@ -1,0 +1,93 @@
+name: mise project setup
+description: Setup mise and tools for project directory
+inputs:
+  cache-mode:
+    description: "Mode of operation regarding cache: 'prepare' or 'use'"
+    required: false
+    default: use
+  directory:
+    description: Directory where mise and tools will be used in
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - id: init
+      name: Prepare variables
+
+      env:
+        CACHE_MODE: ${{ inputs.cache-mode }}
+        # renovate: datasource=github-releases depName=jdx/mise
+        MISE_VERSION: v2025.7.4
+        DIRECTORY: ${{ inputs.directory }}
+      run: "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - id: cache-restore
+      name: Mise cache restore
+      uses: actions/cache/restore@v4.2.3
+      with:
+        fail-on-cache-miss: ${{ steps.init.outputs.fail-on-cache-miss }}
+        key: ${{ steps.init.outputs.cache-key }}
+        path: ${{ steps.init.outputs.cache-paths }}
+        restore-keys: ${{ steps.init.outputs.cache-restore-keys }}
+
+    - name: Install mise
+      uses: jdx/mise-action@v2.3.1
+
+      env:
+        # Action fails on Windows without this as moving from C: to D: fails
+        TEMP: ${{ runner.temp }}
+      with:
+        cache: false
+        cache_save: false
+        install: false
+        version: ${{ steps.init.outputs.mise-version }}
+        working_directory: ${{ inputs.directory }}
+
+    - if: steps.cache-restore.outputs.cache-hit != 'true'
+      name: Install tools
+
+      env:
+        DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
+      run: |
+        set -x
+        for dir in $DIRECTORIES; do
+          echo "::group::Install mise tools: $dir"
+          pushd "$dir"
+          mise install
+          popd
+          echo "::endgroup::"
+        done
+
+        echo ::group::Mise prune
+        mise prune
+        echo ::endgroup::
+      shell: bash
+
+    - if: steps.init.outputs.save-cache == 'true' && steps.cache-restore.outputs.cache-hit != 'true'
+      name: Save cache
+      uses: actions/cache/save@v4.2.3
+      with:
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+        path: ${{ steps.init.outputs.cache-paths }}
+
+    - name: Ensure tools are installed properly
+
+      env:
+        DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
+      run: |
+        set -x
+        for dir in $DIRECTORIES; do
+          echo "::group::Ensure dependencies: $dir"
+          pushd "$dir"
+          mise ls --current --missing
+          count=$(mise ls --current --missing --no-header | wc -l)
+          if [ $count -gt 0 ]; then
+            echo "Missing tools: $count"
+            exit 1
+          fi
+          popd
+          echo "::endgroup::"
+        done
+      shell: bash

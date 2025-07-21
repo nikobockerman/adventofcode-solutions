@@ -1,0 +1,51 @@
+[project]
+name = "aoc-main"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+  "pyyaml==6.0.2"
+]
+
+[dependency-groups]
+dev = [
+  "pytest ==8.4.1",
+  "types-PyYAML ==6.0.12.20250516"
+]
+
+[project.scripts]
+aoc = "aoc_main:main.async_main"
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[tool.mypy]
+strict_optional = true
+
+[tool.pyright]
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+addopts = [
+  "--import-mode=importlib",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "COM812",
+  "D10",
+  "FIX",
+  "ISC001",
+  "PLR2004",
+  "S101",
+  "TD002",
+  "TD003"
+]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"src/aoc_main/main.py" = ["T201"]
+"tests/**/*.py" = ["INP001"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"

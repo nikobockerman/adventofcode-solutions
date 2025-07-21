@@ -1,0 +1,28 @@
+name: Python run
+on:
+  workflow_call:
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore mise project
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: solvers/python
+
+      - name: Restore uv project
+        uses: ./.github/actions/uv-project-setup
+        with:
+          directory: solvers/python
+
+      - name: Run aoc
+        run: mise run aoc:all -- --solver python

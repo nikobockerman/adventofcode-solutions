@@ -1,0 +1,98 @@
+name: CI - Python tooling
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: Python project directory
+        required: true
+        type: string
+permissions:
+  contents: read
+
+jobs:
+  # Mise and uv cache prepare
+  mise-cache:
+    if: inputs.directory != 'aoc-main'
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-${{ inputs.directory }}
+
+  uv-cache:
+    if: inputs.directory != 'aoc-main'
+    needs: mise-cache
+    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-uv-${{ inputs.directory }}
+
+  # Checks
+  check-mypy:
+    if: always() && contains(fromJSON('["skipped", "success"]'), needs.uv-cache.result)
+    needs: uv-cache
+    uses: ./.github/workflows/mise-uv-task.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      task: check:mypy
+
+  check-pyright:
+    if: always() && contains(fromJSON('["skipped", "success"]'), needs.uv-cache.result)
+    needs: uv-cache
+    uses: ./.github/workflows/mise-uv-task.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      task: check:pyright
+
+  check-ruff:
+    if: always() && contains(fromJSON('["skipped", "success"]'), needs.mise-cache.result)
+    needs: mise-cache
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      task: check:ruff
+
+  check-ruff-format:
+    if: always() && contains(fromJSON('["skipped", "success"]'), needs.mise-cache.result)
+    needs: mise-cache
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      task: check:ruff:format
+
+  run-all:
+    if: inputs.directory != 'aoc-main'
+    needs: uv-cache
+    uses: ./.github/workflows/python-run.yaml
+
+  test-pytest:
+    if: always() && contains(fromJSON('["skipped", "success"]'), needs.uv-cache.result)
+    needs: uv-cache
+    uses: ./.github/workflows/mise-uv-task.yaml
+    with:
+      directory: ${{ inputs.directory }}
+      task: check:pytest
+
+  # Check for all green CI for a python project
+  check:
+    if: always()
+    needs:
+      - check-mypy
+      - check-pyright
+      - check-ruff
+      - check-ruff-format
+      - run-all
+      - test-pytest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - uses: re-actors/alls-green@v1.2.2
+        with:
+          allowed-skips: ${{ inputs.directory == 'aoc-main' && '["run-all"]' || '' }}
+          jobs: ${{ toJSON(needs) }}

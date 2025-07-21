@@ -1,0 +1,45 @@
+name: CI - Solvers - C++
+on:
+  workflow_call:
+permissions:
+  contents: read
+
+jobs:
+  # Mise cache prepare
+  mise-cache:
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: solvers/cpp
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-cpp
+
+  # Checks
+  build-test-run:
+    uses: ./.github/workflows/cpp-build-test-run.yaml
+
+  check-clang-format:
+    needs: mise-cache
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: solvers/cpp
+      task: check:clang-format
+
+  check-clang-tidy:
+    uses: ./.github/workflows/check-clang-tidy.yaml
+
+  # Check for all green CI for C++
+  check:
+    if: always()
+    needs:
+      - build-test-run
+      - check-clang-format
+      - check-clang-tidy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - uses: re-actors/alls-green@v1.2.2
+        with:
+          jobs: ${{ toJSON(needs) }}

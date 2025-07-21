@@ -1,0 +1,19 @@
+name: CMake project setup
+description: Setup cmake, conan and CMakeUserPresets.json
+
+runs:
+  using: composite
+  steps:
+    - name: Install CMake
+      # TODO: Install cmake through mise
+      uses: lukka/get-cmake@6b3e96a9bc9976b8b546346fdd102effedae0ca8 # v4.0.3
+
+    - name: Setup Conan Client
+      # TODO: Setup only conan package cache here and use conan through mise
+      uses: conan-io/setup-conan@434f093a557d1ee6972c4ed78693c3191653537b # v1.1.0
+      with:
+        cache_packages: true
+
+    - name: Prepare CMakeUserPresets.json
+      run: cp .github/CMakeUserPresets.json solvers/cpp/CMakeUserPresets.json
+      shell: bash

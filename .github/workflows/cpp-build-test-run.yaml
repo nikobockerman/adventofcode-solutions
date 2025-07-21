@@ -1,0 +1,80 @@
+name: C++ build, test and run
+on:
+  workflow_call:
+permissions:
+  contents: read
+
+jobs:
+  build-test-run:
+    strategy:
+      matrix:
+        include:
+          # MSVC
+          - name: MSVC Debug
+            os: windows-2025
+            workflowPreset: ci-msvc-debug
+            run: false
+
+          - name: MSVC Release
+            os: windows-2025
+            workflowPreset: ci-msvc-release
+            run: true
+
+          # Clang on Linux
+          - name: Linux Clang Release
+            os: ubuntu-24.04
+            workflowPreset: ci-clang-release
+            run: true
+
+          - name: Linux Clang Debug
+            os: ubuntu-24.04
+            workflowPreset: ci-clang-debug
+            run: true
+
+          # Gcc 14 on Linux
+          - name: Linux GCC 14 Release
+            os: ubuntu-24.04
+            workflowPreset: ci-gcc-14-release
+            run: true
+
+          - name: Linux GCC 14 Debug
+            os: ubuntu-24.04
+            workflowPreset: ci-gcc-14-debug
+            run: true
+
+    name: ${{ matrix.name }} - Build + test + run
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: true
+
+      - name: Setup CMake project
+        uses: ./.github/actions/cmake-project-setup
+
+      - name: Run CMake workflow
+        uses: lukka/run-cmake@af1be47fd7c933593f687731bc6fdbee024d3ff4 # v10.8
+        with:
+          cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
+          workflowPreset: ${{ matrix.workflowPreset }}
+
+      - if: matrix.run
+        name: Restore aoc-main mise project
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: aoc-main
+
+      - if: matrix.run
+        name: Restore aoc-main uv project
+        uses: ./.github/actions/uv-project-setup
+        with:
+          directory: aoc-main
+
+      - if: matrix.run
+        name: Run all solutions
+        env:
+          AOC_CPP_WORKFLOW_PRESET: ${{ matrix.workflowPreset }}
+        run: mise run aoc:all -- --solver cpp -vv

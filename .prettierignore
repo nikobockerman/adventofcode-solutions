@@ -1,0 +1,13 @@
+Cargo.lock
+conan.lock
+uv.lock
+
+/solvers/cpp/cmake-conan/
+
+/inputs/*.txt
+
+/aoc-main/**/*.py
+/solvers/cpp/**/*.cpp
+/solvers/cpp/**/*.hpp
+/solvers/python/**/*.py
+/solvers/rust/**/*.rs

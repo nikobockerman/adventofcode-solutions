@@ -1,0 +1,101 @@
+name: Rust build, test and run
+on:
+  workflow_call:
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  build-test-run:
+    strategy:
+      matrix:
+        profile:
+          - dev
+          - release
+          - test
+        runner:
+          - ubuntu-24.04
+          - macos-15
+          - windows-2025
+        include:
+          - clippy: false
+          - run: true
+          - test: false
+          - profile: dev
+            clippy: true
+          - profile: test
+            run: false
+            test: true
+
+    name: ${{ matrix.runner }} - ${{ matrix.profile }} - Build + test + run
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: solvers/rust
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup tools through mise
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: solvers/rust
+
+      - name: Setup rust cache
+        uses: Swatinem/rust-cache@v2.8.0
+        with:
+          key: ${{ matrix.profile }}
+          workspaces: solvers/rust
+
+      - name: Fetch dependencies
+        run: cargo fetch --verbose --locked
+
+      - name: Build
+
+        env:
+          PROFILE: ${{ matrix.profile }}
+        run: cargo build --verbose --frozen --all-targets --profile "${PROFILE}"
+        shell: bash
+
+      - if: matrix.test
+        name: Test
+
+        env:
+          PROFILE: ${{ matrix.profile }}
+        run: cargo test --verbose --frozen --all-targets --profile "${PROFILE}"
+        shell: bash
+
+      - name: Check
+
+        env:
+          PROFILE: ${{ matrix.profile }}
+        run: cargo check --verbose --frozen --all-targets --profile "${PROFILE}"
+        shell: bash
+
+      - if: matrix.clippy
+        name: Clippy
+
+        env:
+          PROFILE: ${{ matrix.profile }}
+        run: cargo clippy --verbose --frozen --all-targets --profile "${PROFILE}" -- -D warnings
+        shell: bash
+
+      - if: matrix.run
+        name: Restore aoc-main project
+        uses: ./.github/actions/uv-project-setup
+        with:
+          directory: aoc-main
+
+      - if: matrix.run
+        name: Run all solutions
+        env:
+          AOC_RUST_BUILD_ARGS: --verbose --frozen --profile ${{ matrix.profile }}
+        run: mise run aoc:all -- --solver rust
+        shell: bash
+        working-directory: .
