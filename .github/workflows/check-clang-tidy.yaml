@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: true
 
@@ -32,7 +32,7 @@ jobs:
         uses: ./.github/actions/cmake-project-setup
 
       - name: Configure CMake project
-        uses: lukka/run-cmake@v10.8
+        uses: lukka/run-cmake@af1be47fd7c933593f687731bc6fdbee024d3ff4 # v10.8
         with:
           cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
           configurePreset: ${{ matrix.configurePreset }}
