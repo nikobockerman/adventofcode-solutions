@@ -1,0 +1,18 @@
+[tools]
+rust = { version = "1.88.0", components = "clippy,rustfmt" }
+
+[tasks.check]
+depends = [
+    "check:rustfmt",
+]
+
+[tasks."check:rustfmt"]
+run = "cargo fmt --check"
+
+[tasks.fix]
+depends = [
+    "fix:rustfmt"
+]
+
+[tasks."fix:rustfmt"]
+run = "cargo fmt"

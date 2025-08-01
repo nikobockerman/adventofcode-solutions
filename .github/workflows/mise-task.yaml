@@ -1,0 +1,42 @@
+name: Mise task
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: Directory to run mise task in
+        required: true
+        type: string
+      runner:
+        description: Runner to use
+        required: false
+        type: string
+        default: ubuntu-24.04
+      task:
+        description: Task to run
+        required: true
+        type: string
+permissions:
+  contents: read
+
+jobs:
+  task:
+    name: Mise task - ${{ inputs.task }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore tools
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: ${{ inputs.directory }}
+
+      - name: Run task - ${{ inputs.task }}
+
+        env:
+          MISE_TASK: ${{ inputs.task }}
+        run: mise run "${MISE_TASK}"
+        shell: bash
+        working-directory: ${{ inputs.directory }}

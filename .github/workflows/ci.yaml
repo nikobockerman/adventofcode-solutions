@@ -1,0 +1,173 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    # Run every Monday at 00:30 UTC
+    - cron: "30 0 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  # Mise cache prepare for root
+  mise-cache-root-macos:
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: .
+      runner: macos-15
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-root-macos
+
+  mise-cache-root-ubuntu:
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: .
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-root-ubuntu
+
+  mise-cache-root-windows:
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: .
+      runner: windows-2025
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-root-windows
+
+  # Mise caceh prepare for aoc-main
+  mise-cache-aoc-main-macos:
+    needs: mise-cache-root-macos
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: aoc-main
+      runner: macos-15
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-aoc-main-macos
+
+  mise-cache-aoc-main-ubuntu:
+    needs: mise-cache-root-ubuntu
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: aoc-main
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-aoc-main-ubuntu
+
+  mise-cache-aoc-main-windows:
+    needs: mise-cache-root-windows
+    uses: ./.github/workflows/mise-prepare-cache.yaml
+    with:
+      directory: aoc-main
+      runner: windows-2025
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-mise-aoc-main-windows
+
+  # uv cache prepare for aoc-main
+  uv-cache-aoc-main-macos:
+    needs: mise-cache-aoc-main-macos
+    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
+    with:
+      directory: aoc-main
+      runner: macos-15
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-macos
+
+  uv-cache-aoc-main-ubuntu:
+    needs: mise-cache-aoc-main-ubuntu
+    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
+    with:
+      directory: aoc-main
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-ubuntu
+
+  uv-cache-aoc-main-windows:
+    needs: mise-cache-aoc-main-windows
+    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
+    with:
+      directory: aoc-main
+      runner: windows-2025
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-windows
+
+  # Checks for root
+  check-prettier:
+    needs: mise-cache-root-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:prettier
+
+  check-renovate-config:
+    needs: mise-cache-root-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:renovateconfig
+
+  # CI workflows for projects in the repository
+  ci-aoc-main:
+    needs:
+      - mise-cache-aoc-main-ubuntu
+      - uv-cache-aoc-main-ubuntu
+    uses: ./.github/workflows/ci-python-project.yaml
+    with:
+      directory: aoc-main
+
+  # CI for C++ solvers
+  ci-solvers-cpp:
+    needs:
+      - mise-cache-root-ubuntu
+      - uv-cache-aoc-main-ubuntu
+      - uv-cache-aoc-main-windows
+    uses: ./.github/workflows/ci-solvers-cpp.yaml
+
+  # CI for Python solvers
+  ci-solvers-python:
+    needs:
+      - mise-cache-root-ubuntu
+      - uv-cache-aoc-main-ubuntu
+    uses: ./.github/workflows/ci-python-project.yaml
+    with:
+      directory: solvers/python
+
+  # CI for Rust solvers
+  ci-solvers-rust:
+    needs:
+      - mise-cache-root-macos
+      - mise-cache-root-ubuntu
+      - mise-cache-root-windows
+      - uv-cache-aoc-main-macos
+      - uv-cache-aoc-main-ubuntu
+      - uv-cache-aoc-main-windows
+    uses: ./.github/workflows/ci-solvers-rust.yaml
+
+  # Check for all green CI
+  check:
+    if: always()
+    needs:
+      - check-prettier
+      - check-renovate-config
+      - ci-aoc-main
+      - ci-solvers-cpp
+      - ci-solvers-python
+      - ci-solvers-rust
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - uses: re-actors/alls-green@v1.2.2
+        with:
+          jobs: ${{ toJSON(needs) }}

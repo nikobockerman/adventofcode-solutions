@@ -1,0 +1,36 @@
+name: Mise + uv - prepare cache
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: Directory containing uv project
+        required: true
+        type: string
+      runner:
+        description: Runner to use
+        required: true
+        type: string
+permissions:
+  contents: read
+
+jobs:
+  prepare-cache:
+    name: Prepare uv cache
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Restore mise project
+        uses: ./.github/actions/mise-project-setup
+        with:
+          cache-mode: use
+          directory: ${{ inputs.directory }}
+
+      - name: Prepare cache
+        uses: ./.github/actions/uv-project-setup
+        with:
+          cache-mode: prepare
+          directory: ${{ inputs.directory }}

@@ -1,0 +1,14 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+Standard: c++20
+WrapNamespaceBodyWithEmptyLines: Always
+IncludeCategories:
+  - Regex: '^".*"$'
+    Priority: 1
+  - Regex: "^<(fmt|spdlog|gtest)/.*>$"
+    Priority: 2
+  - Regex: "^<.*"
+    Priority: 3

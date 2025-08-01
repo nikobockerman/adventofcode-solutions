@@ -1,0 +1,7 @@
+---
+Checks: >-
+  bugprone-*, cert-*, clang-diagnostic-*, clang-analyzer-*, concurrency-*,
+  cppcoreguidelines-*, google-*, hicpp-*, misc-*, modernize-*, performance-*,
+  portability-*, readability-*, -readability-identifier-length
+WarningsAsErrors: "*"
+HeaderFilterRegex: ".*"

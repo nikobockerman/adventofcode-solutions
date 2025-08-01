@@ -1,0 +1,42 @@
+[tools]
+"npm:pyright" = "latest"
+python = "3.13"
+"pipx:mypy" = "latest"
+ruff = "latest"
+uv = "latest"
+
+[tasks.check]
+depends = [
+  "check:mypy",
+  "check:pyright",
+  "check:pytest",
+  "check:ruff",
+  "check:ruff:format"
+]
+
+[tasks."check:mypy"]
+run = "mypy --python-executable $(uv python find) ."
+
+[tasks."check:pyright"]
+run = "uv run pyright"
+
+[tasks."check:pytest"]
+run = "uv run pytest"
+
+[tasks."check:ruff"]
+run = "ruff check"
+
+[tasks."check:ruff:format"]
+run = "ruff format --check"
+
+[tasks.fix]
+depends = [
+  "fix:ruff:format",
+  "fix:ruff",
+]
+
+[tasks."fix:ruff:format"]
+run = "ruff format"
+
+[tasks."fix:ruff"]
+run = "ruff check --fix-only"

@@ -1,0 +1,4 @@
+[submodule "solvers/cpp/cmake-conan"]
+	path = solvers/cpp/cmake-conan
+	url = https://github.com/conan-io/cmake-conan.git
+	branch = develop2
