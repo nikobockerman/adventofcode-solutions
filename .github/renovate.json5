@@ -24,5 +24,11 @@
       matchPackageNames: ["jdx/mise"],
       minimumReleaseAge: "1 day",
     },
+    {
+      description: "Don't pin requires-python in pyproject.toml files",
+      matchDepTypes: ["requires-python"],
+      matchPackageNames: ["python"],
+      pin: { enabled: false },
+    },
   ],
 }
