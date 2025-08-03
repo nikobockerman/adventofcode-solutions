@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup tools through mise
         uses: ./.github/actions/mise-project-setup
@@ -48,7 +48,7 @@ jobs:
           directory: solvers/rust
 
       - name: Setup rust cache
-        uses: Swatinem/rust-cache@v2.8.0
+        uses: Swatinem/rust-cache@98c8021b550208e191a6a3145459bfc9fb29c4c0 # v2.8.0
         with:
           key: ${{ matrix.profile }}
           workspaces: solvers/rust
