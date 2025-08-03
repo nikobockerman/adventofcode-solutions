@@ -1,6 +1,6 @@
 [tools]
-clang-format = "20"
-conan = "latest"
+clang-format = "20.1.8"
+conan = "2.19.1"
 
 [tasks.check]
 depends = [

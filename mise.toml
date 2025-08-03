@@ -1,5 +1,5 @@
 [tools]
-"npm:prettier" = "latest"
+prettier = "3.6.2"
 
 [vars]
 DEFAULT_YEAR = "{{ get_env(name='YEAR', default='2024') }}"

@@ -1,9 +1,9 @@
 [tools]
-"npm:pyright" = "latest"
-python = "3.13"
-"pipx:mypy" = "latest"
-ruff = "latest"
-uv = "latest"
+"npm:pyright" = "1.1.403"
+python = "3.13.2"
+"pipx:mypy" = "1.17.1"
+ruff = "0.12.7"
+uv = "0.8.4"
 
 [tasks.check]
 depends = [
