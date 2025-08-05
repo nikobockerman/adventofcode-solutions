@@ -35,8 +35,23 @@ elif [ ! -f "$DIRECTORY/uv.lock" ]; then
   exit 1
 fi
 
+pushd "$DIRECTORY"
+python_version=$(python -c 'import sys; print(f".".join(map(str, sys.version_info[:3])))')
+mise_python_version=$(mise ls --current --json python | jq -r '.[0].version')
+popd
+echo "::debug Python version: $python_version"
+echo "::debug Mise Python version: $mise_python_version"
+if [ -z "$python_version" ]; then
+  echo "::error Failed to determine Python version"
+  exit 1
+fi
+if [ "$mise_python_version" != "$python_version" ]; then
+  echo "::error Python version mismatch: $mise_python_version != $python_version"
+  exit 1
+fi
+
 dir_key=${DIRECTORY/\//-}
-cache_key_prefix="uv-${dir_key}-${RUNNER_OS}"
+cache_key_prefix="uv-${dir_key}-${RUNNER_OS}-${python_version}"
 cache_key_uv_directory=$(sha256sum "${DIRECTORY}/uv.lock" | cut -d ' ' -f 1)
 cache_key_uv_aoc_main=""
 if [ "$DIRECTORY" != "aoc-main" ]; then
