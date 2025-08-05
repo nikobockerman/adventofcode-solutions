@@ -1,0 +1,31 @@
+name: Cleanup GitHub runner caches on closed pull requests
+on:
+  pull_request:
+    types:
+      - closed
+permissions: {}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Cleanup
+
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
+        run: |
+          echo "Fetching list of cache keys"
+          cacheIdsForPR=$(gh cache list --ref "$BRANCH" --limit 100 --json id --jq '.[].id')
+
+          echo "::group::Deleting caches..."
+          for cacheId in $cacheIdsForPR
+          do
+            echo "Deleting cache: $cacheId"
+            gh cache delete "$cacheId"
+          done
+          echo "Done"
+          echo "::endgroup::"
