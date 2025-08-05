@@ -91,3 +91,11 @@ runs:
           echo "::endgroup::"
         done
       shell: bash
+
+    - name: Set final changes for rest of workflow
+      run: |
+        echo ::group::Environment changes for rest of workflow
+        echo "Disable uv downloads with UV_PYTHON_DOWNLOADS=never"
+        echo "UV_PYTHON_DOWNLOADS=never" >> "$GITHUB_ENV"
+        echo "::endgroup::"
+      shell: bash
