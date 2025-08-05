@@ -10,7 +10,7 @@ runs:
 
     - name: Setup Conan Client
       # TODO: Setup only conan package cache here and use conan through mise
-      uses: conan-io/setup-conan@434f093a557d1ee6972c4ed78693c3191653537b # v1.1.0
+      uses: conan-io/setup-conan@09566912d661de90608308897a4d513e850c04e8 # v1.2.0
       with:
         cache_packages: true
 
