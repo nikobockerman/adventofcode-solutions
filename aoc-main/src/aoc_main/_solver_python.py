@@ -25,7 +25,9 @@ class SolverPython:
 
     async def _uv_sync(self, *, dry_run: bool) -> None:
         _logger.info("CMake configure")
-        args = ["mise", "exec", "--", "uv", "sync", "--inexact", "--frozen"]
+        args = ["mise", "exec", "--", "uv", "sync", "--inexact"]
+        if "UV_LOCKED" not in os.environ:
+            args.append("--frozen")
         if dry_run:
             args.insert(0, "echo")
 

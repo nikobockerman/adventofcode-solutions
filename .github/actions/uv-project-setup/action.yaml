@@ -76,3 +76,13 @@ runs:
           echo "::endgroup::"
         done
       shell: bash
+
+    - name: Adjust environment for rest of workflow
+      run: |
+        echo ::group::Environment changes for rest of workflow
+        echo "Set uv to locked mode: UV_LOCKED=1"
+        echo "UV_LOCKED=1" >> "$GITHUB_ENV"
+        echo "Set uv to offline mode: UV_OFFLINE=1"
+        echo "UV_OFFLINE=1" >> "$GITHUB_ENV"
+        echo "::endgroup::"
+      shell: bash
