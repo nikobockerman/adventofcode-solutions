@@ -3,7 +3,7 @@
 python = "3.13.5"
 "pipx:mypy" = "1.17.1"
 ruff = "0.12.7"
-uv = "0.8.4"
+uv = "0.8.5"
 
 [tasks.check]
 depends = [
