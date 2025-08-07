@@ -39,15 +39,15 @@ pub fn p2(input: &str) -> Answer {
         .filter(|pages| !contains_correctly_ordered_update_pages(&dependencies, pages))
         .map(|mut pages| {
             pages.sort_by(|a, b| {
-                if let Some(a_deps) = dependencies.get(a) {
-                    if a_deps.contains(b) {
-                        return std::cmp::Ordering::Less;
-                    }
+                if let Some(a_deps) = dependencies.get(a)
+                    && a_deps.contains(b)
+                {
+                    return std::cmp::Ordering::Less;
                 }
-                if let Some(b_deps) = dependencies.get(b) {
-                    if b_deps.contains(a) {
-                        return std::cmp::Ordering::Greater;
-                    }
+                if let Some(b_deps) = dependencies.get(b)
+                    && b_deps.contains(a)
+                {
+                    return std::cmp::Ordering::Greater;
                 }
                 std::cmp::Ordering::Equal
             });
@@ -71,10 +71,10 @@ fn contains_correctly_ordered_update_pages(
 ) -> bool {
     let mut pages_before: HashSet<u8> = HashSet::new();
     pages.iter().all(|page| {
-        if let Some(deps) = dependencies.get(page) {
-            if !pages_before.is_disjoint(deps) {
-                return false;
-            }
+        if let Some(deps) = dependencies.get(page)
+            && !pages_before.is_disjoint(deps)
+        {
+            return false;
         }
         pages_before.insert(*page);
         true
