@@ -1,9 +1,11 @@
 [tools]
+# uv before python as mise uses uv to install python
+uv = "0.8.6"
+
 "npm:pyright" = "1.1.403"
 python = "3.13.5"
 "pipx:mypy" = "1.17.1"
 ruff = "0.12.7"
-uv = "0.8.6"
 
 [tasks.check]
 depends = [
