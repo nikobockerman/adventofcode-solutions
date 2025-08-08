@@ -2,7 +2,7 @@
 "npm:pyright" = "1.1.403"
 python = "3.13.6"
 "pipx:mypy" = "1.17.1"
-ruff = "0.12.7"
+ruff = "0.12.8"
 uv = "0.8.6"
 
 [tasks.check]
