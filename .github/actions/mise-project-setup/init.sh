@@ -13,11 +13,9 @@ fi
 case "$CACHE_MODE" in
   prepare)
     save_cache=true
-    fail_on_cache_miss=false
     ;;
   use)
     save_cache=false
-    fail_on_cache_miss=true
     ;;
   *)
     echo "::error Unknown cache mode: $CACHE_MODE"
@@ -85,7 +83,6 @@ cargo_home="${RUNNER_TEMP}${SEP}aoc-cargo-home"
 # Set outputs
 {
   echo "cache-key=${cache_key}"
-  echo "fail-on-cache-miss=${fail_on_cache_miss}"
   echo "mise-version=${MISE_VERSION}"
   echo "save-cache=${save_cache}"
 
