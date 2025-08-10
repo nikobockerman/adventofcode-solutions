@@ -3,11 +3,7 @@
 set -xe
 
 case "$CACHE_MODE" in
-  prepare)
-    save_cache=true
-    ;;
-  use)
-    save_cache=false
+  prepare|use)
     ;;
   *)
     echo "::error Unknown cache mode: $CACHE_MODE"
@@ -72,7 +68,6 @@ uv_cache_dir="${RUNNER_TEMP}/aoc-uv-cache"
 # Set outputs
 {
   echo "cache-key=${cache_key}"
-  echo "save-cache=${save_cache}"
 
   # Install directories
   echo "uv-install-directories<<ENDDIRS"
