@@ -11,11 +11,7 @@ fi
 
 
 case "$CACHE_MODE" in
-  prepare)
-    save_cache=true
-    ;;
-  use)
-    save_cache=false
+  prepare|use)
     ;;
   *)
     echo "::error Unknown cache mode: $CACHE_MODE"
@@ -84,7 +80,6 @@ cargo_home="${RUNNER_TEMP}${SEP}aoc-cargo-home"
 {
   echo "cache-key=${cache_key}"
   echo "mise-version=${MISE_VERSION}"
-  echo "save-cache=${save_cache}"
 
   # Install directories
   echo "mise-install-directories<<ENDDIRS"
