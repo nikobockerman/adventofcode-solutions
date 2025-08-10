@@ -1,5 +1,11 @@
 [tools]
+# Basic technologies used in the repository
+python = "3.13.6"
+uv = "0.8.8"
+
+# Common tools
 prettier = "3.6.2"
+
 
 [vars]
 DEFAULT_YEAR = "{{ get_env(name='YEAR', default='2024') }}"
