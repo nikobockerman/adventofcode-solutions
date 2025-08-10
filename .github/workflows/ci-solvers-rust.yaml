@@ -5,42 +5,11 @@ permissions:
   contents: read
 
 jobs:
-  # Mise cache prepare
-  mise-cache-macos:
-    uses: ./.github/workflows/mise-prepare-cache.yaml
-    with:
-      directory: solvers/rust
-      runner: macos-15
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-rust-macos
-
-  mise-cache-ubuntu:
-    uses: ./.github/workflows/mise-prepare-cache.yaml
-    with:
-      directory: solvers/rust
-      runner: ubuntu-24.04
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-rust-ubuntu
-
-  mise-cache-windows:
-    uses: ./.github/workflows/mise-prepare-cache.yaml
-    with:
-      directory: solvers/rust
-      runner: windows-2025
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-rust-windows
-
   # Checks
   build-test-run:
-    needs:
-      - mise-cache-ubuntu
-      - mise-cache-macos
-      - mise-cache-windows
     uses: ./.github/workflows/rust-build-test-run.yaml
 
   check-rustfmt:
-    needs: mise-cache-ubuntu
     uses: ./.github/workflows/mise-task.yaml
     with:
       directory: solvers/rust

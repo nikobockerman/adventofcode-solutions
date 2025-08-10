@@ -10,20 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  # Mise and uv cache prepare
-  mise-cache:
-    if: inputs.directory != 'aoc-main'
-    uses: ./.github/workflows/mise-prepare-cache.yaml
-    with:
-      directory: ${{ inputs.directory }}
-      runner: ubuntu-24.04
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-mise-${{ inputs.directory }}
-
   uv-cache:
     if: inputs.directory != 'aoc-main'
-    needs: mise-cache
     uses: ./.github/workflows/mise-uv-prepare-cache.yaml
     with:
       directory: ${{ inputs.directory }}
@@ -50,16 +38,12 @@ jobs:
       task: check:pyright
 
   check-ruff:
-    if: always() && contains(fromJSON('["skipped", "success"]'), needs.mise-cache.result)
-    needs: mise-cache
     uses: ./.github/workflows/mise-task.yaml
     with:
       directory: ${{ inputs.directory }}
       task: check:ruff
 
   check-ruff-format:
-    if: always() && contains(fromJSON('["skipped", "success"]'), needs.mise-cache.result)
-    needs: mise-cache
     uses: ./.github/workflows/mise-task.yaml
     with:
       directory: ${{ inputs.directory }}

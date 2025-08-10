@@ -5,22 +5,11 @@ permissions:
   contents: read
 
 jobs:
-  # Mise cache prepare
-  mise-cache:
-    uses: ./.github/workflows/mise-prepare-cache.yaml
-    with:
-      directory: solvers/cpp
-      runner: ubuntu-24.04
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-cpp
-
   # Checks
   build-test-run:
     uses: ./.github/workflows/cpp-build-test-run.yaml
 
   check-clang-format:
-    needs: mise-cache
     uses: ./.github/workflows/mise-task.yaml
     with:
       directory: solvers/cpp
