@@ -6,7 +6,7 @@ inputs:
     required: false
     default: use
   directory:
-    description: Directory where mise and tools will be used in
+    description: Directory where mise and tools will be used in. Must be set to "" if `cache-mode` is "prepare".
     required: true
 
 runs:
@@ -17,9 +17,9 @@ runs:
 
       env:
         CACHE_MODE: ${{ inputs.cache-mode }}
+        DIRECTORY: ${{ inputs.directory }}
         # renovate: datasource=github-releases depName=jdx/mise
         MISE_VERSION: v2025.8.7
-        DIRECTORY: ${{ inputs.directory }}
       run: "${GITHUB_ACTION_PATH}/init.sh"
       shell: bash
 
@@ -27,9 +27,11 @@ runs:
       name: Mise cache restore
       uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
-        key: ${{ steps.init.outputs.cache-key }}
+        key: mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml', 'solvers/*/mise.toml') }}
         path: ${{ steps.init.outputs.cache-paths }}
-        restore-keys: ${{ steps.init.outputs.cache-restore-keys }}
+        restore-keys: |
+          mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-${{ hashFiles('mise.toml') }}-
+          mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-
 
     - name: Install mise
       uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2.4.4
@@ -83,7 +85,7 @@ runs:
         for dir in $DIRECTORIES; do
           echo "::group::Ensure dependencies: $dir"
           pushd "$dir"
-          mise ls --current --missing
+          mise ls --current
           count=$(mise ls --current --missing --no-header | wc -l)
           if [ $count -gt 0 ]; then
             echo "Missing tools: $count"
