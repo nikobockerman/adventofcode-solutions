@@ -1,11 +1,3 @@
-#![warn(
-    clippy::complexity,
-    clippy::correctness,
-    clippy::pedantic,
-    clippy::perf,
-    clippy::style,
-    clippy::suspicious
-)]
 use aoc::answer::Answer;
 use itertools::Itertools;
 use std::collections::HashMap;
