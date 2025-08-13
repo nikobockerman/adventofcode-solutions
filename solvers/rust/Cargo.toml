@@ -18,3 +18,13 @@ suspicious = { level = "warn", priority = -1 }
 
 # Allowed lints
 missing_panics_doc = "allow"
+
+[lints.rust]
+# Lint groups: https://doc.rust-lang.org/rustc/lints/groups.html
+deprecated-safe = "warn"
+future-incompatible = "warn"
+keyword-idents = "warn"
+let-underscore = "warn"
+nonstandard-style = "warn"
+refining-impl-trait = "warn"
+unused = "warn"
