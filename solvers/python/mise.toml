@@ -1,7 +1,7 @@
 [tools]
 "npm:pyright" = "1.1.403"
 "pipx:mypy" = "1.17.1"
-ruff = "0.12.8"
+ruff = "0.12.9"
 
 [tasks.check]
 depends = [
