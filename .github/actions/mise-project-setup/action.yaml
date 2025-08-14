@@ -51,6 +51,10 @@ runs:
 
       env:
         DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
+
+        # Mise settings for CI
+        ## Only use precompiled python binaries
+        MISE_PYTHON_COMPILE: false
       run: |
         set -x
         # Unset in case it is set by an earlier run of this action
