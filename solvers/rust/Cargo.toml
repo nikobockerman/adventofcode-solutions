@@ -8,9 +8,13 @@ log = { version = "=0.4.27", features = ["release_max_level_warn"] }
 simple_logger = "=5.0.0"
 
 [lints.clippy]
-complexity = "warn"
-correctness = "warn"
-pedantic = "warn"
-perf = "warn"
-style = "warn"
-suspicious = "warn"
+# Lint groups: https://doc.rust-lang.org/clippy/lints.html
+complexity = { level = "warn", priority = -1 }
+correctness = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
+style = { level = "warn", priority = -1 }
+suspicious = { level = "warn", priority = -1 }
+
+# Allowed lints
+missing_panics_doc = "allow"
