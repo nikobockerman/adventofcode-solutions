@@ -8,15 +8,8 @@ permissions: {}
 
 jobs:
   cleanup:
-    strategy:
-      matrix:
-        runner:
-          - macos-15
-          - ubuntu-24.04
-          - windows-2025
-
-    name: Cleanup caches - ${{ matrix.runner }}
-    runs-on: ${{ matrix.runner }}
+    name: Cleanup caches
+    runs-on: ubuntu-24.04
     permissions:
       actions: write
     steps:
