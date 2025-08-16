@@ -14,7 +14,7 @@ def log_group(name: str):
 
 
 with log_group("Fetching list of cache keys"):
-    query_prefix = f"mise-{os.environ['RUNNER_OS']}-"
+    query_prefix = "mise-"
     result = subprocess.run(
         [
             "gh",
@@ -31,7 +31,7 @@ with log_group("Fetching list of cache keys"):
     caches = json.loads(result.stdout)
 
 with log_group("Determining which caches to keep"):
-    keep_prefix = f"mise-{os.environ['RUNNER_OS']}-{os.environ['MISE_VERSION']}-"
+    keep_prefix = f"{query_prefix}{os.environ['MISE_VERSION']}-"
     cacheIdsToDelete = set()
     for item in caches:
         if item["key"].startswith(keep_prefix):

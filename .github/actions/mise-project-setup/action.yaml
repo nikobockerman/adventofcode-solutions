@@ -27,11 +27,12 @@ runs:
       name: Mise cache restore
       uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
-        key: mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml', 'solvers/*/mise.toml') }}
+        key: mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-${{ hashFiles('solvers/*/mise.toml') }}
         path: ${{ steps.init.outputs.cache-paths }}
         restore-keys: |
-          mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-${{ hashFiles('mise.toml') }}-
-          mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-
+          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-
+          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-
+          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-
 
     - name: Install mise
       uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2.4.4
