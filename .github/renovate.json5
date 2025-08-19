@@ -25,10 +25,10 @@
       minimumReleaseAge: "1 day",
     },
     {
-      description: "Python prebuilt binaries for mise installation take some time to be available. Delay python updates.",
+      description: "Python prebuilt binaries take some time to be available. Delay python updates.",
       matchManagers: ["mise"],
       matchPackageNames: ["python/cpython"],
-      minimumReleaseAge: "1 day",
+      minimumReleaseAge: "1 week",
     },
     {
       description: "Don't pin requires-python in pyproject.toml files",
