@@ -35,7 +35,7 @@ runs:
           mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-
 
     - name: Install mise
-      uses: jdx/mise-action@c0b8518a9f5e56c720e9545c993b77ff15dc7b27 # v3.0.2
+      uses: jdx/mise-action@ca0c5fc9c8a8386dae8ba5d37608a083a307991c # v3.1.0
 
       env:
         # Action fails on Windows without this as moving from C: to D: fails
