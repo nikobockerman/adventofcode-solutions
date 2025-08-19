@@ -64,7 +64,7 @@ runs:
         for dir in $DIRECTORIES; do
           echo "::group::Install mise tools: $dir"
           pushd "$dir"
-          mise install
+          mise upgrade
           popd
           echo "::endgroup::"
         done
