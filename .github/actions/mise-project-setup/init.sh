@@ -73,8 +73,8 @@ echo "::group::Outputs from init"
       echo solvers/python
     fi
     echo solvers/rust
-  else
-    if [ "$DIRECTORY" != "."  ] && [ "$DIRECTORY" != "aoc-main" ]; then
+  elif [ "$DIRECTORY" != "."  ]; then
+    if [ "$DIRECTORY" != "aoc-main" ]; then
       echo "aoc-main"
     fi
     echo "${DIRECTORY}"
