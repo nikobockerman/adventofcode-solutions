@@ -13,14 +13,15 @@ runs:
   using: composite
   steps:
     - id: init
-      name: Prepare variables
 
       env:
         CACHE_MODE: ${{ inputs.cache-mode }}
         DIRECTORY: ${{ inputs.directory }}
         # renovate: datasource=github-releases depName=jdx/mise
         MISE_VERSION: v2025.8.13
-      run: "${GITHUB_ACTION_PATH}/init.sh"
+      run: |
+        # Initialize mise-project-setup action
+        "${GITHUB_ACTION_PATH}/init.sh"
       shell: bash
 
     - id: cache-restore
@@ -48,7 +49,6 @@ runs:
         working_directory: ${{ inputs.directory }}
 
     - if: steps.cache-restore.outputs.cache-hit != 'true'
-      name: Install tools
 
       env:
         DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
@@ -57,6 +57,8 @@ runs:
         ## Only use precompiled python binaries
         MISE_PYTHON_COMPILE: false
       run: |
+        # Install mise tools
+
         # Unset in case it is set by an earlier run of this action
         unset UV_PYTHON_DOWNLOADS
 
@@ -80,11 +82,11 @@ runs:
         key: ${{ steps.cache-restore.outputs.cache-primary-key }}
         path: ${{ steps.init.outputs.cache-paths }}
 
-    - name: Ensure tools are installed properly
-
-      env:
+    - env:
         DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
       run: |
+        # Ensure tools are installed properly
+
         err=false
         for dir in $DIRECTORIES; do
           echo "::group::Ensure dependencies: $dir"
@@ -106,8 +108,9 @@ runs:
         fi
       shell: bash
 
-    - name: Set final changes for rest of workflow
-      run: |
+    - run: |
+        # Set final changes for rest of workflow
+
         echo "::group::Environment changes for rest of workflow"
         echo "UV_PYTHON_DOWNLOADS=never" | tee -a "$GITHUB_ENV"
         echo "::endgroup::"
