@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -euo pipefail
 
 # TODO: Verify whether SEP is needed or not
 if [ "$RUNNER_OS" = "Windows" ]; then
@@ -14,14 +14,14 @@ case "$CACHE_MODE" in
   prepare|use)
     ;;
   *)
-    echo "::error Unknown cache mode: $CACHE_MODE"
+    echo "::error::Unknown cache mode: $CACHE_MODE"
     exit 1
     ;;
 esac
 
 if [ "$CACHE_MODE" = "prepare" ]; then
   if [ -n "${DIRECTORY}" ]; then
-    echo "::error Directory must be empty for prepare mode"
+    echo "::error::Directory must be empty for prepare mode"
     exit 1
   fi
 
@@ -29,13 +29,13 @@ if [ "$CACHE_MODE" = "prepare" ]; then
 fi
 
 if [ -z "${DIRECTORY}" ]; then
-  echo "::error Empty DIRECTORY is not supported"
+  echo "::error::Empty DIRECTORY is not supported"
   exit 1
 elif [ ! -d "$DIRECTORY" ]; then
-  echo "::error Directory does not exist: $DIRECTORY"
+  echo "::error::Directory does not exist: $DIRECTORY"
   exit 1
 elif [ ! -f "$DIRECTORY/mise.toml" ]; then
-  echo "::error Directory does not contain mise.toml: $DIRECTORY"
+  echo "::error::Directory does not contain mise.toml: $DIRECTORY"
   exit 1
 fi
 
@@ -47,14 +47,15 @@ rustup_home="${RUNNER_TEMP}${SEP}aoc-rustup-home"
 cargo_home="${RUNNER_TEMP}${SEP}aoc-cargo-home"
 
 
-# Set environment variables for remaining workflow
+echo "::group::Environment variable changes"
 {
   echo "CARGO_HOME=$(echo "${cargo_home}" | tr -d '\n')"
   echo "MISE_DATA_DIR=$(echo "${mise_data_dir}" | tr -d '\n')"
   echo "RUSTUP_HOME=$(echo "${rustup_home}" | tr -d '\n')"
-} >> "$GITHUB_ENV"
+} | tee -a "$GITHUB_ENV"
+echo "::endgroup::"
 
-# Set outputs
+echo "::group::Outputs from init"
 {
   echo "mise-version=${MISE_VERSION}"
 
@@ -86,4 +87,5 @@ cargo_home="${RUNNER_TEMP}${SEP}aoc-cargo-home"
   echo "${mise_data_dir}"
   echo "${rustup_home}"
   echo "ENDPATHS"
-} >> "$GITHUB_OUTPUT"
+} | tee -a "$GITHUB_OUTPUT"
+echo "::endgroup::"
