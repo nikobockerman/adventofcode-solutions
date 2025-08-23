@@ -1,7 +1,7 @@
 [requires]
 fmt/11.2.0
 spdlog/1.15.3
-gtest/1.16.0
+gtest/1.17.0
 
 [generators]
 CMakeDeps
