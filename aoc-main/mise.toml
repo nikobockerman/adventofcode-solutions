@@ -1,5 +1,5 @@
 [tools]
-"npm:pyright" = "1.1.403"
+"npm:pyright" = "1.1.404"
 "pipx:mypy" = "1.17.1"
 ruff = "0.12.10"
 
