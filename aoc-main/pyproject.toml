@@ -30,22 +30,9 @@ addopts = [
   "--import-mode=importlib",
 ]
 
-[tool.ruff.lint]
-select = ["ALL"]
-ignore = [
-  "COM812",
-  "D10",
-  "FIX",
-  "ISC001",
-  "PLR2004",
-  "S101",
-  "TD002",
-  "TD003"
-]
+[tool.ruff]
+extend = "../ruff.toml"
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/aoc_main/main.py" = ["T201"]
 "tests/**/*.py" = ["INP001"]
-
-[tool.ruff.lint.pydocstyle]
-convention = "pep257"
