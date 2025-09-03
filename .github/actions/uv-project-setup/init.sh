@@ -32,15 +32,23 @@ fi
 pushd "$DIRECTORY"
 python_version=$(python -c 'import sys; print(f".".join(map(str, sys.version_info[:3])))')
 mise_python_version=$(mise ls --current --json python | jq -r '.[0].version')
+mise_uv_version=$(mise ls --current --json uv | jq -r '.[0].version')
 popd
 echo "::debug Python version: $python_version"
 echo "::debug Mise Python version: $mise_python_version"
+echo "::debug Mise uv version: $mise_uv_version"
+
 if [ -z "$python_version" ]; then
   echo "::error Failed to determine Python version"
   exit 1
 fi
 if [ "$mise_python_version" != "$python_version" ]; then
   echo "::error Python version mismatch: $mise_python_version != $python_version"
+  exit 1
+fi
+
+if [ -z "$mise_uv_version" ]; then
+  echo "::error Failed to determine uv version"
   exit 1
 fi
 
@@ -52,12 +60,6 @@ if [ "$DIRECTORY" != "aoc-main" ]; then
   cache_key_uv_aoc_main=$(sha256sum "aoc-main/uv.lock" | cut -d ' ' -f 1)
 fi
 
-cache_key="${cache_key_prefix}-${cache_key_uv_directory}"
-if [ -n "${cache_key_uv_aoc_main}" ]; then
-  cache_key="${cache_key}-${cache_key_uv_aoc_main}"
-fi
-
-
 uv_cache_dir="${RUNNER_TEMP}/aoc-uv-cache"
 
 # Set environment variables for remaining workflow
@@ -67,8 +69,6 @@ uv_cache_dir="${RUNNER_TEMP}/aoc-uv-cache"
 
 # Set outputs
 {
-  echo "cache-key=${cache_key}"
-
   # Install directories
   echo "uv-install-directories<<ENDDIRS"
   echo "${DIRECTORY}"
@@ -77,11 +77,19 @@ uv_cache_dir="${RUNNER_TEMP}/aoc-uv-cache"
   fi
   echo "ENDDIRS"
 
+  # Cache key
+  cache_key="${cache_key_prefix}-${mise_uv_version}-${cache_key_uv_directory}"
+  if [ -n "${cache_key_uv_aoc_main}" ]; then
+    cache_key="${cache_key}-${cache_key_uv_aoc_main}"
+  fi
+  echo "cache-key=${cache_key}"
+
   # Cache restore keys
   echo "cache-restore-keys<<ENDKEYS"
   if [ -n "${cache_key_uv_aoc_main}" ]; then
-    echo "${cache_key_prefix}-${cache_key_uv_directory}"-
+    echo "${cache_key_prefix}-${mise_uv_version}-${cache_key_uv_directory}"-
   fi
+  echo "${cache_key_prefix}-${mise_uv_version}-"
   echo "${cache_key_prefix}-"
   echo "ENDKEYS"
 
