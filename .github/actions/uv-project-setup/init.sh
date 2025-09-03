@@ -79,12 +79,10 @@ uv_cache_dir="${RUNNER_TEMP}/aoc-uv-cache"
 
   # Cache restore keys
   echo "cache-restore-keys<<ENDKEYS"
-  if [ "$CACHE_MODE" = "prepare" ]; then
-    if [ -n "${cache_key_uv_aoc_main}" ]; then
-      echo "${cache_key_prefix}-${cache_key_uv_directory}"-
-    fi
-    echo "${cache_key_prefix}-"
+  if [ -n "${cache_key_uv_aoc_main}" ]; then
+    echo "${cache_key_prefix}-${cache_key_uv_directory}"-
   fi
+  echo "${cache_key_prefix}-"
   echo "ENDKEYS"
 
   # Cache paths
