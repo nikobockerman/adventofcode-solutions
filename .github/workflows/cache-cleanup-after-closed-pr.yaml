@@ -7,7 +7,8 @@ permissions: {}
 
 jobs:
   cleanup:
-    runs-on: ubuntu-latest
+    name: Cleanup caches
+    runs-on: ubuntu-24.04
     permissions:
       actions: write
     steps:
@@ -29,3 +30,4 @@ jobs:
           done
           echo "Done"
           echo "::endgroup::"
+        shell: bash
