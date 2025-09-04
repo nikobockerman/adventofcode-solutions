@@ -8,7 +8,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "pytest ==8.4.1",
+  "pytest ==8.4.2",
   "types-PyYAML ==6.0.12.20250822"
 ]
 
