@@ -73,7 +73,7 @@ constexpr auto priority(char sharedItem) -> unsigned {
   throw std::runtime_error("Invalid character");
 }
 
-constexpr auto sumScore(auto &&items) -> uint64_t {
+constexpr auto sumScore(auto&& items) -> uint64_t {
   auto result = ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
     items |
       views::transform([](auto character) { return priority(character); }),
@@ -84,21 +84,21 @@ constexpr auto sumScore(auto &&items) -> uint64_t {
   return result.value();
 }
 
-constexpr auto middle(const auto &rucksack) {
+constexpr auto middle(const auto& rucksack) {
   if (modulo(rucksack.size(), 2) != 0) {
     throw std::runtime_error("Uneven length");
   }
   return rucksack.size() / 2;
 }
 
-constexpr auto getCompartments(const auto &rucksack) {
+constexpr auto getCompartments(const auto& rucksack) {
   const auto mid = middle(rucksack);
 
   return std::make_pair(rucksack | views::take(mid),
                         rucksack | views::drop(mid));
 }
 
-constexpr auto getSharedItem(auto &&rucksack) {
+constexpr auto getSharedItem(auto&& rucksack) {
   if (rucksack.empty()) {
     throw std::runtime_error("Empty rucksack");
   }
@@ -123,12 +123,12 @@ constexpr auto getSharedItem(auto &&rucksack) {
 auto solver::p1(std::string_view inputStr) -> Answer {
   return sumScore(
     splitLinesUntilEmpty(inputStr) |
-    views::transform([](auto &&line) { return getSharedItem(line); }));
+    views::transform([](auto&& line) { return getSharedItem(line); }));
 }
 
 namespace {
 
-constexpr auto getGroupBadgeItem(auto &&groupRuckSacks) -> char {
+constexpr auto getGroupBadgeItem(auto&& groupRuckSacks) -> char {
   auto end = groupRuckSacks.end();
   auto iter = groupRuckSacks.begin();
   auto first = vectorSet(*iter);
@@ -164,7 +164,7 @@ constexpr auto solve2(auto inputStr) {
 
   return sumScore(
     splitLinesUntilEmpty(inputStr) | views::chunk(groupSize) |
-    views::transform([](auto &&group) { return getGroupBadgeItem(group); }));
+    views::transform([](auto&& group) { return getGroupBadgeItem(group); }));
 }
 
 }  // namespace

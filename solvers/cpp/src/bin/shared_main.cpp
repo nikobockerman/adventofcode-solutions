@@ -26,7 +26,7 @@ enum class Part : std::uint8_t {
 
 auto argToInt(std::string_view arg) -> std::uint8_t {
   std::uint8_t value = 0;
-  const auto *last = arg.data() + arg.size();
+  const auto* last = arg.data() + arg.size();
   if (auto [ptr,
             ec]{std::from_chars(arg.data(), arg.data() + arg.size(), value)};
       ec != std::errc() || ptr != last) {
@@ -35,7 +35,7 @@ auto argToInt(std::string_view arg) -> std::uint8_t {
   return value;
 }
 
-auto processArgs(const std::span<const char *> args) {
+auto processArgs(const std::span<const char*> args) {
   if (args.size() != 3) {
     throw std::runtime_error(
       std::format("Invalid number of arguments: {}", args.size()));
@@ -60,7 +60,7 @@ auto processArgs(const std::span<const char *> args) {
   return std::array{Part::P1, Part::P2}.at(part - 1);
 }
 
-auto run(const std::span<const char *> &args) -> int {
+auto run(const std::span<const char*>& args) -> int {
   const auto part = processArgs(args);
 
   auto stderr_logger = spdlog::stderr_color_mt("stderr");
@@ -88,6 +88,6 @@ auto run(const std::span<const char *> &args) -> int {
 }  // namespace
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-auto main(const int argc, const char *argv[]) -> int {
+auto main(const int argc, const char* argv[]) -> int {
   return run(std::span(argv, argc));
 }

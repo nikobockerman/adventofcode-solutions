@@ -84,7 +84,7 @@ constexpr auto parseOpponent(char move) {
   }
 }
 
-constexpr auto parseBattleMarks(auto &&line) {
+constexpr auto parseBattleMarks(auto&& line) {
   auto end = line.end();
   auto iter = line.begin();
   auto opponentMark = *iter;
@@ -96,14 +96,14 @@ constexpr auto parseBattleMarks(auto &&line) {
   return std::make_pair(opponentMark, meMark);
 }
 
-constexpr auto getBattleMarks(auto &&range) {
+constexpr auto getBattleMarks(auto&& range) {
   return splitLinesUntilEmpty(range) |
-         views::transform([](auto &&line) { return parseBattleMarks(line); });
+         views::transform([](auto&& line) { return parseBattleMarks(line); });
 }
 
-constexpr auto sumBattleScores(auto &&range) -> uint64_t {
+constexpr auto sumBattleScores(auto&& range) -> uint64_t {
   auto result = ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
-    range | views::transform([](auto &&battle) { return battle.score(); }),
+    range | views::transform([](auto&& battle) { return battle.score(); }),
     std::plus());
   if (!result) {
     throw std::runtime_error("No result");

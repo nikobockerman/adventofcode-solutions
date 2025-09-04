@@ -12,7 +12,7 @@ class TestFixture : public ::testing::Test {
 };
 
 template <typename TAnswer>
-auto verifyResult(const Answer &result, const TAnswer &expected) {
+auto verifyResult(const Answer& result, const TAnswer& expected) {
   ASSERT_TRUE(std::holds_alternative<TAnswer>(result));
   EXPECT_EQ(std::get<TAnswer>(result), expected);
 }

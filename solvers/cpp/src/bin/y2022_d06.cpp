@@ -16,9 +16,9 @@ using namespace std::string_view_literals;
 namespace {
 
 template <std::size_t windowSize>
-constexpr auto firstDistinctWindow(auto &&range) {
+constexpr auto firstDistinctWindow(auto&& range) {
   auto notStarts =
-    range | views::slide(windowSize) | views::take_while([](auto &&window) {
+    range | views::slide(windowSize) | views::take_while([](auto&& window) {
       auto vector = window | ranges::to<std::vector>();
       ranges::sort(vector);
       return ranges::adjacent_find(vector) != vector.end();
