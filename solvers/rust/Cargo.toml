@@ -4,7 +4,7 @@ edition = "2024"
 
 [dependencies]
 itertools = "=0.14.0"
-log = { version = "=0.4.27", features = ["release_max_level_warn"] }
+log = { version = "=0.4.28", features = ["release_max_level_warn"] }
 simple_logger = "=5.0.0"
 
 [lints.clippy]
