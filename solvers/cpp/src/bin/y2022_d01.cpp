@@ -23,7 +23,7 @@ using namespace std::string_literals;
 
 namespace {
 
-constexpr auto resolveCalorieSums(auto &&input) {
+constexpr auto resolveCalorieSums(auto&& input) {
   return input | views::split("\n\n"sv) |
          views::transform([](auto calorieLines) {
            return ranges::fold_left_first(  // NOLINT(misc-include-cleaner)

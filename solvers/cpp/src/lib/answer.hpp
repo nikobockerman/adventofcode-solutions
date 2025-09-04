@@ -13,12 +13,12 @@ namespace fmt {
 template <>
 struct formatter<Answer> {
   template <typename ParseContext>
-  constexpr auto parse(ParseContext &ctx) const {
+  constexpr auto parse(ParseContext& ctx) const {
     return ctx.begin();
   }
 
   template <typename FormatContext>
-  auto format(const Answer &result, FormatContext &ctx) const {
+  auto format(const Answer& result, FormatContext& ctx) const {
     if (std::holds_alternative<uint64_t>(result)) {
       return fmt::format_to(ctx.out(), "{}", std::get<uint64_t>(result));
     }
