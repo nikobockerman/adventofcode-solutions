@@ -1,6 +1,7 @@
-lint.select = ["ALL"]
+[lint]
+select = ["ALL"]
 
-lint.ignore = [
+ignore = [
   "COM812",
   "D10",
   "FIX",
@@ -10,4 +11,11 @@ lint.ignore = [
   "TD002",
   "TD003"
 ]
-lint.pydocstyle.convention = "pep257"
+
+[lint.pydocstyle]
+convention = "pep257"
+
+[lint.per-file-ignores]
+".github/scripts/*.py" = [
+  "T201" # print
+]
