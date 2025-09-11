@@ -22,7 +22,7 @@ def main() -> None:
                 "gh",
                 "cache",
                 "list",
-                "--ref=main",
+                "--ref=refs/heads/main",
                 f"--key={query_prefix}",
                 "--limit=100",
                 "--json=id,key",
