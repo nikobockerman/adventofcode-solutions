@@ -1,6 +1,7 @@
 name: Check - clang-tidy
 on:
   workflow_call:
+  workflow_dispatch:
 permissions:
   contents: read
 

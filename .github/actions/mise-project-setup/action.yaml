@@ -2,9 +2,9 @@ name: mise project setup
 description: Setup mise and tools for project directory
 inputs:
   cache-mode:
+    default: use
     description: "Mode of operation regarding cache: 'prepare' or 'use'"
     required: false
-    default: use
   directory:
     description: Directory where mise and tools will be used in. Must be set to "" if `cache-mode` is "prepare".
     required: true

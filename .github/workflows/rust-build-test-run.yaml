@@ -1,6 +1,7 @@
 name: Rust build, test and run
 on:
   workflow_call:
+  workflow_dispatch:
 permissions:
   contents: read
 

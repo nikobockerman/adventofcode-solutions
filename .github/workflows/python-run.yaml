@@ -1,6 +1,7 @@
 name: Python run
 on:
   workflow_call:
+  workflow_dispatch:
 permissions:
   contents: read
 

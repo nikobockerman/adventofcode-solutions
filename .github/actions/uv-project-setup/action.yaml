@@ -2,9 +2,9 @@ name: mise + uv project setup
 description: Setup tools for uv project and install dependencies
 inputs:
   cache-mode:
+    default: use
     description: "Mode of operation regarding cache: 'prepare' or 'use'"
     required: false
-    default: use
   directory:
     description: Directory containing uv project.
     required: true
