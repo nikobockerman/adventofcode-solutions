@@ -43,6 +43,12 @@ jobs:
             workflowPreset: ci-gcc-14-debug
             run: true
 
+          # Clang from XCode on MacOS
+          - name: MacOS XCode Clang Release
+            os: macos-26
+            workflowPreset: ci-clang-release
+            run: true
+
     name: ${{ matrix.name }} - Build + test + run
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
