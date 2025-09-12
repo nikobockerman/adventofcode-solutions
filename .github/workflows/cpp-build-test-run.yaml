@@ -40,12 +40,12 @@ jobs:
             workflowPreset: ci-ubuntu-clang-debug
 
           - name: MacOS Clang Release
-            os: macos-15
+            os: macos-26
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
             workflowPreset: ci-macos-clang-release
 
           - name: MacOS Clang Debug
-            os: macos-15
+            os: macos-26
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
             workflowPreset: ci-macos-clang-debug
 

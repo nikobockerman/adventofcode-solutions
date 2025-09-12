@@ -19,7 +19,7 @@ jobs:
           - test
         runner:
           - ubuntu-24.04
-          - macos-15
+          - macos-26
           - windows-2025
         include:
           - clippy: false

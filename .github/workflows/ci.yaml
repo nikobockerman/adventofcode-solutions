@@ -16,7 +16,7 @@ jobs:
   mise-cache-macos:
     uses: ./.github/workflows/mise-prepare-cache.yaml
     with:
-      runner: macos-15
+      runner: macos-26
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-mise-root-macos
@@ -43,7 +43,7 @@ jobs:
     uses: ./.github/workflows/mise-uv-prepare-cache.yaml
     with:
       directory: aoc-main
-      runner: macos-15
+      runner: macos-26
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-macos
@@ -72,7 +72,7 @@ jobs:
   homebrew-cache-macos:
     uses: ./.github/workflows/homebrew-prepare-cache.yaml
     with:
-      runner: macos-15
+      runner: macos-26
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-homebrew-macos
