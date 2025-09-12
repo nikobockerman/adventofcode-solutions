@@ -6,6 +6,15 @@ on:
         description: Python project directory
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: Python project directory
+        options:
+          - aoc-main
+          - solvers/python
+        required: true
+        type: choice
 permissions:
   contents: read
 
