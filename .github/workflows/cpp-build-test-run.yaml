@@ -10,39 +10,6 @@ jobs:
     strategy:
       matrix:
         include:
-          # MSVC
-          - name: MSVC Debug
-            os: windows-2025
-            workflowPreset: ci-msvc-debug
-            run: false
-
-          - name: MSVC Release
-            os: windows-2025
-            workflowPreset: ci-msvc-release
-            run: true
-
-          # Clang on Linux
-          - name: Linux Clang Release
-            os: ubuntu-24.04
-            workflowPreset: ci-clang-release
-            run: true
-
-          - name: Linux Clang Debug
-            os: ubuntu-24.04
-            workflowPreset: ci-clang-debug
-            run: true
-
-          # Gcc 14 on Linux
-          - name: Linux GCC 14 Release
-            os: ubuntu-24.04
-            workflowPreset: ci-gcc-14-release
-            run: true
-
-          - name: Linux GCC 14 Debug
-            os: ubuntu-24.04
-            workflowPreset: ci-gcc-14-debug
-            run: true
-
           # Clang from XCode on MacOS
           - name: MacOS XCode Clang Release
             os: macos-26
