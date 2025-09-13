@@ -83,6 +83,20 @@ jobs:
       directory: .
       task: check:renovateconfig
 
+  check-ruff:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:ruff
+
+  check-ruff-format:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:ruff:format
+
   # CI workflows for projects in the repository
   ci-aoc-main:
     needs:
@@ -126,6 +140,8 @@ jobs:
     needs:
       - check-prettier
       - check-renovate-config
+      - check-ruff
+      - check-ruff-format
       - ci-aoc-main
       - ci-solvers-cpp
       - ci-solvers-python
