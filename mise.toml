@@ -5,6 +5,7 @@ uv = "0.8.17"
 
 # Common tools
 prettier = "3.6.2"
+ruff = "0.12.12"
 
 
 [vars]
@@ -64,6 +65,9 @@ shell = "sh -c"
 depends = [
   "check:prettier",
   "check:renovateconfig",
+  "check:ruff",
+  "check:ruff:format",
+
   "check:aoc-main",
   "check:solver:cpp",
   "check:solver:python",
@@ -92,6 +96,12 @@ prettier --ignore-path=.gitignore --ignore-path=.prettierignore "$userIgnoreArg"
 run = "renovate-config-validator --strict"
 tools."npm:renovate" = "latest"
 
+[tasks."check:ruff"]
+run = "ruff check"
+
+[tasks."check:ruff:format"]
+run = "ruff format --check"
+
 [tasks."check:aoc-main"]
 run = "mise run check"
 dir = "aoc-main"
@@ -111,6 +121,9 @@ dir = "solvers/rust"
 [tasks.fix]
 depends = [
   "fix:prettier",
+  "fix:ruff",
+  "fix:ruff:format",
+
   "fix:aoc-main",
   "fix:solver:cpp",
   "fix:solver:python",
@@ -119,6 +132,12 @@ depends = [
 
 [tasks."fix:prettier"]
 run = "prettier --write --cache-location .prettiercache ."
+
+[tasks."fix:ruff:format"]
+run = "ruff format"
+
+[tasks."fix:ruff"]
+run = "ruff check --fix-only"
 
 [tasks."fix:aoc-main"]
 run = "mise run fix"

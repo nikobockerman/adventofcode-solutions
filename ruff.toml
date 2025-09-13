@@ -1,3 +1,8 @@
+extend-exclude = [
+  "solvers/cpp/cmake-conan/**"
+]
+target-version = "py313"
+
 [lint]
 select = ["ALL"]
 

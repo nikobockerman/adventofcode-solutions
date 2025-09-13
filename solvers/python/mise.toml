@@ -1,15 +1,12 @@
 [tools]
 "npm:pyright" = "1.1.405"
 "pipx:mypy" = "1.18.1"
-ruff = "0.12.12"
 
 [tasks.check]
 depends = [
   "check:mypy",
   "check:pyright",
   "check:pytest",
-  "check:ruff",
-  "check:ruff:format"
 ]
 
 [tasks."check:mypy"]
@@ -21,20 +18,5 @@ run = "uv run pyright"
 [tasks."check:pytest"]
 run = "uv run pytest"
 
-[tasks."check:ruff"]
-run = "ruff check"
-
-[tasks."check:ruff:format"]
-run = "ruff format --check"
-
 [tasks.fix]
-depends = [
-  "fix:ruff:format",
-  "fix:ruff",
-]
-
-[tasks."fix:ruff:format"]
-run = "ruff format"
-
-[tasks."fix:ruff"]
-run = "ruff check --fix-only"
+depends = []

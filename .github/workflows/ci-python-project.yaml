@@ -46,18 +46,6 @@ jobs:
       directory: ${{ inputs.directory }}
       task: check:pyright
 
-  check-ruff:
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: ${{ inputs.directory }}
-      task: check:ruff
-
-  check-ruff-format:
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: ${{ inputs.directory }}
-      task: check:ruff:format
-
   run-all:
     if: inputs.directory != 'aoc-main'
     needs: uv-cache
@@ -77,8 +65,6 @@ jobs:
     needs:
       - check-mypy
       - check-pyright
-      - check-ruff
-      - check-ruff-format
       - run-all
       - test-pytest
     runs-on: ubuntu-24.04
