@@ -6,6 +6,7 @@ uv = "0.8.17"
 # Common tools
 prettier = "3.6.2"
 ruff = "0.13.0"
+shellcheck = "0.11.0"
 
 
 [vars]
@@ -67,6 +68,7 @@ depends = [
   "check:renovateconfig",
   "check:ruff",
   "check:ruff:format",
+  "check:shellcheck",
 
   "check:aoc-main",
   "check:solver:cpp",
