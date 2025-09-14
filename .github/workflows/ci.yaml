@@ -97,6 +97,13 @@ jobs:
       directory: .
       task: check:ruff:format
 
+  check-shellcheck:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:shellcheck
+
   # CI workflows for projects in the repository
   ci-aoc-main:
     needs:
@@ -142,6 +149,7 @@ jobs:
       - check-renovate-config
       - check-ruff
       - check-ruff-format
+      - check-shellcheck
       - ci-aoc-main
       - ci-solvers-cpp
       - ci-solvers-python
