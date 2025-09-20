@@ -8,6 +8,7 @@ permissions:
 jobs:
   build-test-run:
     strategy:
+      fail-fast: false
       matrix:
         include:
           # MSVC
