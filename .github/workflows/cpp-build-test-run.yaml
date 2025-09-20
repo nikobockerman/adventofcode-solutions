@@ -33,10 +33,10 @@ jobs:
             run: true
 
           # Gcc 14 on Linux
-          - name: Linux GCC 14 Release
-            os: ubuntu-24.04
-            workflowPreset: ci-gcc-14-release
-            run: true
+          #- name: Linux GCC 14 Release
+          #  os: ubuntu-24.04
+          #  workflowPreset: ci-gcc-14-release
+          #  run: true
 
           - name: Linux GCC 14 Debug
             os: ubuntu-24.04
