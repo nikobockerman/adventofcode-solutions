@@ -147,6 +147,7 @@ auto solve(std::string_view input) {
           SPDLOG_INFO("Possible Equation: {} -> {}", index, testValue);
           return eq.testResult();
         }
+        SPDLOG_DEBUG("Not Possible Equation: {} -> {}", index, testValue);
         return std::nullopt;
       }) |
       views::filter([](const auto& eqResult) { return eqResult.has_value(); }) |
