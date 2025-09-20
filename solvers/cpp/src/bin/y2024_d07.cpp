@@ -130,6 +130,7 @@ class PossibleEquation {
 
 template <bool allowConcatenationOperator>
 auto solve(std::string_view input) {
+  SPDLOG_DEBUG("input: {}", input);
   auto result = ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
     splitLinesUntilEmpty(input) | views::enumerate |
       views::transform([](auto&& args) -> std::optional<uint64_t> {
