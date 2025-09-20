@@ -98,30 +98,35 @@
   ],
   "testPresets": [
     {
+      "name": "_ci-outputs",
+      "hidden": true,
+      "inherits": ["output-on-failure", "verbose"]
+    },
+    {
       "name": "ci-clang-release",
       "configurePreset": "ci-clang-release",
-      "inherits": ["output-on-failure"]
+      "inherits": ["_ci-outputs"]
     },
     {
       "name": "ci-clang-debug",
       "configurePreset": "ci-clang-debug",
-      "inherits": ["output-on-failure"]
+      "inherits": ["_ci-outputs"]
     },
     {
       "name": "ci-gcc-14-release",
       "configurePreset": "ci-gcc-14-release",
-      "inherits": ["output-on-failure"]
+      "inherits": ["_ci-outputs"]
     },
     {
       "name": "ci-gcc-14-debug",
       "configurePreset": "ci-gcc-14-debug",
-      "inherits": ["output-on-failure"]
+      "inherits": ["_ci-outputs"]
     },
     {
       "name": "ci-msvc-release",
       "configurePreset": "ci-msvc",
       "configuration": "Release",
-      "inherits": ["output-on-failure"]
+      "inherits": ["_ci-outputs"]
     }
   ],
   "workflowPresets": [

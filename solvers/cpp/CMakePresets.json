@@ -64,6 +64,13 @@
       "output": {
         "outputOnFailure": true
       }
+    },
+    {
+      "name": "verbose",
+      "hidden": true,
+      "output": {
+        "verbosity": "verbose"
+      }
     }
   ]
 }
