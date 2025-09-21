@@ -28,5 +28,5 @@ constexpr auto convert(TRange&& range) -> TResult {
   if (ec == std::errc::result_out_of_range) {
     throw std::runtime_error("Result out of range: " + inputValue);
   }
-  throw std::runtime_error("Conversion failed due unknown reason");
+  throw std::runtime_error("Conversion failed due to unknown reason");
 }
