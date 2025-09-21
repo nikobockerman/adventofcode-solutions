@@ -1,0 +1,49 @@
+name: Temp
+on:
+  push:
+    branches:
+      - temp/*
+permissions:
+  contents: read
+
+jobs:
+  inspect-macos-runner:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-26
+          - macos-15
+          - ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+
+    steps:
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install llvm
+        shell: bash
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install gcc@15
+        shell: bash
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew ls
+        shell: bash
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew --prefix llvm
+        shell: bash
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          "$(brew --prefix llvm)/bin/clang++" --version
+        shell: bash
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          ls -la "$(brew --prefix llvm)/bin/"
+        shell: bash
+      - run: |
+          [ ${RUNNER_OS} = "Linux" ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          ls -la "$(brew --prefix gcc@15)"/lib/gcc/*/
+        shell: bash
