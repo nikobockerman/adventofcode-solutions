@@ -10,7 +10,12 @@ depends = [
 ]
 
 [tasks."check:mypy"]
-run = "mypy --python-executable $(uv python find) ."
+run = """
+# Run mypy
+pythonExecutable=$(uv python find)
+echo "Running mypy with python executable: ${pythonExecutable}"
+mypy --python-executable "${pythonExecutable}" .
+"""
 
 [tasks."check:pyright"]
 run = "uv run pyright"
