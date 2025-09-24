@@ -30,6 +30,10 @@ runs:
       with:
         key: mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-${{ hashFiles('solvers/*/mise.toml') }}
         path: ${{ steps.init.outputs.cache-paths }}
+        restore-keys: |
+          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-
+          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-
+          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-
 
     - name: Install mise
       uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
