@@ -97,13 +97,19 @@ runs:
         # Unset in case it is set by an earlier run of this action
         unset UV_PYTHON_DOWNLOADS
 
+        echo "PATH=${PATH}"
+
+        set -x
         for dir in $DIRECTORIES; do
           echo "::group::Install mise tools: $dir"
           pushd "$dir"
+          which python || true
+          which python3 || true
           mise upgrade
           popd
           echo "::endgroup::"
         done
+        set +x
 
         echo ::group::Mise prune
         mise prune
