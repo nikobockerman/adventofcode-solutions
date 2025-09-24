@@ -14,7 +14,8 @@ run = """
 # Run mypy
 pythonExecutable=$(uv python find)
 echo "Running mypy with python executable: ${pythonExecutable}"
-mypy --python-executable "${pythonExecutable}" .
+set -x
+mypy --python-executable "${pythonExecutable}" --python-version 3.13 . -v
 """
 
 [tasks."check:pyright"]
