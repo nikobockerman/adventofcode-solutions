@@ -53,6 +53,8 @@ runs:
       run: |
         # Set mise trusted config paths
 
+        echo "PATH=${PATH}"
+
         # Unset MISE_TRUSTED_CONFIG_PATHS for this step
         unset MISE_TRUSTED_CONFIG_PATHS
 
