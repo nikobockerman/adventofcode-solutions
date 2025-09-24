@@ -96,6 +96,7 @@ runs:
         for dir in $DIRECTORIES; do
           echo "::group::Install mise tools: $dir"
           pushd "$dir"
+          mise upgrade python
           mise upgrade
           popd
           echo "::endgroup::"

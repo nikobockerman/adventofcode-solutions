@@ -88,8 +88,6 @@ echo "::group::Environment variable changes"
   echo -n "RUSTUP_HOME="
   echo "${rustup_home}" | tr -d '\n'
   echo
-
-  echo "UV_MANAGED_PYTHON=1"
 } | tee -a "${GITHUB_ENV}"
 echo "::endgroup::"
 
