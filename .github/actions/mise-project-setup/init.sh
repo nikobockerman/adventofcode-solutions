@@ -90,7 +90,7 @@ echo "::group::Environment variable changes"
   echo
 
   echo RUST_LOG=uv=debug
-  echo MISE_TRACE=1
+  echo MISE_DEBUG=1
 } | tee -a "${GITHUB_ENV}"
 echo "::endgroup::"
 
