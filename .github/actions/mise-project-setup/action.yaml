@@ -28,12 +28,8 @@ runs:
       name: Mise cache restore
       uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
       with:
-        key: mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-${{ hashFiles('solvers/*/mise.toml') }}
+        key: cache-miss-mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-${{ hashFiles('solvers/*/mise.toml') }}
         path: ${{ steps.init.outputs.cache-paths }}
-        restore-keys: |
-          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-
-          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-${{ hashFiles('mise.toml') }}-
-          mise-${{ steps.init.outputs.mise-version }}-${{ runner.os }}-
 
     - name: Install mise
       uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
@@ -109,13 +105,6 @@ runs:
         mise prune
         echo ::endgroup::
       shell: bash
-
-    - if: inputs.cache-mode == 'prepare' && steps.cache-restore.outputs.cache-hit != 'true'
-      name: Save cache
-      uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-      with:
-        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
-        path: ${{ steps.init.outputs.cache-paths }}
 
     - env:
         DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}

@@ -15,7 +15,7 @@ run = """
 pythonExecutable=$(uv python find)
 pythonVersion=$(cat pyproject.toml | yq -p toml '.project.requires-python' | sed 's/>=//')
 set -x
-mypy --python-executable "${pythonExecutable}" --python-version "${pythonVersion}" .
+mypy --python-executable "${pythonExecutable}" --python-version "${pythonVersion}" . -v
 """
 
 [tasks."check:pyright"]
