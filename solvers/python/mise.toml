@@ -13,8 +13,8 @@ depends = [
 run = """
 # Run mypy
 pythonExecutable=$(uv python find)
-echo "Running mypy with python executable: ${pythonExecutable}"
-mypy --python-executable "${pythonExecutable}" .
+pythonVersion=$(cat pyproject.toml | yq -p toml '.project.requires-python' | sed 's/>=//')
+mypy --python-executable "${pythonExecutable}" --python-version "${pythonVersion}" .
 """
 
 [tasks."check:pyright"]
