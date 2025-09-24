@@ -53,3 +53,7 @@ jobs:
         run: mise run "${MISE_TASK}"
         shell: bash
         working-directory: ${{ inputs.directory }}
+
+      - run: uv python list --only-installed
+        shell: bash
+        working-directory: ${{ inputs.directory }}
