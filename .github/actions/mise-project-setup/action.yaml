@@ -103,7 +103,7 @@ runs:
         for dir in $DIRECTORIES; do
           echo "::group::Install mise tools: $dir"
           pushd "$dir"
-          ls -la "${MISE_DATA_DIR}/shims" || true
+          which uvx || true
           mise upgrade
           popd
           echo "::endgroup::"
@@ -113,6 +113,13 @@ runs:
         echo ::group::Mise prune
         mise prune
         echo ::endgroup::
+
+        echo "List mount points"
+        set -x
+        mount
+        cat /proc/mounts
+        cat /etc/fstab
+        set +x
       shell: bash
 
     - if: inputs.cache-mode == 'prepare' && steps.cache-restore.outputs.cache-hit != 'true'
