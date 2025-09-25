@@ -10,6 +10,20 @@ on:
         description: Runner to use
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: Directory containing uv project
+        options:
+          - aoc-main
+          - solvers/python
+        required: true
+        type: choice
+      runner:
+        default: ubuntu-24.04
+        description: Runner to use
+        required: true
+        type: string
 permissions:
   contents: read
 
