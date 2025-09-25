@@ -103,8 +103,8 @@ runs:
         for dir in $DIRECTORIES; do
           echo "::group::Install mise tools: $dir"
           pushd "$dir"
-          which python || true
-          which python3 || true
+          ls -la "${MISE_DATA_DIR}/shims" || true
+          "${MISE_DATA_DIR}/shims/uv" --version || true
           mise upgrade
           popd
           echo "::endgroup::"
