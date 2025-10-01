@@ -22,5 +22,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           # renovate: datasource=github-releases depName=jdx/mise
-          MISE_VERSION: v2025.9.24
+          MISE_VERSION: v2025.9.25
         run: ./.github/scripts/delete_obsolete_mise_caches.py
