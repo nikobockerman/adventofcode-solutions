@@ -6,7 +6,7 @@ runs:
   steps:
     - name: Install CMake
       # TODO: Install cmake through mise
-      uses: lukka/get-cmake@2ecc21724e5215b0e567bc399a2602d2ecb48541 # v4.1.1
+      uses: lukka/get-cmake@628dd514bed37cb0a609e84a6186cbbaa2fc0140 # v4.1.2
 
     - name: Setup Conan Client
       # TODO: Setup only conan package cache here and use conan through mise
