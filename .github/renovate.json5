@@ -10,6 +10,9 @@
   conan: {
     enabled: true,
   },
+  "git-submodules": {
+    enabled: true,
+  },
   lockFileMaintenance: {
     enabled: true,
   },
