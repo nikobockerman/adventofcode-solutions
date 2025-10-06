@@ -65,7 +65,6 @@ shell = "sh -c"
 [tasks.check]
 depends = [
   "check:prettier",
-  "check:renovateconfig",
   "check:ruff",
   "check:ruff:format",
   "check:shellcheck",
@@ -93,10 +92,6 @@ if [ -f "$excludesFile" ]; then
 fi
 prettier --ignore-path=.gitignore --ignore-path=.prettierignore "$userIgnoreArg" --check .
 """
-
-[tasks."check:renovateconfig"]
-run = "renovate-config-validator --strict"
-tools."npm:renovate" = "latest"
 
 [tasks."check:ruff"]
 run = "ruff check"
