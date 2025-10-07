@@ -48,41 +48,6 @@ runs:
         version: ${{ steps.init.outputs.mise-version }}
         working_directory: ${{ inputs.directory }}
 
-    - env:
-        DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
-      run: |
-        # Set mise trusted config paths
-
-        # Unset MISE_TRUSTED_CONFIG_PATHS for this step
-        unset MISE_TRUSTED_CONFIG_PATHS
-
-        envValues=""
-        for dir in ${DIRECTORIES}; do
-          echo "::group::Set mise trusted config paths: ${dir}"
-          pushd "${dir}"
-          echo "Show trust status before setting"
-          mise trust --show
-          echo "Set as trusted"
-          mise trust .
-          echo "Show trust status after setting"
-          mise trust --show
-          popd
-          echo "::endgroup::"
-
-          if [ -n "${envValues}" ]; then
-            envValues="${envValues}:"
-          fi
-          fullPath=$(realpath .)
-          envValues="${envValues}${fullPath}"
-        done
-
-        echo "::group::Set mise trusted config paths to environment: ${envValues}"
-        {
-          echo "MISE_TRUSTED_CONFIG_PATHS=${envValues}"
-        } | tee -a "${GITHUB_ENV}"
-        echo "::endgroup::"
-      shell: bash
-
     - if: steps.cache-restore.outputs.cache-hit != 'true'
 
       env:
