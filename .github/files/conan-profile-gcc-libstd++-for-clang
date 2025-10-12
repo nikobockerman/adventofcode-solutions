@@ -1,0 +1,7 @@
+{% set prefix = os.environ["HOMEBREW_PREFIX"] %}
+{% set gccPlat = {"Darwin": "aarch64-apple-darwin24", "Linux": "x86_64-pc-linux-gnu"}[platform.system()] %}
+
+[conf]
+tools.build:cxxflags=["-stdlib++-isystem{{ prefix }}/opt/gcc/include/c++/15", "-cxx-isystem{{ prefix }}/opt/gcc/include/c++/15/{{ gccPlat }}"]
+tools.build:exelinkflags=["-stdlib=libstdc++", "-L{{ prefix }}/opt/gcc/lib/gcc/15"]
+tools.build:sharedlinkflags=["-stdlib=libstdc++", "-L{{ prefix }}/opt/gcc/lib/gcc/15"]

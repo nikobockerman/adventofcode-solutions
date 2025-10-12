@@ -1,0 +1,289 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "_ci-common",
+      "hidden": true,
+      "binaryDir": "build",
+      "inherits": ["cmake-conan"]
+    },
+    {
+      "name": "ci-ubuntu-gcc-release",
+      "inherits": ["_ci-ubuntu-gcc", "_ci-release"]
+    },
+    {
+      "name": "ci-ubuntu-gcc-debug",
+      "inherits": ["_ci-ubuntu-gcc", "_ci-debug"]
+    },
+    {
+      "name": "ci-ubuntu-clang-release",
+      "inherits": ["_ci-ubuntu-clang", "_ci-release"]
+    },
+    {
+      "name": "ci-ubuntu-clang-debug",
+      "inherits": ["_ci-ubuntu-clang", "_ci-debug"]
+    },
+    {
+      "name": "ci-macos-clang-release",
+      "inherits": ["_ci-macos-clang", "_ci-release"]
+    },
+    {
+      "name": "ci-macos-clang-debug",
+      "inherits": ["_ci-macos-clang", "_ci-debug"]
+    },
+    {
+      "name": "_ci-ubuntu-gcc",
+      "hidden": true,
+      "inherits": ["gcc-clang-flags", "_ci-common", "_ci-gcc"],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
+      }
+    },
+    {
+      "name": "_ci-ubuntu-clang",
+      "hidden": true,
+      "inherits": [
+        "gcc-clang-flags",
+        "_ci-common",
+        "_ci-clang",
+        "_ci-gcc-libstdc++-for-clang-common",
+        "_ci-gcc-libstdc++-for-clang-ubuntu"
+      ],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU}"
+      }
+    },
+    {
+      "name": "_ci-macos-clang",
+      "hidden": true,
+      "inherits": [
+        "gcc-clang-flags",
+        "_ci-common",
+        "_ci-clang",
+        "_ci-gcc-libstdc++-for-clang-common",
+        "_ci-gcc-libstdc++-for-clang-macos"
+      ],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_MACOS}"
+      }
+    },
+    {
+      "name": "_ci-release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "_ci-debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "_ci-clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/llvm/bin/clang",
+        "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/llvm/bin/clang++"
+      }
+    },
+    {
+      "name": "_ci-gcc",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@15/bin/gcc-15",
+        "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@15/bin/g++-15"
+      }
+    },
+    {
+      "name": "_ci-gcc-libstdc++-for-clang-common",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/gcc/include/c++/15"
+      },
+      "cacheVariables": {
+        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc/lib/gcc/15",
+        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc/lib/gcc/15",
+        "CONAN_HOST_PROFILE": "${sourceDir}/conan-profile-gcc-libstd++-for-clang;auto-cmake"
+      }
+    },
+    {
+      "name": "_ci-gcc-libstdc++-for-clang-ubuntu",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU": "-cxx-isystem$penv{HOMEBREW_PREFIX}/opt/gcc/include/c++/15/x86_64-pc-linux-gnu"
+      }
+    },
+    {
+      "name": "_ci-gcc-libstdc++-for-clang-macos",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_MACOS": "-cxx-isystem$penv{HOMEBREW_PREFIX}/opt/gcc/include/c++/15/aarch64-apple-darwin24"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "ci-ubuntu-gcc-release",
+      "configurePreset": "ci-ubuntu-gcc-release"
+    },
+    {
+      "name": "ci-ubuntu-gcc-debug",
+      "configurePreset": "ci-ubuntu-gcc-debug"
+    },
+    {
+      "name": "ci-ubuntu-clang-release",
+      "configurePreset": "ci-ubuntu-clang-release"
+    },
+    {
+      "name": "ci-ubuntu-clang-debug",
+      "configurePreset": "ci-ubuntu-clang-debug"
+    },
+    {
+      "name": "ci-macos-clang-release",
+      "configurePreset": "ci-macos-clang-release"
+    },
+    {
+      "name": "ci-macos-clang-debug",
+      "configurePreset": "ci-macos-clang-debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "ci-ubuntu-gcc-release",
+      "configurePreset": "ci-ubuntu-gcc-release",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-gcc-debug",
+      "configurePreset": "ci-ubuntu-gcc-debug",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-clang-release",
+      "configurePreset": "ci-ubuntu-clang-release",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-clang-debug",
+      "configurePreset": "ci-ubuntu-clang-debug",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-macos-clang-release",
+      "configurePreset": "ci-macos-clang-release",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-macos-clang-debug",
+      "configurePreset": "ci-macos-clang-debug",
+      "inherits": ["output-on-failure"]
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "ci-ubuntu-gcc-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-gcc-release"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-gcc-release"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-gcc-release"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-gcc-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-gcc-debug"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-gcc-debug"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-gcc-debug"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-clang-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-clang-release"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-clang-release"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-clang-release"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-clang-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-clang-debug"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-clang-debug"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-clang-debug"
+        }
+      ]
+    },
+    {
+      "name": "ci-macos-clang-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-macos-clang-release"
+        },
+        {
+          "type": "build",
+          "name": "ci-macos-clang-release"
+        },
+        {
+          "type": "test",
+          "name": "ci-macos-clang-release"
+        }
+      ]
+    },
+    {
+      "name": "ci-macos-clang-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-macos-clang-debug"
+        },
+        {
+          "type": "build",
+          "name": "ci-macos-clang-debug"
+        },
+        {
+          "type": "test",
+          "name": "ci-macos-clang-debug"
+        }
+      ]
+    }
+  ]
+}
