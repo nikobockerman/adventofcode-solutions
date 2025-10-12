@@ -59,21 +59,7 @@ runs:
         MISE_PYTHON_COMPILE: false
       run: |
         # Install mise tools
-
-        # Unset in case it is set by an earlier run of this action
-        unset UV_PYTHON_DOWNLOADS
-
-        for dir in $DIRECTORIES; do
-          echo "::group::Install mise tools: $dir"
-          pushd "$dir"
-          mise upgrade
-          popd
-          echo "::endgroup::"
-        done
-
-        echo ::group::Mise prune
-        mise prune
-        echo ::endgroup::
+        "${GITHUB_ACTION_PATH}/install-tools.sh"
       shell: bash
 
     - if: inputs.cache-mode == 'prepare' && steps.cache-restore.outputs.cache-hit != 'true'
