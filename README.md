@@ -37,7 +37,7 @@ Solver executable is executed with 2 arguments:
 1. log level as integer: 0, 1, 2
 2. part number: 1, 2
 
-Stardard input is used to pass input of the day to solver.
+Standard input is used to pass input of the day to solver.
 
 ### Outputs
 
