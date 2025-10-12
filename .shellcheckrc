@@ -1,1 +1,1 @@
-enable=all
+enable=add-default-case,avoid-negated-conditions,avoid-nullary-conditions,check-extra-masked-returns,check-set-e-suppressed,deprecate-which,quote-safe-variables,require-double-brackets,require-variable-braces,useless-use-of-cat
