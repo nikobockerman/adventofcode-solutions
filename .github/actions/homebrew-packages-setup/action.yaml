@@ -1,0 +1,75 @@
+name: Homebrew packages setup
+description: Setup packages through Homebrew
+inputs:
+  cache-mode:
+    default: use
+    description: "Mode of operation regarding cache: 'prepare' or 'use'"
+    required: false
+  packages-hash-to-use:
+    description: "In 'use' mode, the hash of cached downloads to use. From output of an earlier 'prepare' mode run"
+    required: false
+outputs:
+  packages-hash:
+    description: "Hash of cached downloads. To be used in subsequent 'use' mode executions."
+    value: ${{ steps.checks-after-install.outputs.packages-hash }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Homebrew
+      uses: Homebrew/actions/setup-homebrew@b2da65092292aade9599608fc29415389641b3cb # main
+
+    - id: init
+
+      env:
+        INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
+        INPUT_PACKAGES_HASH_TO_USE: ${{ inputs.packages-hash-to-use }}
+        # Major versions of GCC and LLVM to use
+        GCC_MAJOR_VERSION: 15
+        LLVM_MAJOR_VERSION: 21
+      run: |
+        # Initialize homebrew-packages-setup action
+        "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - id: cache-restore
+      name: Mise cache restore
+      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        key: ${{ steps.init.outputs.cache-restore-key }}
+        path: ${{ steps.init.outputs.cache-path }}
+        restore-keys: ${{ steps.init.outputs.cache-restore-other-keys }}
+
+    - if: inputs.cache-mode == 'prepare' || steps.cache-restore.outputs.cache-hit != 'true'
+
+      env:
+        GCC_MAJOR_VERSION: ${{ steps.init.outputs.gcc-major-version }}
+        LLVM_MAJOR_VERSION: ${{ steps.init.outputs.llvm-major-version }}
+      run: |
+        # Install and upgrade homebrew packages
+        "${GITHUB_ACTION_PATH}/install-packages.sh"
+      shell: bash
+
+    - id: checks-after-install
+
+      env:
+        INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
+        INPUT_DOWNLOADS_HASH_TO_USE: ${{ inputs.packages-hash-to-use }}
+        DOWNLOADS_HASH: ${{ hashFiles(format('{0}/**', steps.init.outputs.cache-path)) }}
+        TEMP_HASHFILES_ARG: ${{ format('{0}/**', steps.init.outputs.cache-path) }}
+      run: |
+        # Check changes to downloads after install/upgrade
+        "${GITHUB_ACTION_PATH}/checks-after-install.sh"
+      shell: bash
+
+    - if: steps.list-result-packages.outputs.save-cache == 'true'
+      name: Save cache
+      uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        key: ${{ steps.init.outputs.cache-key-prefix }}-${{ steps.checks-after-install.outputs.downloads-hash }}
+        path: ${{ steps.init.outputs.cache-path }}
+
+    - run: |
+        # Set final changes for rest of workflow
+        "${GITHUB_ACTION_PATH}/final-changes.sh"
+      shell: bash
