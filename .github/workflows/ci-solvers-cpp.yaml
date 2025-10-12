@@ -1,6 +1,15 @@
 name: CI - Solvers - C++
 on:
   workflow_call:
+    inputs:
+      packages-hash-macos:
+        description: Hash of installed packages on MacOS
+        required: true
+        type: string
+      packages-hash-ubuntu:
+        description: Hash of installed packages on Ubuntu
+        required: true
+        type: string
   workflow_dispatch:
 permissions:
   contents: read
@@ -9,6 +18,9 @@ jobs:
   # Checks
   build-test-run:
     uses: ./.github/workflows/cpp-build-test-run.yaml
+    with:
+      packages-hash-macos: ${{ inputs.packages-hash-macos }}
+      packages-hash-ubuntu: ${{ inputs.packages-hash-ubuntu }}
 
   check-clang-format:
     uses: ./.github/workflows/mise-task.yaml
@@ -16,16 +28,12 @@ jobs:
       directory: solvers/cpp
       task: check:clang-format
 
-  check-clang-tidy:
-    uses: ./.github/workflows/check-clang-tidy.yaml
-
   # Check for all green CI for C++
   check:
     if: always()
     needs:
       - build-test-run
       - check-clang-format
-      - check-clang-tidy
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 

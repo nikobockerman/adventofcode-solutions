@@ -43,17 +43,10 @@
       }
     },
     {
-      "name": "msvc-flags",
-      "hidden": true,
-      "environment": {
-        "PRESET_CXX_FLAGS_MSVC": "/W4 /WX /EHsc"
-      }
-    },
-    {
       "name": "configure-flags",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_MSVC} $env{PRESET_CXX_FLAGS_GCC_CLANG}"
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
       }
     }
   ],
