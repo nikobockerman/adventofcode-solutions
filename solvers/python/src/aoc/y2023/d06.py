@@ -1,8 +1,11 @@
 import enum
-from collections.abc import Iterable
 from functools import reduce
+from typing import TYPE_CHECKING
 
 from aoc.tooling.run import run
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def _parse_input(lines: list[str]) -> list[tuple[int, int]]:

@@ -1,12 +1,15 @@
 import enum
 from collections import Counter
-from collections.abc import Iterable
 from functools import total_ordering
-from types import NotImplementedType
+from typing import TYPE_CHECKING
 
 from attrs import define
 
 from aoc.tooling.run import run
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from types import NotImplementedType
 
 
 def _parse_input(lines: Iterable[str]) -> Iterable[tuple[str, int]]:
@@ -25,7 +28,7 @@ class _HandType(enum.Enum):
     FourOfAKind = 5
     FiveOfAKind = 6
 
-    def __lt__(self, other: "_HandType") -> bool | NotImplementedType:
+    def __lt__(self, other: _HandType) -> bool | NotImplementedType:
         if self.__class__ is other.__class__:
             return self.value < other.value
         return NotImplemented
@@ -37,7 +40,7 @@ class _Hand:
     hand_type: _HandType
     bid: int
 
-    def __lt__(self, other: "_Hand") -> bool:
+    def __lt__(self, other: _Hand) -> bool:
         if self.hand_type != other.hand_type:
             return self.hand_type < other.hand_type
 

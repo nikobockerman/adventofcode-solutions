@@ -1,8 +1,11 @@
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from attrs import Factory, define, field
 
 from aoc.tooling.run import get_logger, run
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 _logger = get_logger()
 

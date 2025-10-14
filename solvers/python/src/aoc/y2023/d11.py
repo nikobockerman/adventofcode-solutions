@@ -1,9 +1,12 @@
 import contextlib
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from aoc.tooling.coordinates import Coord2d
 from aoc.tooling.map import Map2d
 from aoc.tooling.run import run
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class _InputMap(Map2d):

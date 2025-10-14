@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing
 from functools import cache
 from typing import Protocol, runtime_checkable

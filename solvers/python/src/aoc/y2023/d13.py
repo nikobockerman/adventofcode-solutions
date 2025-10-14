@@ -1,9 +1,12 @@
 import itertools
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from aoc.tooling.coordinates import X, Y
 from aoc.tooling.map import IterDirection, Map2d
 from aoc.tooling.run import get_logger, run
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 _logger = get_logger()
 
