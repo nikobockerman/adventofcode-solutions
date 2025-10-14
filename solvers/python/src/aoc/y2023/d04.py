@@ -1,9 +1,12 @@
 from collections import Counter
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from attrs import define
 
 from aoc.tooling.run import run
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 @define

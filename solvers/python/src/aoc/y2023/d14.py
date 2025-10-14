@@ -1,11 +1,13 @@
 import logging
-from collections.abc import Callable, Iterable
-from typing import Literal, overload, override
+from typing import TYPE_CHECKING, Literal, overload, override
 
 from aoc.tooling.coordinates import Coord2d, X, Y
 from aoc.tooling.directions import CardinalDirection as Dir
 from aoc.tooling.map import IterDirection, Map2d
 from aoc.tooling.run import get_logger, run
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 _logger = get_logger()
 

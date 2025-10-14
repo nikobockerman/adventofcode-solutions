@@ -4,7 +4,10 @@
 import pathlib
 import subprocess
 import sys
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 DISABLED_OPTIONAL_CHECKS = ["check-unassigned-uppercase"]
 

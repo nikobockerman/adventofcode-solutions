@@ -1,10 +1,12 @@
 import functools
-from collections.abc import Iterator
-from typing import NewType, overload
+from typing import TYPE_CHECKING, NewType, overload
 
 import yaml
 
 from aoc_main import _solvers, _types, _utils
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 AnswerIntType = NewType("AnswerIntType", int)
 AnswerStrType = NewType("AnswerStrType", str)

@@ -1,7 +1,7 @@
 import enum
 import itertools
 import logging
-from collections.abc import Collection, Iterable
+from typing import TYPE_CHECKING
 
 from attrs import define, field
 
@@ -10,6 +10,9 @@ from aoc.tooling.directions import CardinalDirection as Dir
 from aoc.tooling.directions import CardinalDirectionsAll
 from aoc.tooling.map import Map2d
 from aoc.tooling.run import get_logger, run
+
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
 
 _logger = get_logger()
 

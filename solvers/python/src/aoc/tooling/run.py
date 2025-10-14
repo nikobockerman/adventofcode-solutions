@@ -2,8 +2,10 @@ import inspect
 import logging
 import pathlib
 import sys
-from collections.abc import Callable
-from typing import Literal, TypeIs
+from typing import TYPE_CHECKING, Literal, TypeIs
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def is_part(n: int) -> TypeIs[Literal[1, 2]]:
