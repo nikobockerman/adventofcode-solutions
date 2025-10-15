@@ -5,7 +5,7 @@
       "name": "aoc-base",
       "description": "Base preset used when triggered from aoc. User preset named 'aoc' should inherit this and specify GCC/Clang compiler that can build the project",
       "hidden": true,
-      "binaryDir": "build-aoc",
+      "binaryDir": "build/aoc",
       "inherits": [
         "cmake-conan",
         "ninja",
