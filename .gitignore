@@ -5,7 +5,7 @@
 .venv/
 __pycache__/
 
-/solvers/cpp/build-*/
+/solvers/cpp/build*/
 /solvers/cpp/CMakeUserPresets*.json
 
 /solvers/rust/target/
