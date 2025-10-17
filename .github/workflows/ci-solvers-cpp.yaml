@@ -15,6 +15,74 @@ permissions:
   contents: read
 
 jobs:
+  # DEBUG
+  debug-ubuntu:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          mods="$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          eval "${mods}"
+
+          brewCache=$(brew --cache)
+          ls -la "${brewCache}"/ || true
+
+          brew cleanup -s -v -n --prune=all
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup homebrew packages
+        uses: ./.github/actions/homebrew-packages-setup
+        with:
+          cache-mode: use
+          packages-hash-to-use: ${{ inputs.packages-hash-ubuntu }}
+
+      - run: |
+          set -x
+          echo "HOMEBREW_PREFIX=${HOMEBREW_PREFIX}"
+          ls -la "${HOMEBREW_PREFIX}"/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/include/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/include/c++/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/include/c++/15/ || true
+          brewCache=$(brew --cache)
+          ls -la "${brewCache}"/ || true
+
+        shell: bash
+
+  debug-macos:
+    runs-on: macos-15
+    steps:
+      - run: |
+          set -x
+          brewCache=$(brew --cache)
+          ls -la "${brewCache}"/ || true
+
+          brew cleanup -s -v
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup homebrew packages
+        uses: ./.github/actions/homebrew-packages-setup
+        with:
+          cache-mode: use
+          packages-hash-to-use: ${{ inputs.packages-hash-macos }}
+
+      - run: |
+          set -x
+          echo "HOMEBREW_PREFIX=${HOMEBREW_PREFIX}"
+          ls -la "${HOMEBREW_PREFIX}"/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/include/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/include/c++/ || true
+          ls -la "${HOMEBREW_PREFIX}"/opt/gcc/include/c++/15/ || true
+          brewCache=$(brew --cache)
+          ls -la "${brewCache}"/ || true
+
+        shell: bash
+
+
   # Checks
   build-test-run:
     uses: ./.github/workflows/cpp-build-test-run.yaml
