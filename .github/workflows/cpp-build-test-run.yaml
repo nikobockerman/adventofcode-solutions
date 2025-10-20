@@ -1,6 +1,15 @@
 name: C++ build, test and run
 on:
   workflow_call:
+    inputs:
+      homebrew-downloads-hash-from-prepare-macos:
+        description: Hash of cached Homebrew downloads on MacOS
+        required: true
+        type: string
+      homebrew-downloads-hash-from-prepare-ubuntu:
+        description: Hash of cached Homebrew downloads on Ubuntu
+        required: true
+        type: string
   workflow_dispatch:
 permissions:
   contents: read
@@ -10,38 +19,35 @@ jobs:
     strategy:
       matrix:
         include:
-          # MSVC
-          - name: MSVC Debug
-            os: windows-2025
-            workflowPreset: ci-msvc-debug
-            run: false
-
-          - name: MSVC Release
-            os: windows-2025
-            workflowPreset: ci-msvc-release
-            run: true
-
-          # Clang on Linux
-          - name: Linux Clang Release
+          - name: Ubuntu GCC Release
             os: ubuntu-24.04
-            workflowPreset: ci-clang-release
-            run: true
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            workflowPreset: ci-ubuntu-gcc-release
 
-          - name: Linux Clang Debug
+          - name: Ubuntu GCC Debug
             os: ubuntu-24.04
-            workflowPreset: ci-clang-debug
-            run: true
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            workflowPreset: ci-ubuntu-gcc-debug
 
-          # Gcc 14 on Linux
-          - name: Linux GCC 14 Release
+          - name: Ubuntu Clang Release
             os: ubuntu-24.04
-            workflowPreset: ci-gcc-14-release
-            run: true
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            workflowPreset: ci-ubuntu-clang-release
 
-          - name: Linux GCC 14 Debug
+          - name: Ubuntu Clang Debug
             os: ubuntu-24.04
-            workflowPreset: ci-gcc-14-debug
-            run: true
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            workflowPreset: ci-ubuntu-clang-debug
+
+          - name: MacOS Clang Release
+            os: macos-15
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
+            workflowPreset: ci-macos-clang-release
+
+          - name: MacOS Clang Debug
+            os: macos-15
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
+            workflowPreset: ci-macos-clang-debug
 
     name: ${{ matrix.name }} - Build + test + run
     runs-on: ${{ matrix.os }}
@@ -53,8 +59,27 @@ jobs:
         with:
           submodules: true
 
+      - name: Setup homebrew packages
+        uses: ./.github/actions/homebrew-packages-setup
+        with:
+          cache-mode: use
+          downloads-hash-from-prepare: ${{ matrix.homebrew-downloads-hash-from-prepare }}
+
       - name: Setup CMake project
         uses: ./.github/actions/cmake-project-setup
+
+      - if: matrix.os == 'ubuntu-24.04'
+        name: Specify HOMEBREW_PREFIX
+        run: |
+          brewPrefix=$(brew --prefix)
+          echo "HOMEBREW_PREFIX=${brewPrefix}" | tr -d '\n' >> "${GITHUB_ENV}"
+        shell: bash
+
+      - if: matrix.os == 'ubuntu-24.04' && contains(matrix.workflowPreset, '-gcc-')
+        name: "Add brew binutils to path"
+        run: |
+          echo "${HOMEBREW_PREFIX}/opt/binutils/bin" >> "${GITHUB_PATH}"
+        shell: bash
 
       - name: Run CMake workflow
         uses: lukka/run-cmake@af1be47fd7c933593f687731bc6fdbee024d3ff4 # v10.8
@@ -62,20 +87,17 @@ jobs:
           cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
           workflowPreset: ${{ matrix.workflowPreset }}
 
-      - if: matrix.run
-        name: Restore aoc-main mise project
+      - name: Restore aoc-main mise project
         uses: ./.github/actions/mise-project-setup
         with:
           directory: aoc-main
 
-      - if: matrix.run
-        name: Restore aoc-main uv project
+      - name: Restore aoc-main uv project
         uses: ./.github/actions/uv-project-setup
         with:
           directory: aoc-main
 
-      - if: matrix.run
-        name: Run all solutions
+      - name: Run all solutions
         env:
           AOC_CPP_WORKFLOW_PRESET: ${{ matrix.workflowPreset }}
         run: mise run aoc:all -- --solver cpp -vv

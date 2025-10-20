@@ -1,6 +1,15 @@
 name: CI - Solvers - C++
 on:
   workflow_call:
+    inputs:
+      homebrew-downloads-hash-from-prepare-macos:
+        description: Hash of cached Homebrew downloads on MacOS
+        required: true
+        type: string
+      homebrew-downloads-hash-from-prepare-ubuntu:
+        description: Hash of cached Homebrew downloads on Ubuntu
+        required: true
+        type: string
   workflow_dispatch:
 permissions:
   contents: read
@@ -9,6 +18,9 @@ jobs:
   # Checks
   build-test-run:
     uses: ./.github/workflows/cpp-build-test-run.yaml
+    with:
+      homebrew-downloads-hash-from-prepare-macos: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
+      homebrew-downloads-hash-from-prepare-ubuntu: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
 
   check-clang-format:
     uses: ./.github/workflows/mise-task.yaml
@@ -16,16 +28,12 @@ jobs:
       directory: solvers/cpp
       task: check:clang-format
 
-  check-clang-tidy:
-    uses: ./.github/workflows/check-clang-tidy.yaml
-
   # Check for all green CI for C++
   check:
     if: always()
     needs:
       - build-test-run
       - check-clang-format
-      - check-clang-tidy
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 

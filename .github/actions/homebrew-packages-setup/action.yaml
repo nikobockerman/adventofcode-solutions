@@ -1,0 +1,65 @@
+name: Homebrew packages setup
+description: Setup packages through Homebrew
+inputs:
+  cache-mode:
+    default: use
+    description: "Mode of operation regarding cache: 'prepare' or 'use'"
+    required: false
+  downloads-hash-from-prepare:
+    description: "In 'use' mode, the hash of cached downloads to use. From output of an earlier 'prepare' mode run"
+    required: false
+outputs:
+  downloads-hash:
+    description: "Hash of cached downloads. To be used with subsequent 'use' mode executions."
+    value: ${{ steps.install.outputs.downloads-hash }}
+
+runs:
+  using: composite
+  steps:
+    - env:
+        INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
+        INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
+      run: |
+        # Validate action inputs
+        "${GITHUB_ACTION_PATH}/validate-action-inputs.sh"
+      shell: bash
+
+    - id: init
+
+      env:
+        INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
+        INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
+        # Major versions of GCC and LLVM to use
+        GCC_MAJOR_VERSION: 15
+        LLVM_MAJOR_VERSION: 21
+      run: |
+        # Initialize action
+        "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - id: cache-restore
+      name: Mise cache restore
+      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        key: ${{ steps.init.outputs.cache-key-for-restore }}
+        path: ${{ steps.init.outputs.cache-path }}
+        restore-keys: ${{ steps.init.outputs.cache-restore-keys }}
+
+    - id: install
+
+      env:
+        CACHE_HIT: ${{ steps.cache-restore.outputs.cache-hit }}
+        INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
+        INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
+        TOOLS_TO_INSTALL: ${{ steps.init.outputs.tools-to-install }}
+      run: |
+        # Install tools
+        "${GITHUB_ACTION_PATH}/install.sh"
+      shell: bash
+
+    - if: steps.install.outputs.save-cache == 'true'
+      name: Save cache
+      uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        key: ${{ steps.init.outputs.cache-key-prefix }}-${{ steps.install.outputs.downloads-hash }}
+        path: ${{ steps.init.outputs.cache-path }}
