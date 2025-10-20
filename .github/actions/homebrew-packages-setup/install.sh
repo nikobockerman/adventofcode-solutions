@@ -19,7 +19,7 @@ initialDownloadsHash=$(calculateDownloadsHash)
 if [[ "${CACHE_HIT}" == "true" && "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" != "${initialDownloadsHash}" ]]; then
   echo -n "::error::Cache restored with exact key match but calculated downloads hash doesn't match"
   echo -n " 'downloads-hash-from-prepare' input value. This should never happen."
-  echo -n " Calculated downloads hash: ${downloadsHash}"
+  echo -n " Calculated downloads hash: ${initialDownloadsHash}"
   echo
   exit 1
 fi
