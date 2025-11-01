@@ -1,7 +1,19 @@
 ---
 Checks: >-
-  bugprone-*, cert-*, clang-diagnostic-*, clang-analyzer-*, concurrency-*,
-  cppcoreguidelines-*, google-*, hicpp-*, misc-*, modernize-*, performance-*,
-  portability-*, readability-*, -readability-identifier-length
+  bugprone-*,
+  cert-*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  google-*,
+  hicpp-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*, -portability-avoid-pragma-once,
+  readability-*, -readability-identifier-length
+CheckOptions:
+  modernize-use-trailing-return-type.TransformLambdas: 'all_except_auto'
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*"
