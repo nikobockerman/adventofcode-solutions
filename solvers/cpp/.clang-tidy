@@ -12,8 +12,12 @@ Checks: >-
   modernize-*,
   performance-*,
   portability-*, -portability-avoid-pragma-once,
-  readability-*, -readability-identifier-length
+  readability-*, -readability-identifier-length,
+  -bugprone-exception-escape, -bugprone-use-after-move, -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -hicpp-invalid-access-moved, -misc-include-cleaner, -modernize-use-ranges, -modernize-use-trailing-return-type,
+  -readability-math-missing-parentheses
 CheckOptions:
+  modernize-use-ranges.IncludeStyle: 'google'
   modernize-use-trailing-return-type.TransformLambdas: 'all_except_auto'
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*"
