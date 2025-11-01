@@ -17,19 +17,19 @@
     },
     {
       "name": "ci-ubuntu-clang-release",
-      "inherits": ["_ci-ubuntu-clang", "_ci-release"]
+      "inherits": ["_ci-ubuntu-clang", "_ci-release", "_ci-clang-tidy"]
     },
     {
       "name": "ci-ubuntu-clang-debug",
-      "inherits": ["_ci-ubuntu-clang", "_ci-debug"]
+      "inherits": ["_ci-ubuntu-clang", "_ci-debug", "_ci-clang-tidy"]
     },
     {
       "name": "ci-macos-clang-release",
-      "inherits": ["_ci-macos-clang", "_ci-release"]
+      "inherits": ["_ci-macos-clang", "_ci-release", "_ci-clang-tidy"]
     },
     {
       "name": "ci-macos-clang-debug",
-      "inherits": ["_ci-macos-clang", "_ci-debug"]
+      "inherits": ["_ci-macos-clang", "_ci-debug", "_ci-clang-tidy"]
     },
     {
       "name": "_ci-ubuntu-gcc",
@@ -95,6 +95,13 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@15/bin/gcc-15",
         "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@15/bin/g++-15"
+      }
+    },
+    {
+      "name": "_ci-clang-tidy",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_CLANG_TIDY": "$penv{HOMEBREW_PREFIX}/opt/llvm/bin/clang-tidy"
       }
     },
     {
