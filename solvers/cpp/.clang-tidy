@@ -17,7 +17,7 @@ Checks: >-
   -hicpp-invalid-access-moved, -misc-include-cleaner, -modernize-use-ranges, -modernize-use-trailing-return-type,
   -readability-math-missing-parentheses
 CheckOptions:
-  modernize-use-ranges.IncludeStyle: 'google'
-  modernize-use-trailing-return-type.TransformLambdas: 'all_except_auto'
+  modernize-use-ranges.IncludeStyle: "google"
+  modernize-use-trailing-return-type.TransformLambdas: "all_except_auto"
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*"

@@ -5,64 +5,36 @@
       "name": "_ci-common",
       "hidden": true,
       "binaryDir": "build",
-      "inherits": [
-        "cmake-conan"
-      ]
+      "inherits": ["cmake-conan"]
     },
     {
       "name": "ci-ubuntu-gcc-release",
-      "inherits": [
-        "_ci-ubuntu-gcc",
-        "_ci-release"
-      ]
+      "inherits": ["_ci-ubuntu-gcc", "_ci-release"]
     },
     {
       "name": "ci-ubuntu-gcc-debug",
-      "inherits": [
-        "_ci-ubuntu-gcc",
-        "_ci-debug"
-      ]
+      "inherits": ["_ci-ubuntu-gcc", "_ci-debug"]
     },
     {
       "name": "ci-ubuntu-clang-release",
-      "inherits": [
-        "_ci-ubuntu-clang",
-        "_ci-release",
-        "_ci-clang-tidy"
-      ]
+      "inherits": ["_ci-ubuntu-clang", "_ci-release", "_ci-clang-tidy"]
     },
     {
       "name": "ci-ubuntu-clang-debug",
-      "inherits": [
-        "_ci-ubuntu-clang",
-        "_ci-debug",
-        "_ci-clang-tidy"
-      ]
+      "inherits": ["_ci-ubuntu-clang", "_ci-debug", "_ci-clang-tidy"]
     },
     {
       "name": "ci-macos-clang-release",
-      "inherits": [
-        "_ci-macos-clang",
-        "_ci-release",
-        "_ci-clang-tidy"
-      ]
+      "inherits": ["_ci-macos-clang", "_ci-release", "_ci-clang-tidy"]
     },
     {
       "name": "ci-macos-clang-debug",
-      "inherits": [
-        "_ci-macos-clang",
-        "_ci-debug",
-        "_ci-clang-tidy"
-      ]
+      "inherits": ["_ci-macos-clang", "_ci-debug", "_ci-clang-tidy"]
     },
     {
       "name": "_ci-ubuntu-gcc",
       "hidden": true,
-      "inherits": [
-        "gcc-clang-flags",
-        "_ci-common",
-        "_ci-gcc"
-      ],
+      "inherits": ["gcc-clang-flags", "_ci-common", "_ci-gcc"],
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
       }
@@ -189,44 +161,32 @@
     {
       "name": "ci-ubuntu-gcc-release",
       "configurePreset": "ci-ubuntu-gcc-release",
-      "inherits": [
-        "output-on-failure"
-      ]
+      "inherits": ["output-on-failure"]
     },
     {
       "name": "ci-ubuntu-gcc-debug",
       "configurePreset": "ci-ubuntu-gcc-debug",
-      "inherits": [
-        "output-on-failure"
-      ]
+      "inherits": ["output-on-failure"]
     },
     {
       "name": "ci-ubuntu-clang-release",
       "configurePreset": "ci-ubuntu-clang-release",
-      "inherits": [
-        "output-on-failure"
-      ]
+      "inherits": ["output-on-failure"]
     },
     {
       "name": "ci-ubuntu-clang-debug",
       "configurePreset": "ci-ubuntu-clang-debug",
-      "inherits": [
-        "output-on-failure"
-      ]
+      "inherits": ["output-on-failure"]
     },
     {
       "name": "ci-macos-clang-release",
       "configurePreset": "ci-macos-clang-release",
-      "inherits": [
-        "output-on-failure"
-      ]
+      "inherits": ["output-on-failure"]
     },
     {
       "name": "ci-macos-clang-debug",
       "configurePreset": "ci-macos-clang-debug",
-      "inherits": [
-        "output-on-failure"
-      ]
+      "inherits": ["output-on-failure"]
     }
   ],
   "workflowPresets": [
