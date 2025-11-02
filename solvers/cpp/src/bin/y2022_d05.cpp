@@ -114,7 +114,7 @@ constexpr auto countStacks(auto&& stackIdLine) -> std::size_t {
                           [](auto character) { return character != ' '; });
 }
 
-constexpr auto crateCharIndex(auto stackIndex) { return 1 + 4 * stackIndex; }
+constexpr auto crateCharIndex(auto stackIndex) { return 1 + (4 * stackIndex); }
 
 constexpr auto loadStage(auto&& linesView) -> Stage {
   auto lines = linesView | ranges::to<std::vector>();
