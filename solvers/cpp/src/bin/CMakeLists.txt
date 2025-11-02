@@ -20,22 +20,21 @@ endfunction()
 getBinaries(binaries)
 message(STATUS "Binaries: ${binaries}")
 
-add_library(solver INTERFACE)
-target_link_libraries(solver INTERFACE lib)
+add_library(shared_main OBJECT shared_main.cpp)
+target_link_libraries(shared_main PRIVATE lib fmt::fmt spdlog::spdlog)
 
 foreach(binary ${binaries})
   add_library(${binary}.lib STATIC ${binary}.cpp)
   target_link_libraries(
       ${binary}.lib
       PRIVATE lib fmt::fmt spdlog::spdlog
-      PUBLIC solver
   )
 
-  add_executable(${binary} shared_main.cpp)
+  add_executable(${binary})
   set_target_properties(${binary} PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
   )
-  target_link_libraries(${binary} PRIVATE ${binary}.lib spdlog::spdlog)
+  target_link_libraries(${binary} PRIVATE shared_main ${binary}.lib)
 
   if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${binary}.test.cpp)
     add_executable(${binary}.test ${binary}.test.cpp)
