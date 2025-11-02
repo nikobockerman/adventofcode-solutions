@@ -13,8 +13,7 @@ Checks: >-
   performance-*,
   portability-*, -portability-avoid-pragma-once,
   readability-*, -readability-identifier-length,
-  -bugprone-exception-escape, -cppcoreguidelines-pro-bounds-pointer-arithmetic, -misc-include-cleaner,
-  -modernize-use-trailing-return-type
+  -bugprone-exception-escape, -misc-include-cleaner, -modernize-use-trailing-return-type
 CheckOptions:
   modernize-use-ranges.IncludeStyle: "google"
   modernize-use-trailing-return-type.TransformLambdas: "all_except_auto"

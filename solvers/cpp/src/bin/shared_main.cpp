@@ -1,3 +1,4 @@
+#include "convert.hpp"
 #include "solver.hpp"
 
 #include <fmt/base.h>
@@ -6,7 +7,6 @@
 #include <spdlog/spdlog.h>
 
 #include <array>
-#include <charconv>
 #include <cstdint>
 #include <cstdlib>
 #include <format>
@@ -24,24 +24,13 @@ enum class Part : std::uint8_t {
   P2,
 };
 
-auto argToInt(std::string_view arg) -> std::uint8_t {
-  std::uint8_t value = 0;
-  const auto* last = arg.data() + arg.size();
-  if (auto [ptr,
-            ec]{std::from_chars(arg.data(), arg.data() + arg.size(), value)};
-      ec != std::errc() || ptr != last) {
-    throw std::runtime_error(std::format("Invalid argument: {}", arg));
-  }
-  return value;
-}
-
 auto processArgs(const std::span<const char*> args) {
   if (args.size() != 3) {
     throw std::runtime_error(
       std::format("Invalid number of arguments: {}", args.size()));
   }
-  auto verbosity = argToInt(args[1]);
-  auto part = argToInt(args[2]);
+  auto verbosity = convert<std::uint8_t>(std::string_view{args[1]});
+  auto part = convert<std::uint8_t>(std::string_view{args[2]});
 
   if (verbosity > 2) {
     throw std::runtime_error(
