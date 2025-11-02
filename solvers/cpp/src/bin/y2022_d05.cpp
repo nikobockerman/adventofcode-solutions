@@ -261,8 +261,7 @@ namespace {
   Stage stage;
   for (std::size_t index{}; auto& stack : prevStage) {
     if (index == move.indexToStack()) {
-      std::move(movedCrates.begin(), movedCrates.end(),
-                std::back_inserter(stack));
+      ranges::move(movedCrates, std::back_inserter(stack));
     }
     stage.emplace_back(std::move(stack));
     ++index;
