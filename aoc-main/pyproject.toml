@@ -29,6 +29,7 @@ typeCheckingMode = "strict"
 addopts = [
   "--import-mode=importlib",
 ]
+strict = true
 
 [tool.ruff]
 extend = "../ruff.toml"
