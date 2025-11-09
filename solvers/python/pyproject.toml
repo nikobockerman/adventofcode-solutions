@@ -21,7 +21,7 @@ strict_optional = true
 [tool.pyright]
 typeCheckingMode = "strict"
 
-[tool.pytest.ini_options]
+[tool.pytest]
 addopts = [
   "--import-mode=importlib",
 ]
