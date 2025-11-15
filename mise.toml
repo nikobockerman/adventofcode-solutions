@@ -7,7 +7,7 @@ uv = "0.9.9"
 prettier = "3.6.2"
 ruff = "0.14.5"
 shellcheck = "0.11.0"
-yq = "4.48.1"
+yq = "4.48.2"
 
 
 [vars]
