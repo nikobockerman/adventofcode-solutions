@@ -99,5 +99,6 @@ jobs:
 
       - name: Run all solutions
         env:
+          AOC_CPP_SKIP_PREPARE: "1"
           AOC_CPP_WORKFLOW_PRESET: ${{ matrix.workflowPreset }}
         run: mise run aoc:all -- --solver cpp -vv
