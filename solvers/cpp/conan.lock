@@ -2,8 +2,7 @@
     "version": "0.5",
     "requires": [
         "spdlog/1.16.0#942c2c39562ae25ba575d9c8e2bdf3b6%1760375663.769",
-        "gtest/1.17.0#5224b3b3ff3b4ce1133cbdd27d53ee7d%1755784855.585",
-        "fmt/12.1.0#50abab23274d56bb8f42c94b3b9a40c7%1761885265.231"
+        "gtest/1.17.0#5224b3b3ff3b4ce1133cbdd27d53ee7d%1755784855.585"
     ],
     "build_requires": [
         "cmake/4.1.0#c45377ac8029e0a1738a0c40269991c3%1754591635.125"

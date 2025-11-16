@@ -8,7 +8,7 @@ WrapNamespaceBodyWithEmptyLines: Always
 IncludeCategories:
   - Regex: '^".*"$'
     Priority: 1
-  - Regex: "^<(fmt|spdlog|gtest)/.*>$"
+  - Regex: "^<(spdlog|gtest)/.*>$"
     Priority: 2
   - Regex: "^<.*"
     Priority: 3

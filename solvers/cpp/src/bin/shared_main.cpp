@@ -1,7 +1,6 @@
 #include "convert.hpp"
 #include "solver.hpp"
 
-#include <fmt/base.h>
 #include <spdlog/common.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -11,6 +10,7 @@
 #include <cstdlib>
 #include <format>
 #include <iostream>
+#include <print>
 #include <span>
 #include <stdexcept>
 #include <string>
@@ -69,7 +69,7 @@ auto run(const std::span<const char*>& args) -> int {
   }
 
   auto answer = part == Part::P1 ? solver::p1(inputStr) : solver::p2(inputStr);
-  fmt::print("{}\n", answer);
+  std::print("{}\n", answer);
 
   return 0;
 }

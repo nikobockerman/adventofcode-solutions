@@ -3,7 +3,6 @@
 #include "named_type.hpp"
 #include "solver.hpp"
 
-#include <fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -69,22 +68,9 @@ struct std::formatter<Stack> {
   template <typename FormatContext>
   auto format(const Stack& stack, FormatContext& ctx) const {
     if (stack.empty()) {
-      return fmt::format_to(ctx.out(), "Empty");
+      return std::format_to(ctx.out(), "Empty");
     }
-    return fmt::format_to(ctx.out(), "[{}:{}]", stack.size(), stack.back());
-  }
-};
-
-template <>
-struct std::formatter<Stage> {
-  template <typename ParseContext>
-  constexpr auto parse(ParseContext& ctx) const {
-    return ctx.begin();
-  }
-
-  template <typename FormatContext>
-  auto format(const Stage& stage, FormatContext& ctx) const {
-    return fmt::format_to(ctx.out(), "{}", fmt::join(stage, ","sv));
+    return std::format_to(ctx.out(), "[{}:{}]", stack.size(), stack.back());
   }
 };
 
@@ -97,7 +83,7 @@ struct std::formatter<Move> {
 
   template <typename FormatContext>
   auto format(const Move& move, FormatContext& ctx) const {
-    return fmt::format_to(ctx.out(), "{} from {} to {}", move.amount(),
+    return std::format_to(ctx.out(), "{} from {} to {}", move.amount(),
                           move.indexFromStack() + Move::inputIndexOffset,
                           move.indexToStack() + Move::inputIndexOffset);
   }
