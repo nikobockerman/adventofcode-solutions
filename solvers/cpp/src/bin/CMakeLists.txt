@@ -21,13 +21,13 @@ getBinaries(binaries)
 message(STATUS "Binaries: ${binaries}")
 
 add_library(shared_main OBJECT shared_main.cpp)
-target_link_libraries(shared_main PRIVATE lib fmt::fmt spdlog::spdlog)
+target_link_libraries(shared_main PRIVATE lib spdlog::spdlog)
 
 foreach(binary ${binaries})
   add_library(${binary}.lib STATIC ${binary}.cpp)
   target_link_libraries(
       ${binary}.lib
-      PRIVATE lib fmt::fmt spdlog::spdlog
+      PRIVATE lib spdlog::spdlog
   )
 
   add_executable(${binary})
