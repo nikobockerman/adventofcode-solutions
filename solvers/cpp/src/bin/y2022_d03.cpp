@@ -2,7 +2,6 @@
 #include "solver.hpp"
 #include "utils.hpp"
 
-#include <fmt/ranges.h>  // NOLINT(misc-include-cleaner) necessary include in debug builds
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -110,7 +109,7 @@ constexpr auto getSharedItem(auto&& rucksack) {
   auto intersection = std::vector<char>{};
   ranges::set_intersection(first, second, std::back_inserter(intersection));
 
-  SPDLOG_DEBUG("Intersection: {}", fmt::join(intersection, ","));
+  SPDLOG_DEBUG("Intersection: {}", intersection);
   if (intersection.size() != 1) {
     throw std::runtime_error("Unexpected number of intersections");
   }

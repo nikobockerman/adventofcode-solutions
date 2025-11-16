@@ -3,7 +3,6 @@
 #include "named_type.hpp"
 #include "solver.hpp"
 
-#include <fmt/base.h>
 #include <fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
@@ -23,7 +22,8 @@ using namespace std::string_view_literals;
 namespace {
 
 using Crate = char;
-using Stack = std::vector<Crate>;
+
+class Stack : public std::vector<Crate> {};
 
 using Amount = NamedType<std::size_t, struct AmountTag>;
 using IndexFromStack = NamedType<std::size_t, struct IndexFromStackTag>;
@@ -55,14 +55,12 @@ class Move {
   std::size_t _indexToStack;
 };
 
-using Stage = std::vector<Stack>;
+class Stage : public std::vector<Stack> {};
 
 }  // namespace
 
-namespace fmt {
-
 template <>
-struct formatter<Stack> {
+struct std::formatter<Stack> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) const {
     return ctx.begin();
@@ -78,7 +76,7 @@ struct formatter<Stack> {
 };
 
 template <>
-struct formatter<Stage> {
+struct std::formatter<Stage> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) const {
     return ctx.begin();
@@ -91,7 +89,7 @@ struct formatter<Stage> {
 };
 
 template <>
-struct formatter<Move> {
+struct std::formatter<Move> {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx) const {
     return ctx.begin();
@@ -104,8 +102,6 @@ struct formatter<Move> {
                           move.indexToStack() + Move::inputIndexOffset);
   }
 };
-
-}  // namespace fmt
 
 namespace {
 

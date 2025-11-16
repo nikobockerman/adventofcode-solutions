@@ -3,7 +3,6 @@
 #include "solver.hpp"
 #include "utils.hpp"
 
-#include <fmt/ranges.h>  // NOLINT(misc-include-cleaner) necessary include in debug builds
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
@@ -46,13 +45,13 @@ namespace {
 
 auto solve2(std::string_view inputStr) -> uint64_t {
   auto calorieSums = resolveCalorieSums(inputStr) | ranges::to<std::vector>();
-  SPDLOG_DEBUG("Initial: {}", fmt::join(calorieSums, ","));
+  SPDLOG_DEBUG("Initial: {}", calorieSums);
 
   constexpr std::size_t interestedSize{3};
 
   auto pastInteresting = ranges::next(calorieSums.begin(), interestedSize);
   ranges::nth_element(calorieSums, pastInteresting, std::greater<>());
-  SPDLOG_DEBUG("Partitioned: {}", fmt::join(calorieSums, ","));
+  SPDLOG_DEBUG("Partitioned: {}", calorieSums);
 
   auto result =
     ranges::fold_left_first(calorieSums.begin(), pastInteresting, std::plus());
