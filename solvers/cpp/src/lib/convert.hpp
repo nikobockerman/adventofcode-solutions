@@ -3,6 +3,7 @@
 #include <charconv>
 #include <ranges>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 
 template <typename TResult, typename TRange>
