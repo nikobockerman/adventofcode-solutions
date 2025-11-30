@@ -7,10 +7,8 @@
 #include <string>
 #include <string_view>
 
-#ifdef __cpp_lib_ranges_stride
-#ifdef _LIBCPP_VERSION
+#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_stride >= 202207L
 #error "libc++ started supporting std::views::stride. Use it directly"
-#endif
 #endif
 
 namespace ranges = std::ranges;
