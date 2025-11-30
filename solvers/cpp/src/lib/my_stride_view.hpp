@@ -1,16 +1,9 @@
 #pragma once
 
 #include <ranges>
+#include <utility>
 
-#ifdef TEST_MY_STRIDE_VIEW
-#define USE_MY_STRIDE_VIEW
-#else
-#ifndef __cpp_lib_ranges_stride
-#define USE_MY_STRIDE_VIEW
-#endif
-#endif
-
-#ifndef USE_MY_STRIDE_VIEW
+#if !defined(TEST_MY_STRIDE_VIEW) && __cpp_lib_ranges_stride >= 202207L
 
 template <typename T>
 constexpr auto MyStride(T&& n) {
