@@ -1,5 +1,6 @@
 #include "answer.hpp"
 #include "convert.hpp"
+#include "my_stride_view.hpp"
 #include "named_type.hpp"
 #include "solver.hpp"
 
@@ -123,8 +124,7 @@ constexpr auto loadStage(auto&& linesView) -> Stage {
 
 constexpr auto parseMove(auto&& line) {
   auto parts =
-    line | views::split(" "sv) | views::drop(1) | views::stride(2) |
-    views::take(3) |
+    line | views::split(" "sv) | views::drop(1) | MyStride(2) | views::take(3) |
     views::transform([](auto&& value) { return convert<std::size_t>(value); }) |
     ranges::to<std::vector>();
   return Move{Amount{parts.at(0)}, IndexFromStack{parts.at(1)},
