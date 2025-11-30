@@ -5,10 +5,7 @@
 
 #if !defined(TEST_MY_STRIDE_VIEW) && __cpp_lib_ranges_stride >= 202207L
 
-template <typename T>
-constexpr auto MyStride(T&& n) {
-  return std::views::stride(std::forward<T>(n));
-}
+inline constexpr auto MyStride = std::views::stride;
 
 #else
 
