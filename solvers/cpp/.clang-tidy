@@ -15,7 +15,10 @@ Checks: >-
   readability-*, -readability-identifier-length,
   -bugprone-exception-escape, -misc-include-cleaner, -modernize-use-trailing-return-type
 CheckOptions:
+  cppcoreguidelines-avoid-do-while.IgnoreMacros: "true"
+  cppcoreguidelines-macro-usage.AllowedRegexp: "^ASSERT_HAS_VALUE"
   modernize-use-ranges.IncludeStyle: "google"
   modernize-use-trailing-return-type.TransformLambdas: "all_except_auto"
+  readability-function-cognitive-complexity.IgnoreMacros: true
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*"

@@ -1,5 +1,6 @@
 #include "answer.hpp"
 #include "convert.hpp"
+#include "my_fold_left_first.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
 
@@ -25,7 +26,7 @@ namespace {
 constexpr auto resolveCalorieSums(auto&& input) {
   return input | views::split("\n\n"sv) |
          views::transform([](auto calorieLines) {
-           return ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
+           return MyFoldLeftFirst(  // NOLINT(misc-include-cleaner)
                     splitLinesUntilEmpty(calorieLines) |
                       views::transform([](auto calorieLine) {
                         return convert<unsigned>(calorieLine);
@@ -54,7 +55,7 @@ auto solve2(std::string_view inputStr) -> uint64_t {
   SPDLOG_DEBUG("Partitioned: {}", calorieSums);
 
   auto result =
-    ranges::fold_left_first(calorieSums.begin(), pastInteresting, std::plus());
+    MyFoldLeftFirst(calorieSums.begin(), pastInteresting, std::plus());
   if (!result) {
     throw std::runtime_error("No result");
   }
