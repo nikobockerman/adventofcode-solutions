@@ -1,7 +1,7 @@
 [tools]
 # Basic technologies used in the repository
 python = "3.14.0"
-uv = "0.9.14"
+uv = "0.9.15"
 
 # Common tools
 prettier = "3.6.2"
