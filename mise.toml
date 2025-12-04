@@ -5,7 +5,7 @@ uv = "0.9.15"
 
 # Common tools
 prettier = "3.6.2"
-ruff = "0.14.7"
+ruff = "0.14.8"
 shellcheck = "0.11.0"
 yq = "4.49.2"
 
