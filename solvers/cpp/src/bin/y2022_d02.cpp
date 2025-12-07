@@ -1,4 +1,5 @@
 #include "answer.hpp"
+#include "my_fold_left_first.hpp"
 #include "named_type.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
@@ -102,7 +103,7 @@ constexpr auto getBattleMarks(auto&& range) {
 }
 
 constexpr auto sumBattleScores(auto&& range) -> uint64_t {
-  auto result = ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
+  auto result = MyFoldLeftFirst(
     range | views::transform([](auto&& battle) { return battle.score(); }),
     std::plus());
   if (!result) {

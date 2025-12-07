@@ -1,4 +1,5 @@
 #include "answer.hpp"
+#include "my_fold_left_first.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
 
@@ -73,10 +74,10 @@ constexpr auto priority(char sharedItem) -> unsigned {
 }
 
 constexpr auto sumScore(auto&& items) -> uint64_t {
-  auto result = ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
-    items |
-      views::transform([](auto character) { return priority(character); }),
-    std::plus());
+  auto result = MyFoldLeftFirst(items | views::transform([](auto character) {
+                                  return priority(character);
+                                }),
+                                std::plus());
   if (!result) {
     throw std::runtime_error("No result");
   }

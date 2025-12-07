@@ -21,3 +21,11 @@ constexpr auto processExampleInput(auto input) {
   input.remove_prefix(1);
   return input;
 }
+
+#define ASSERT_HAS_VALUE(x)         \
+  do {                              \
+    if (!(x).has_value()) {         \
+      ASSERT_TRUE((x).has_value()); \
+      return;                       \
+    }                               \
+  } while (0)

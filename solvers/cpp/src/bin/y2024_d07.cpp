@@ -1,5 +1,6 @@
 #include "answer.hpp"
 #include "convert.hpp"
+#include "my_fold_left_first.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
 
@@ -128,7 +129,7 @@ class PossibleEquation {
 
 template <bool allowConcatenationOperator>
 auto solve(std::string_view input) {
-  auto result = ranges::fold_left_first(  // NOLINT(misc-include-cleaner)
+  auto result = MyFoldLeftFirst(
     splitLinesUntilEmpty(input) | views::enumerate |
       views::transform([](auto&& args) -> std::optional<uint64_t> {
         auto [index, line] = args;
