@@ -5,10 +5,7 @@
 
 #if !defined(TEST_MY_STRIDE_VIEW) && __cpp_lib_ranges_stride >= 202207L
 
-template <typename T>
-constexpr auto MyStride(T&& n) {
-  return std::views::stride(std::forward<T>(n));
-}
+inline constexpr auto MyStride = std::views::stride;
 
 #else
 
@@ -38,17 +35,19 @@ class MyStrideView : public std::ranges::view_interface<MyStrideView<Rng>> {
 
     constexpr auto operator*() const noexcept(noexcept(*_cur)) { return *_cur; }
 
-    constexpr Iterator& operator++() noexcept {
+    constexpr Iterator& operator++() noexcept(
+      noexcept(std::ranges::advance(_cur, _n, _end))) {
       std::ranges::advance(_cur, _n, _end);
       return *this;
     }
-    constexpr void operator++(int) noexcept { ++*this; }
+    constexpr void operator++(int) noexcept(noexcept(++(*this))) { ++*this; }
 
-    constexpr bool operator==(const Iterator& o) const noexcept {
+    constexpr bool operator==(const Iterator& o) const
+      noexcept(noexcept(_cur == o._cur)) {
       return _cur == o._cur;
     }
-    constexpr bool operator==(
-      std::default_sentinel_t /*unused*/) const noexcept {
+    constexpr bool operator==(std::default_sentinel_t /*unused*/) const
+      noexcept(noexcept(_cur == _end)) {
       return _cur == _end;
     }
 
@@ -59,15 +58,18 @@ class MyStrideView : public std::ranges::view_interface<MyStrideView<Rng>> {
   };
 
  public:
-  explicit MyStrideView(Rng&& rng, std::size_t n) noexcept
+  explicit MyStrideView(Rng&& rng, std::size_t n) noexcept(
+    noexcept(std::views::all(std::move(rng))))
     : _base{std::views::all(std::move(rng))}, _n{n} {}
 
-  [[nodiscard]] constexpr auto begin() const noexcept
+  [[nodiscard]] constexpr auto begin() const noexcept(noexcept(Iterator{
+    std::ranges::begin(_base), std::ranges::end(_base), _n}))
     requires std::ranges::range<const Base>
   {
     return Iterator{std::ranges::begin(_base), std::ranges::end(_base), _n};
   }
-  [[nodiscard]] constexpr auto begin() noexcept {
+  [[nodiscard]] constexpr auto begin() noexcept(noexcept(Iterator{
+    std::ranges::begin(_base), std::ranges::end(_base), _n})) {
     return Iterator{std::ranges::begin(_base), std::ranges::end(_base), _n};
   }
 
@@ -84,7 +86,9 @@ class MyStrideAdaptorClosure
   constexpr explicit MyStrideAdaptorClosure(std::size_t n) noexcept : _n{n} {}
 
   template <std::ranges::viewable_range Rng>
-  constexpr auto operator()(Rng&& rng) const noexcept {
+  constexpr auto operator()(Rng&& rng) const noexcept(
+    noexcept(MyStrideView<decltype(std::views::all(std::forward<Rng>(rng)))>(
+      std::views::all(std::forward<Rng>(rng)), _n))) {
     auto rngAll = std::views::all(std::forward<Rng>(rng));
     return MyStrideView<decltype(rngAll)>(std::move(rngAll), _n);
   }
