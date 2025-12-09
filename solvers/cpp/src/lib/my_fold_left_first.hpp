@@ -19,7 +19,9 @@ class MyFoldLeftFirstFunction {
  public:
   template <std::input_iterator I, std::sentinel_for<I> S, typename Fn>
   constexpr auto operator()(I first, const S& last, Fn fn) const {
-    using RetVal = typename std::iterator_traits<decltype(first)>::value_type;
+    using InitVal = std::iter_value_t<I>;
+    using RetVal =
+      std::invoke_result_t<decltype(std::ranges::fold_left), I, S, InitVal, Fn>;
 
     if (first == last) {
       return std::optional<RetVal>();
