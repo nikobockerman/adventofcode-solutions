@@ -22,7 +22,7 @@ runs:
 
     - name: uv cache restore
       id: cache-restore
-      uses: actions/cache/restore@a7833574556fa59680c1b7cb190c1735db73ebf0 # v5.0.0
+      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         key: ${{ steps.init.outputs.cache-key }}
         path: ${{ steps.init.outputs.cache-paths }}
@@ -58,7 +58,7 @@ runs:
 
     - name: Save cache
       if: inputs.cache-mode == 'prepare' && steps.cache-restore.outputs.cache-hit != 'true'
-      uses: actions/cache/save@a7833574556fa59680c1b7cb190c1735db73ebf0 # v5.0.0
+      uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         key: ${{ steps.cache-restore.outputs.cache-primary-key }}
         path: ${{ steps.init.outputs.cache-paths }}

@@ -39,7 +39,7 @@ runs:
 
     - id: cache-restore
       name: Mise cache restore
-      uses: actions/cache/restore@a7833574556fa59680c1b7cb190c1735db73ebf0 # v5.0.0
+      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         key: ${{ steps.init.outputs.cache-key-for-restore }}
         path: ${{ steps.init.outputs.cache-path }}
@@ -59,7 +59,7 @@ runs:
 
     - if: steps.install.outputs.save-cache == 'true'
       name: Save cache
-      uses: actions/cache/save@a7833574556fa59680c1b7cb190c1735db73ebf0 # v5.0.0
+      uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         key: ${{ steps.init.outputs.cache-key-prefix }}-${{ steps.install.outputs.downloads-hash }}
         path: ${{ steps.init.outputs.cache-path }}
