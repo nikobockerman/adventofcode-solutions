@@ -18,7 +18,7 @@ runs:
         CACHE_MODE: ${{ inputs.cache-mode }}
         DIRECTORY: ${{ inputs.directory }}
         # renovate: datasource=github-releases depName=jdx/mise
-        MISE_VERSION: v2025.12.1
+        MISE_VERSION: v2025.12.3
       run: |
         # Initialize mise-project-setup action
         "${GITHUB_ACTION_PATH}/init.sh"
