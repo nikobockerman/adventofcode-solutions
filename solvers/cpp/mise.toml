@@ -1,5 +1,5 @@
 [tools]
-"pipx:clang-format" = "21.1.7"
+"pipx:clang-format" = "21.1.8"
 conan = "2.19.1"
 
 [tasks.check]
