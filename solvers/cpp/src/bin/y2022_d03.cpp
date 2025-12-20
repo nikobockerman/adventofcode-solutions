@@ -1,4 +1,5 @@
 #include "answer.hpp"
+#include "my_chunk_view.hpp"
 #include "my_fold_left_first.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
@@ -163,7 +164,7 @@ constexpr auto solve2(auto inputStr) {
   constexpr std::size_t groupSize{3};
 
   return sumScore(
-    splitLinesUntilEmpty(inputStr) | views::chunk(groupSize) |
+    splitLinesUntilEmpty(inputStr) | MyChunk(groupSize) |
     views::transform([](auto&& group) { return getGroupBadgeItem(group); }));
 }
 
