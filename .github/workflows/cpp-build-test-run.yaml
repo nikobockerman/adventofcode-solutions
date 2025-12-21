@@ -19,42 +19,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - macos
+        compiler:
+          - clang
+          - gcc
+        buildType:
+          - debug
+          - release
         include:
-          - name: Ubuntu GCC Release
-            os: ubuntu-24.04
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            workflowPreset: ci-ubuntu-gcc-release
-
-          - name: Ubuntu GCC Debug
-            os: ubuntu-24.04
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            workflowPreset: ci-ubuntu-gcc-debug
-
-          - name: Ubuntu Clang Release
-            os: ubuntu-24.04
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            workflowPreset: ci-ubuntu-clang-release
-
-          - name: Ubuntu Clang Debug
-            os: ubuntu-24.04
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            workflowPreset: ci-ubuntu-clang-debug
-
-          - name: MacOS Clang Release
-            os: macos-15
+          - os: macos
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
-            workflowPreset: ci-macos-clang-release
+            runsOn: macos-15
 
-          - name: MacOS Clang Debug
-            os: macos-15
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
-            workflowPreset: ci-macos-clang-debug
+          - os: ubuntu
 
-    name: ${{ matrix.name }} - Build + test + run
-    runs-on: ${{ matrix.os }}
+            compiler: clang
+            buildType: release
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            runsOn: ubuntu-24.04
+
+    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.buildType }} - Build + test + run
+    runs-on: ${{ matrix.runsOn }}
     timeout-minutes: 30
 
     steps:
+      - name: Define workflow preset name
+        id: preset-name
+        run: |
+          name="ci-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.buildType }}"
+          echo "name=${name}" | tee -a "${GITHUB_OUTPUT}"
+        shell: bash
+
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -69,24 +65,18 @@ jobs:
       - name: Setup CMake project
         uses: ./.github/actions/cmake-project-setup
 
-      - if: matrix.os == 'ubuntu-24.04'
+      - if: matrix.os == 'ubuntu'
         name: Specify HOMEBREW_PREFIX
         run: |
           brewPrefix=$(brew --prefix)
           echo "HOMEBREW_PREFIX=${brewPrefix}" | tr -d '\n' >> "${GITHUB_ENV}"
         shell: bash
 
-      - if: matrix.os == 'ubuntu-24.04' && contains(matrix.workflowPreset, '-gcc-')
-        name: "Add brew binutils to path"
-        run: |
-          echo "${HOMEBREW_PREFIX}/opt/binutils/bin" >> "${GITHUB_PATH}"
-        shell: bash
-
       - name: Run CMake workflow
         uses: lukka/run-cmake@af1be47fd7c933593f687731bc6fdbee024d3ff4 # v10.8
         with:
           cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
-          workflowPreset: ${{ matrix.workflowPreset }}
+          workflowPreset: ${{ steps.preset-name.outputs.name }}
 
       - name: Restore aoc-main mise project
         uses: ./.github/actions/mise-project-setup
@@ -101,5 +91,5 @@ jobs:
       - name: Run all solutions
         env:
           AOC_CPP_SKIP_PREPARE: "1"
-          AOC_CPP_WORKFLOW_PRESET: ${{ matrix.workflowPreset }}
+          AOC_CPP_WORKFLOW_PRESET: ${{ steps.preset-name.outputs.name }}
         run: mise run aoc:all -- --solver cpp -vv
