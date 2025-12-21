@@ -12,6 +12,7 @@ env:
 jobs:
   build-test-run:
     strategy:
+      fail-fast: false
       matrix:
         profile:
           - dev
