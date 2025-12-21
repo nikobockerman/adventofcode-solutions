@@ -50,7 +50,7 @@
         "_ci-gcc-libstdc++-for-clang-ubuntu"
       ],
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU}"
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU}"
       }
     },
     {
@@ -64,7 +64,7 @@
         "_ci-gcc-libstdc++-for-clang-macos"
       ],
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_MACOS}"
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_MACOS}"
       }
     },
     {
