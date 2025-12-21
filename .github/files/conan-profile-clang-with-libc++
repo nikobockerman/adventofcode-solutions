@@ -1,0 +1,6 @@
+{% set prefix = os.environ["HOMEBREW_PREFIX"] %}
+
+[conf]
+tools.build:cxxflags=["-stdlib++-isystem{{ prefix }}/opt/llvm/include/c++/v1"]
+tools.build:exelinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm/lib/c++"]
+tools.build:sharedlinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm/lib/c++"]
