@@ -17,5 +17,6 @@ runs:
     - name: Prepare files
       run: |
         cp .github/files/CMakeUserPresets.json solvers/cpp/
+        cp .github/files/conan-profile-clang-with-libc++ solvers/cpp/
         cp .github/files/conan-profile-gcc-libstd++-for-clang solvers/cpp/
       shell: bash

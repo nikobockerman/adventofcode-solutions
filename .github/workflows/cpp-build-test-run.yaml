@@ -24,9 +24,15 @@ jobs:
         compiler:
           - clang
           - gcc
+        cxxLib:
+          - libc++
+          - libstdc++
         buildType:
           - debug
           - release
+        exclude:
+          - compiler: gcc
+            cxxLib: libc++
         include:
           - os: macos
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
@@ -35,11 +41,12 @@ jobs:
           - os: ubuntu
 
             compiler: clang
+            cxxLib: libstdc++
             buildType: release
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
             runsOn: ubuntu-24.04
 
-    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.buildType }} - Build + test + run
+    name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.cxxLib }} ${{ matrix.buildType }} - Build + test + run
     runs-on: ${{ matrix.runsOn }}
     timeout-minutes: 30
 
@@ -47,7 +54,7 @@ jobs:
       - name: Define workflow preset name
         id: preset-name
         run: |
-          name="ci-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.buildType }}"
+          name="ci-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.cxxLib }}-${{ matrix.buildType }}"
           echo "name=${name}" | tee -a "${GITHUB_OUTPUT}"
         shell: bash
 
