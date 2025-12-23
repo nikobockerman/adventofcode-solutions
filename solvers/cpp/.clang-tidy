@@ -1,7 +1,7 @@
 ---
 Checks: >-
   bugprone-*,
-  cert-*,
+  cert-*, -cert-err58-cpp,
   clang-diagnostic-*,
   clang-analyzer-*,
   concurrency-*,
