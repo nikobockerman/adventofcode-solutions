@@ -17,6 +17,7 @@ permissions:
 jobs:
   build-test-run:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Ubuntu GCC Release
