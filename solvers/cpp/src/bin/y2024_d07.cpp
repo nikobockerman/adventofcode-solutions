@@ -1,5 +1,6 @@
 #include "answer.hpp"
 #include "convert.hpp"
+#include "my_enumerate_view.hpp"
 #include "my_fold_left_first.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
@@ -130,7 +131,7 @@ class PossibleEquation {
 template <bool allowConcatenationOperator>
 auto solve(std::string_view input) {
   auto result = MyFoldLeftFirst(
-    splitLinesUntilEmpty(input) | views::enumerate |
+    splitLinesUntilEmpty(input) | MyEnumerate |
       views::transform([](auto&& args) -> std::optional<uint64_t> {
         auto [index, line] = args;
         auto parts = line | views::split(':') | ranges::to<std::vector>();
