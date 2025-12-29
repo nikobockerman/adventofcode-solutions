@@ -104,11 +104,13 @@ echo "::group::Outputs from init"
   if [[ "${CACHE_MODE}" = "prepare" ]]; then
     echo "aoc-main"
     # Use of mise tools in CI on different OSes for solvers:
-    #   - C++: Ubuntu
+    #   - C++: macOS and Ubuntu
     #   - Python: Ubuntu
-    #   - Rust: Ubuntu, Windows and macOS
-    if [[ "${RUNNER_OS}" = "Linux" ]]; then
+    #   - Rust: macOS, Ubuntu and Windows
+    if [[ "${RUNNER_OS}" = "macOS" ]] || [[ "${RUNNER_OS}" = "Linux" ]]; then
       echo "solvers/cpp"
+    fi
+    if [[ "${RUNNER_OS}" = "Linux" ]]; then
       echo "solvers/python"
     fi
     echo "solvers/rust"
