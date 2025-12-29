@@ -46,7 +46,7 @@ runs:
           echo "::endgroup::"
         done
 
-        first_dir_with_uv=$(echo $DIRECTORIES | cut -d ' ' -f 1)
+        first_dir_with_uv=$(echo "$DIRECTORIES" | cut -d ' ' -f 1)
         echo "::group::Prune uv cache"
         pushd "$first_dir_with_uv"
         # --ci switch removes build-system dependencies, unless they are pinned to specific version
@@ -81,7 +81,7 @@ runs:
 
     - name: Adjust environment for rest of workflow
       run: |
-        echo ::group::Environment changes for rest of workflow
+        echo "::group::Environment changes for rest of workflow"
         echo "Set uv to locked mode: UV_LOCKED=1"
         echo "UV_LOCKED=1" >> "$GITHUB_ENV"
         echo "Set uv to offline mode: UV_OFFLINE=1"
