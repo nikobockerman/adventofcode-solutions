@@ -1,3 +1,3 @@
 * text=auto
 
-inputs/*.txt text eol=lf
+inputs.tar.gpg binary

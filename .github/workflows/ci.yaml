@@ -122,6 +122,7 @@ jobs:
       - uv-cache-aoc-main-macos
       - uv-cache-aoc-main-ubuntu
     uses: ./.github/workflows/ci-solvers-cpp.yaml
+    secrets: inherit
     with:
       homebrew-downloads-hash-from-prepare-macos: ${{ needs.homebrew-cache-macos.outputs.downloads-hash }}
       homebrew-downloads-hash-from-prepare-ubuntu: ${{ needs.homebrew-cache-ubuntu.outputs.downloads-hash }}
@@ -132,6 +133,7 @@ jobs:
       - mise-cache-ubuntu
       - uv-cache-aoc-main-ubuntu
     uses: ./.github/workflows/ci-python-project.yaml
+    secrets: inherit
     with:
       directory: solvers/python
 
@@ -143,6 +145,7 @@ jobs:
       - uv-cache-aoc-main-macos
       - uv-cache-aoc-main-ubuntu
     uses: ./.github/workflows/ci-solvers-rust.yaml
+    secrets: inherit
 
   # Check for all green CI
   check:

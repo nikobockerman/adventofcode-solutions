@@ -5,6 +5,7 @@ uv.lock
 /solvers/cpp/cmake-conan/
 
 /inputs/*.txt
+/inputs.json
 
 /aoc-main/**/*.py
 /solvers/cpp/**/*.cpp
