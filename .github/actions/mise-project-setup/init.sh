@@ -89,8 +89,8 @@ echo "::group::Environment variable changes"
   echo "${rustup_home}" | tr -d '\n'
   echo
 
-  echo MISE_DEBUG=1
-  echo RUST_LOG=uv=debug
+  echo "MISE_DEBUG=1"
+  echo "RUST_LOG=uv=debug"
 } | tee -a "${GITHUB_ENV}"
 echo "::endgroup::"
 
@@ -108,10 +108,10 @@ echo "::group::Outputs from init"
     #   - Python: Ubuntu
     #   - Rust: Ubuntu, Windows and macOS
     if [[ "${RUNNER_OS}" = "Linux" ]]; then
-      echo solvers/cpp
-      echo solvers/python
+      echo "solvers/cpp"
+      echo "solvers/python"
     fi
-    echo solvers/rust
+    echo "solvers/rust"
   elif [[ "${DIRECTORY}" != "."  ]]; then
     if [[ "${DIRECTORY}" != "aoc-main" ]]; then
       echo "aoc-main"
