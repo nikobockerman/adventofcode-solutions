@@ -48,6 +48,13 @@
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
       }
+    },
+    {
+      "name": "sccache",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache"
+      }
     }
   ],
   "testPresets": [

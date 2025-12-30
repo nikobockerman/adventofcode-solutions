@@ -3,31 +3,52 @@
   "configurePresets": [
     {
       "name": "ci-macos-clang-libc++-debug",
-      "inherits": ["_ci-macos-clang-libc++", "_ci-debug", "_ci-clang-tidy"]
+      "inherits": [
+        "sccache",
+        "_ci-macos-clang-libc++",
+        "_ci-debug",
+        "_ci-clang-tidy"
+      ]
     },
     {
       "name": "ci-macos-clang-libc++-release",
-      "inherits": ["_ci-macos-clang-libc++", "_ci-release", "_ci-clang-tidy"]
+      "inherits": [
+        "sccache",
+        "_ci-macos-clang-libc++",
+        "_ci-release",
+        "_ci-clang-tidy"
+      ]
     },
     {
       "name": "ci-macos-clang-libstdc++-debug",
-      "inherits": ["_ci-macos-clang-libstdc++", "_ci-debug", "_ci-clang-tidy"]
+      "inherits": [
+        "sccache",
+        "_ci-macos-clang-libstdc++",
+        "_ci-debug",
+        "_ci-clang-tidy"
+      ]
     },
     {
       "name": "ci-macos-clang-libstdc++-release",
-      "inherits": ["_ci-macos-clang-libstdc++", "_ci-release", "_ci-clang-tidy"]
+      "inherits": [
+        "sccache",
+        "_ci-macos-clang-libstdc++",
+        "_ci-release",
+        "_ci-clang-tidy"
+      ]
     },
     {
       "name": "ci-macos-gcc-libstdc++-debug",
-      "inherits": ["_ci-macos-gcc", "_ci-debug"]
+      "inherits": ["sccache", "_ci-macos-gcc", "_ci-debug"]
     },
     {
       "name": "ci-macos-gcc-libstdc++-release",
-      "inherits": ["_ci-macos-gcc", "_ci-release"]
+      "inherits": ["sccache", "_ci-macos-gcc", "_ci-release"]
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-release",
       "inherits": [
+        "sccache",
         "_ci-ubuntu-clang-libstdc++",
         "_ci-release",
         "_ci-clang-tidy"
