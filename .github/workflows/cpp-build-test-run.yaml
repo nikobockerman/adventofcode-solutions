@@ -69,8 +69,16 @@ jobs:
           cache-mode: use
           downloads-hash-from-prepare: ${{ matrix.homebrew-downloads-hash-from-prepare }}
 
-      - name: Setup CMake project
+      - name: Setup tools through mise
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: solvers/cpp
+
+      - id: setup-cmake-project
+        name: Setup CMake project
         uses: ./.github/actions/cmake-project-setup
+        with:
+          conan-cache-key-prefix: conan-${{ steps.preset-name.outputs.name }}
 
       - if: matrix.os == 'ubuntu'
         name: Specify HOMEBREW_PREFIX
@@ -85,11 +93,6 @@ jobs:
           cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
           workflowPreset: ${{ steps.preset-name.outputs.name }}
 
-      - name: Restore aoc-main mise project
-        uses: ./.github/actions/mise-project-setup
-        with:
-          directory: aoc-main
-
       - name: Restore aoc-main uv project
         uses: ./.github/actions/uv-project-setup
         with:
@@ -100,3 +103,9 @@ jobs:
           AOC_CPP_SKIP_PREPARE: "1"
           AOC_CPP_WORKFLOW_PRESET: ${{ steps.preset-name.outputs.name }}
         run: mise run aoc:all -- --solver cpp -vv
+
+      - name: Finalize cmake project
+        uses: ./.github/actions/cmake-project-finalize
+        with:
+          conan-cache-key-prefix: conan-${{ steps.preset-name.outputs.name }}
+          conan-cache-matched-key: ${{ steps.setup-cmake-project.outputs.conan-cache-matched-key }}
