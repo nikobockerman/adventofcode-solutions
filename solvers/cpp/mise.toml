@@ -1,6 +1,6 @@
 [tools]
 "pipx:clang-format" = "21.1.8"
-conan = "2.19.1"
+conan = "2.24.0"
 
 [tasks.check]
 depends = [
