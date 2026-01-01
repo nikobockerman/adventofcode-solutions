@@ -1,18 +1,38 @@
 name: CMake project setup
 description: Setup cmake, conan and CMakeUserPresets.json
+inputs:
+  conan-cache-key-prefix:
+    description: Prefix for the conan cache key
+    required: true
+outputs:
+  conan-cache-matched-key:
+    description: Cache restore key used to restore Conan packages
+    value: ${{ steps.cache-conan-packages.outputs.cache-matched-key }}
 
 runs:
   using: composite
   steps:
+    - id: init
+      run: |
+        # Initialize cmake-project-setup action
+        "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - id: cache-conan-packages
+      name: Restore Conan packages cache
+      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      with:
+        # Use an intentionally non-matching suffix so that restores only use the prefixes below.
+        # The full key is only used when saving a new cache entry.
+        key: ${{ inputs.conan-cache-key-prefix }}-${{ hashFiles('solvers/cpp/conan.lock') }}-partial-match-only
+        path: ${{ steps.init.outputs.conan-cache-path }}
+        restore-keys: |
+          ${{ inputs.conan-cache-key-prefix }}-${{ hashFiles('solvers/cpp/conan.lock') }}-
+          ${{ inputs.conan-cache-key-prefix }}-
+
     - name: Install CMake
       # TODO: Install cmake through mise
       uses: lukka/get-cmake@9e07ecdcee1b12e5037e42f410b67f03e2f626e1 # v4.2.1
-
-    - name: Setup Conan Client
-      # TODO: Setup only conan package cache here and use conan through mise
-      uses: conan-io/setup-conan@2f4bd34e8e0af00e1a77a66e1d284e06d71d703f # v1.3.0
-      with:
-        cache_packages: true
 
     - name: Prepare files
       run: |

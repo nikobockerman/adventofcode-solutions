@@ -1,0 +1,27 @@
+name: CMake project finalize
+description: Finalize conan packages in cache
+inputs:
+  conan-cache-key-prefix:
+    description: Prefix for the conan cache key
+    required: true
+  conan-cache-matched-key:
+    description: Matched cache used to restore conan cache
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - env:
+        CONAN_CACHE_MATCHED_KEY: ${{ inputs.conan-cache-matched-key }}
+      id: init
+      run: |
+        # Initialize cmake-project-finalize action
+        "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - if: steps.init.outputs.save-cache == 'true'
+      name: Cache Conan packages
+      uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      with:
+        key: ${{ inputs.conan-cache-key-prefix }}-${{ hashFiles('solvers/cpp/conan.lock') }}-${{ steps.init.outputs.packages-hash }}
+        path: ${{ steps.init.outputs.conan-cache-path }}
