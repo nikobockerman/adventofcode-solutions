@@ -55,6 +55,7 @@ jobs:
       - name: Cleanup caches
 
         env:
+          GH_TOKEN: ${{ github.token }}
           MISE_TASK: "github:cache:remove-for-pr"
           PR_NUMBER: ${{ needs.resolve-pr-number.outputs.pr_number }}
         run: mise run "${MISE_TASK}"
