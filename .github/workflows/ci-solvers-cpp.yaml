@@ -18,6 +18,7 @@ jobs:
   # Checks
   build-test-run:
     uses: ./.github/workflows/cpp-build-test-run.yaml
+    secrets: inherit
     with:
       homebrew-downloads-hash-from-prepare-macos: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
       homebrew-downloads-hash-from-prepare-ubuntu: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}

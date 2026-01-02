@@ -50,6 +50,7 @@ jobs:
     if: inputs.directory != 'aoc-main'
     needs: uv-cache
     uses: ./.github/workflows/python-run.yaml
+    secrets: inherit
 
   test-pytest:
     if: always() && contains(fromJSON('["skipped", "success"]'), needs.uv-cache.result)

@@ -94,6 +94,12 @@ jobs:
           directory: aoc-main
 
       - if: matrix.run
+        name: Extract inputs
+        uses: ./.github/actions/extract-inputs
+        with:
+          encryption-key: ${{ secrets.INPUTS_ENCRYPTION_KEY }}
+
+      - if: matrix.run
         name: Run all solutions
         env:
           AOC_RUST_BUILD_ARGS: --verbose --frozen --profile ${{ matrix.profile }}

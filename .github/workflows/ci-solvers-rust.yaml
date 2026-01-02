@@ -9,6 +9,7 @@ jobs:
   # Checks
   build-test-run:
     uses: ./.github/workflows/rust-build-test-run.yaml
+    secrets: inherit
 
   check-rustfmt:
     uses: ./.github/workflows/mise-task.yaml

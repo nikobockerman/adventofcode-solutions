@@ -25,5 +25,10 @@ jobs:
         with:
           directory: solvers/python
 
+      - name: Extract inputs
+        uses: ./.github/actions/extract-inputs
+        with:
+          encryption-key: ${{ secrets.INPUTS_ENCRYPTION_KEY }}
+
       - name: Run aoc
         run: mise run aoc:all -- --solver python
