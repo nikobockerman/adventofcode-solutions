@@ -4,31 +4,56 @@ on:
     types:
       - closed
   workflow_dispatch:
+    inputs:
+      pull_request_number:
+        description: "Pull request number"
+        required: true
 permissions: {}
 
 jobs:
-  cleanup:
-    name: Cleanup caches
+  resolve-pr-number:
+    name: Resolve PR number
     runs-on: ubuntu-24.04
     permissions:
-      actions: write
+      actions: read
     steps:
-      - name: Cleanup
+      - env:
+          EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+          INPUT_PR_NUMBER: ${{ github.event.inputs.pull_request_number }}
+        id: resolve-pr-number
+        run: |
+          # Resolve PR number
+          prNumber="${EVENT_PR_NUMBER:-$INPUT_PR_NUMBER}"
+          if [[ -z "$prNumber" ]]; then
+            echo "::error::Pull request number not provided"
+            exit 1
+          fi
+
+          echo "::group::Outputs"
+          {
+            echo "pr_number=$prNumber"
+          } | tee -a "${GITHUB_OUTPUT}"
+        shell: bash
+
+  cleanup:
+    name: Cleanup caches
+    needs: resolve-pr-number
+    permissions:
+      actions: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Restore mise tools
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: .
+
+      - name: Cleanup caches
 
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
-        run: |
-          echo "Fetching list of cache keys"
-          cacheIdsForPR=$(gh cache list --ref "$BRANCH" --limit 100 --json id --jq '.[].id')
-
-          echo "::group::Deleting caches..."
-          for cacheId in $cacheIdsForPR
-          do
-            echo "Deleting cache: $cacheId"
-            gh cache delete "$cacheId"
-          done
-          echo "Done"
-          echo "::endgroup::"
+          MISE_TASK: "github:cache:remove-for-pr"
+          PR_NUMBER: ${{ needs.resolve-pr-number.outputs.pr_number }}
+        run: mise run "${MISE_TASK}"
         shell: bash
