@@ -21,7 +21,6 @@ jobs:
         runner:
           - ubuntu-24.04
           - macos-15
-          - windows-2025
         include:
           - clippy: false
           - run: true

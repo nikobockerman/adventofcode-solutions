@@ -20,14 +20,6 @@ if [[ -z "${RUNNER_TEMP}" ]]; then
   exit 1
 fi
 
-
-# TODO: Verify whether SEP is needed or not
-if [[ "${RUNNER_OS}" = "Windows" ]]; then
-  SEP="\\"
-else
-  SEP="/"
-fi
-
 # Validate inputs
 if [[ -z "${MISE_VERSION}" ]]; then
   echo "::error::MISE_VERSION is not set"
@@ -67,12 +59,12 @@ elif [[ ! -f "${DIRECTORY}/mise.toml" ]]; then
   exit 1
 fi
 
-mise_data_dir="${RUNNER_TEMP}${SEP}aoc-mise-data"
+mise_data_dir="${RUNNER_TEMP}/aoc-mise-data"
 
 # Isolate rustup used with mise.
-rustup_home="${RUNNER_TEMP}${SEP}aoc-rustup-home"
+rustup_home="${RUNNER_TEMP}/aoc-rustup-home"
 # Isolate cargo used with mise.
-cargo_home="${RUNNER_TEMP}${SEP}aoc-cargo-home"
+cargo_home="${RUNNER_TEMP}/aoc-cargo-home"
 
 
 echo "::group::Environment variable changes"
@@ -106,10 +98,8 @@ echo "::group::Outputs from init"
     # Use of mise tools in CI on different OSes for solvers:
     #   - C++: macOS and Ubuntu
     #   - Python: Ubuntu
-    #   - Rust: macOS, Ubuntu and Windows
-    if [[ "${RUNNER_OS}" = "macOS" ]] || [[ "${RUNNER_OS}" = "Linux" ]]; then
-      echo "solvers/cpp"
-    fi
+    #   - Rust: macOS and Ubuntu
+    echo "solvers/cpp"
     if [[ "${RUNNER_OS}" = "Linux" ]]; then
       echo "solvers/python"
     fi

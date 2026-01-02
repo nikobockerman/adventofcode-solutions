@@ -29,14 +29,6 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-mise-root-ubuntu
 
-  mise-cache-windows:
-    uses: ./.github/workflows/mise-prepare-cache.yaml
-    with:
-      runner: windows-2025
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-mise-root-windows
-
   # uv cache prepare for aoc-main
   uv-cache-aoc-main-macos:
     needs: mise-cache-macos
@@ -57,16 +49,6 @@ jobs:
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-ubuntu
-
-  uv-cache-aoc-main-windows:
-    needs: mise-cache-windows
-    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
-    with:
-      directory: aoc-main
-      runner: windows-2025
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-windows
 
   # Homebrew cache prepare
   homebrew-cache-macos:
@@ -158,10 +140,8 @@ jobs:
     needs:
       - mise-cache-macos
       - mise-cache-ubuntu
-      - mise-cache-windows
       - uv-cache-aoc-main-macos
       - uv-cache-aoc-main-ubuntu
-      - uv-cache-aoc-main-windows
     uses: ./.github/workflows/ci-solvers-rust.yaml
 
   # Check for all green CI
