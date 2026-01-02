@@ -13,14 +13,16 @@ permissions: {}
 jobs:
   resolve-pr-number:
     name: Resolve PR number
-    runs-on: ubuntu-24.04
+    outputs:
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
     permissions:
       actions: read
+    runs-on: ubuntu-24.04
     steps:
       - env:
           EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
           INPUT_PR_NUMBER: ${{ github.event.inputs.pull_request_number }}
-        id: resolve-pr-number
+        id: resolve
         run: |
           # Resolve PR number
           prNumber="${EVENT_PR_NUMBER:-$INPUT_PR_NUMBER}"
