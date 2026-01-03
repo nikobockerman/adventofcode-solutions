@@ -1,0 +1,16 @@
+name: Extract inputs
+description: Extract input files from the encrypted tarball
+inputs:
+  encryption-key:
+    description: The encryption key for the input files
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - env:
+        ENCRYPTION_KEY: ${{ inputs.encryption-key }}
+      run: |
+        # Extract inputs
+        "${GITHUB_ACTION_PATH}/extract.sh"
+      shell: bash

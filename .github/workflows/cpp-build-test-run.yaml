@@ -98,6 +98,11 @@ jobs:
         with:
           directory: aoc-main
 
+      - name: Extract inputs
+        uses: ./.github/actions/extract-inputs
+        with:
+          encryption-key: ${{ secrets.INPUTS_ENCRYPTION_KEY }}
+
       - name: Run all solutions
         env:
           AOC_CPP_SKIP_PREPARE: "1"
