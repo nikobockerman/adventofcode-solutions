@@ -94,7 +94,7 @@ def main() -> bool:
     inputs_dir = repo_root / "inputs"
     if inputs_dir.exists() and inputs_dir.is_dir():
         if next(inputs_dir.iterdir(), None) is not None:
-            _logger.error("Inputs directory and is not empty. Not overwriting.")
+            _logger.error("Inputs directory exists and is not empty. Not overwriting.")
             return False
         _logger.debug("Inputs directory exists but is empty")
     else:

@@ -123,7 +123,7 @@ class EncryptedInputFiles:
                 if backup_file:
                     backup_file.unlink()
             except subprocess.CalledProcessError:
-                _logger.exception("Encryption error: %s")
+                _logger.exception("Encryption error")
                 if backup_file:
                     backup_file.rename(self._encrypted_file)
                 return False
