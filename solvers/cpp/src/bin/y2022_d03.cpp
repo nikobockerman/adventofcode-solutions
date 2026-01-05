@@ -111,7 +111,7 @@ constexpr auto getSharedItem(auto&& rucksack) {
   auto intersection = std::vector<char>{};
   ranges::set_intersection(first, second, std::back_inserter(intersection));
 
-  SPDLOG_DEBUG("Intersection: {}", intersection);
+  spdlog::debug("Intersection: {}", intersection);
   if (intersection.size() != 1) {
     throw std::runtime_error("Unexpected number of intersections");
   }
@@ -139,7 +139,7 @@ constexpr auto getGroupBadgeItem(auto&& groupRuckSacks) -> char {
   auto third = vectorSet(*iter);
 
   if (iter == end) {
-    SPDLOG_DEBUG("Invalid group size: {}", ranges::distance(groupRuckSacks));
+    spdlog::debug("Invalid group size: {}", ranges::distance(groupRuckSacks));
     throw std::runtime_error("Invalid group size");
   }
 
@@ -156,7 +156,7 @@ constexpr auto getGroupBadgeItem(auto&& groupRuckSacks) -> char {
   }
 
   auto badge = intersection.at(0);
-  SPDLOG_DEBUG("Group badge found: {}", badge);
+  spdlog::debug("Group badge found: {}", badge);
   return badge;
 }
 

@@ -102,7 +102,7 @@ constexpr auto crateCharIndex(auto stackIndex) { return 1 + (4 * stackIndex); }
 constexpr auto loadStage(auto&& linesView) -> Stage {
   auto lines = linesView | ranges::to<std::vector>();
   auto stackCount = countStacks(lines.back());
-  SPDLOG_DEBUG("Stack count: {}", stackCount);
+  spdlog::debug("Stack count: {}", stackCount);
 
   auto crateLines =
     lines | views::reverse | views::drop(1) | ranges::to<std::vector>();
@@ -133,8 +133,8 @@ constexpr auto parseMove(auto&& line) {
 
 constexpr auto loadMoves(auto&& lines) {
   return lines | views::transform([](auto&& line) {
-           SPDLOG_DEBUG("DEBUG");
-           SPDLOG_DEBUG("Parsing move: {}", line);
+           spdlog::debug("DEBUG");
+           spdlog::debug("Parsing move: {}", line);
            return parseMove(line);
          });
 }
@@ -200,19 +200,19 @@ constexpr auto loadParts(auto&& range) {
     [&move](auto prev, auto) {
       auto stack = applySingleMove(std::move(prev), move.indexFromStack(),
                                    move.indexToStack());
-      SPDLOG_DEBUG("Intermediate stage: {}", stack);
+      spdlog::debug("Intermediate stage: {}", stack);
       return stack;
     });
 }
 
 auto solve1(auto inputStr) {
   auto [stage, moves] = loadParts(inputStr);
-  SPDLOG_INFO("Initial stage: {}", stage);
+  spdlog::info("Initial stage: {}", stage);
   auto finalStage =
     ranges::fold_left(moves, std::move(stage), [](auto prev, const auto& move) {
-      SPDLOG_DEBUG("Performing move ({}); Stage: {}", move, prev);
+      spdlog::debug("Performing move ({}); Stage: {}", move, prev);
       auto next = applyMoveOneByOne(std::move(prev), move);
-      SPDLOG_DEBUG("Move performed ({}); Stage: {}", move, next);
+      spdlog::debug("Move performed ({}); Stage: {}", move, next);
       return next;
     });
 
@@ -253,12 +253,12 @@ namespace {
 
 constexpr auto solve2(auto inputStr) {
   auto [stage, moves] = loadParts(inputStr);
-  SPDLOG_INFO("Initial stage: {}", stage);
+  spdlog::info("Initial stage: {}", stage);
   auto finalStage =
     ranges::fold_left(moves, std::move(stage), [](auto prev, const auto& move) {
-      SPDLOG_DEBUG("Performing move ({}); Stage: {}", move, prev);
+      spdlog::debug("Performing move ({}); Stage: {}", move, prev);
       auto next = applyMoveInSingle(std::move(prev), move);
-      SPDLOG_DEBUG("Move performed ({}); Stage: {}", move, next);
+      spdlog::debug("Move performed ({}); Stage: {}", move, next);
       return next;
     });
 
