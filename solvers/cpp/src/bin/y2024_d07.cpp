@@ -143,7 +143,7 @@ auto solve(std::string_view input) {
         auto eq = PossibleEquation<allowConcatenationOperator>{
           testValue, std::move(values)};
         if (eq.canBeMadeTrue()) {
-          SPDLOG_INFO("Possible Equation: {} -> {}", index, testValue);
+          spdlog::info("Possible Equation: {} -> {}", index, testValue);
           return eq.testResult();
         }
         return std::nullopt;

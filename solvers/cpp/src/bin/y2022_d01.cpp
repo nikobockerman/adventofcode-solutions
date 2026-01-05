@@ -46,13 +46,13 @@ namespace {
 
 auto solve2(std::string_view inputStr) -> uint64_t {
   auto calorieSums = resolveCalorieSums(inputStr) | ranges::to<std::vector>();
-  SPDLOG_DEBUG("Initial: {}", calorieSums);
+  spdlog::debug("Initial: {}", calorieSums);
 
   constexpr std::size_t interestedSize{3};
 
   auto pastInteresting = ranges::next(calorieSums.begin(), interestedSize);
   ranges::nth_element(calorieSums, pastInteresting, std::greater<>());
-  SPDLOG_DEBUG("Partitioned: {}", calorieSums);
+  spdlog::debug("Partitioned: {}", calorieSums);
 
   auto result =
     MyFoldLeftFirst(calorieSums.begin(), pastInteresting, std::plus());
