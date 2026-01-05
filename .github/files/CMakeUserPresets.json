@@ -4,7 +4,7 @@
     {
       "name": "ci-macos-clang-libc++-debug",
       "inherits": [
-        "sccache",
+        "_ci-common",
         "_ci-macos-clang-libc++",
         "_ci-debug",
         "_ci-clang-tidy"
@@ -13,7 +13,7 @@
     {
       "name": "ci-macos-clang-libc++-release",
       "inherits": [
-        "sccache",
+        "_ci-common",
         "_ci-macos-clang-libc++",
         "_ci-release",
         "_ci-clang-tidy"
@@ -22,7 +22,7 @@
     {
       "name": "ci-macos-clang-libstdc++-debug",
       "inherits": [
-        "sccache",
+        "_ci-common",
         "_ci-macos-clang-libstdc++",
         "_ci-debug",
         "_ci-clang-tidy"
@@ -31,7 +31,7 @@
     {
       "name": "ci-macos-clang-libstdc++-release",
       "inherits": [
-        "sccache",
+        "_ci-common",
         "_ci-macos-clang-libstdc++",
         "_ci-release",
         "_ci-clang-tidy"
@@ -39,20 +39,26 @@
     },
     {
       "name": "ci-macos-gcc-libstdc++-debug",
-      "inherits": ["sccache", "_ci-macos-gcc", "_ci-debug"]
+      "inherits": ["_ci-common", "_ci-macos-gcc", "_ci-debug"]
     },
     {
       "name": "ci-macos-gcc-libstdc++-release",
-      "inherits": ["sccache", "_ci-macos-gcc", "_ci-release"]
+      "inherits": ["_ci-common", "_ci-macos-gcc", "_ci-release"]
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-release",
       "inherits": [
-        "sccache",
+        "_ci-common",
         "_ci-ubuntu-clang-libstdc++",
         "_ci-release",
         "_ci-clang-tidy"
       ]
+    },
+    {
+      "name": "_ci-common",
+      "hidden": true,
+      "binaryDir": "build",
+      "inherits": ["cmake-conan", "sccache", "ninja"]
     },
     {
       "name": "_ci-macos-clang-libc++",
@@ -77,12 +83,12 @@
     {
       "name": "_ci-macos-clang-common",
       "hidden": true,
-      "inherits": ["gcc-clang-flags", "_ci-common", "_ci-clang"]
+      "inherits": ["gcc-clang-flags", "_ci-clang"]
     },
     {
       "name": "_ci-macos-gcc",
       "hidden": true,
-      "inherits": ["gcc-clang-flags", "_ci-common", "_ci-gcc"],
+      "inherits": ["gcc-clang-flags", "_ci-gcc"],
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
       }
@@ -92,7 +98,6 @@
       "hidden": true,
       "inherits": [
         "gcc-clang-flags",
-        "_ci-common",
         "_ci-clang",
         "_ci-gcc-libstdc++-for-clang-common",
         "_ci-gcc-libstdc++-for-clang-ubuntu"
@@ -100,12 +105,6 @@
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU}"
       }
-    },
-    {
-      "name": "_ci-common",
-      "hidden": true,
-      "binaryDir": "build",
-      "inherits": ["cmake-conan"]
     },
     {
       "name": "_ci-debug",
