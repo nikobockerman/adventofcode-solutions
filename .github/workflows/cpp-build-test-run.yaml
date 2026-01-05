@@ -107,7 +107,7 @@ jobs:
         env:
           AOC_CPP_SKIP_PREPARE: "1"
           AOC_CPP_WORKFLOW_PRESET: ${{ steps.preset-name.outputs.name }}
-        run: mise run aoc:all -- --solver cpp -vv
+        run: mise run aoc:all -- --solver cpp
 
       - name: Finalize cmake project
         uses: ./.github/actions/cmake-project-finalize
