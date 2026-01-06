@@ -1,5 +1,5 @@
 [requires]
-spdlog/1.16.0
+spdlog/1.17.0
 gtest/1.17.0
 
 [options]
