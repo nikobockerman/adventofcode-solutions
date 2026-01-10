@@ -2,33 +2,6 @@
   "version": 8,
   "configurePresets": [
     {
-      "name": "ci-macos-clang-libc++-debug",
-      "inherits": [
-        "_ci-common",
-        "_ci-macos-clang-libc++",
-        "_ci-debug",
-        "_ci-clang-tidy"
-      ]
-    },
-    {
-      "name": "ci-macos-clang-libc++-release",
-      "inherits": [
-        "_ci-common",
-        "_ci-macos-clang-libc++",
-        "_ci-release",
-        "_ci-clang-tidy"
-      ]
-    },
-    {
-      "name": "ci-macos-clang-libstdc++-debug",
-      "inherits": [
-        "_ci-common",
-        "_ci-macos-clang-libstdc++",
-        "_ci-debug",
-        "_ci-clang-tidy"
-      ]
-    },
-    {
       "name": "ci-macos-clang-libstdc++-release",
       "inherits": [
         "_ci-common",
@@ -38,12 +11,31 @@
       ]
     },
     {
-      "name": "ci-macos-gcc-libstdc++-debug",
-      "inherits": ["_ci-common", "_ci-macos-gcc", "_ci-debug"]
+      "name": "ci-ubuntu-clang-libc++-debug",
+      "inherits": [
+        "_ci-common",
+        "_ci-ubuntu-clang-libc++",
+        "_ci-debug",
+        "_ci-clang-tidy"
+      ]
     },
     {
-      "name": "ci-macos-gcc-libstdc++-release",
-      "inherits": ["_ci-common", "_ci-macos-gcc", "_ci-release"]
+      "name": "ci-ubuntu-clang-libc++-release",
+      "inherits": [
+        "_ci-common",
+        "_ci-ubuntu-clang-libc++",
+        "_ci-release",
+        "_ci-clang-tidy"
+      ]
+    },
+    {
+      "name": "ci-ubuntu-clang-libstdc++-debug",
+      "inherits": [
+        "_ci-common",
+        "_ci-ubuntu-clang-libstdc++",
+        "_ci-debug",
+        "_ci-clang-tidy"
+      ]
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-release",
@@ -55,24 +47,25 @@
       ]
     },
     {
+      "name": "ci-ubuntu-gcc-libstdc++-debug",
+      "inherits": ["_ci-common", "_ci-ubuntu-gcc", "_ci-debug"]
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-release",
+      "inherits": ["_ci-common", "_ci-ubuntu-gcc", "_ci-release"]
+    },
+    {
       "name": "_ci-common",
       "hidden": true,
       "binaryDir": "build",
       "inherits": ["cmake-conan", "sccache", "ninja"]
     },
     {
-      "name": "_ci-macos-clang-libc++",
-      "hidden": true,
-      "inherits": ["_ci-macos-clang-common", "_ci-clang-libc++"],
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}"
-      }
-    },
-    {
       "name": "_ci-macos-clang-libstdc++",
       "hidden": true,
       "inherits": [
-        "_ci-macos-clang-common",
+        "gcc-clang-flags",
+        "_ci-clang",
         "_ci-gcc-libstdc++-for-clang-common",
         "_ci-gcc-libstdc++-for-clang-macos"
       ],
@@ -81,29 +74,36 @@
       }
     },
     {
-      "name": "_ci-macos-clang-common",
+      "name": "_ci-ubuntu-clang-libc++",
       "hidden": true,
-      "inherits": ["gcc-clang-flags", "_ci-clang"]
-    },
-    {
-      "name": "_ci-macos-gcc",
-      "hidden": true,
-      "inherits": ["gcc-clang-flags", "_ci-gcc"],
+      "inherits": ["_ci-ubuntu-clang-common", "_ci-clang-libc++"],
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}"
       }
     },
     {
       "name": "_ci-ubuntu-clang-libstdc++",
       "hidden": true,
       "inherits": [
-        "gcc-clang-flags",
-        "_ci-clang",
+        "_ci-ubuntu-clang-common",
         "_ci-gcc-libstdc++-for-clang-common",
         "_ci-gcc-libstdc++-for-clang-ubuntu"
       ],
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU}"
+      }
+    },
+    {
+      "name": "_ci-ubuntu-clang-common",
+      "hidden": true,
+      "inherits": ["gcc-clang-flags", "_ci-clang"]
+    },
+    {
+      "name": "_ci-ubuntu-gcc",
+      "hidden": true,
+      "inherits": ["gcc-clang-flags", "_ci-gcc"],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
       }
     },
     {
@@ -150,8 +150,8 @@
         "PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/llvm/include/c++/v1"
       },
       "cacheVariables": {
-        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib/c++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib/unwind -lunwind",
-        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib/c++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib/unwind -lunwind",
+        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm/lib",
+        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm/lib",
         "CONAN_HOST_PROFILE": "${sourceDir}/conan-profile-clang-with-libc++;auto-cmake"
       }
     },
@@ -184,123 +184,72 @@
   ],
   "buildPresets": [
     {
-      "name": "ci-macos-clang-libc++-debug",
-      "configurePreset": "ci-macos-clang-libc++-debug"
-    },
-    {
-      "name": "ci-macos-clang-libc++-release",
-      "configurePreset": "ci-macos-clang-libc++-release"
-    },
-    {
-      "name": "ci-macos-clang-libstdc++-debug",
-      "configurePreset": "ci-macos-clang-libstdc++-debug"
-    },
-    {
       "name": "ci-macos-clang-libstdc++-release",
       "configurePreset": "ci-macos-clang-libstdc++-release"
     },
     {
-      "name": "ci-macos-gcc-libstdc++-debug",
-      "configurePreset": "ci-macos-gcc-libstdc++-debug"
+      "name": "ci-ubuntu-clang-libc++-debug",
+      "configurePreset": "ci-ubuntu-clang-libc++-debug"
     },
     {
-      "name": "ci-macos-gcc-libstdc++-release",
-      "configurePreset": "ci-macos-gcc-libstdc++-release"
+      "name": "ci-ubuntu-clang-libc++-release",
+      "configurePreset": "ci-ubuntu-clang-libc++-release"
+    },
+    {
+      "name": "ci-ubuntu-clang-libstdc++-debug",
+      "configurePreset": "ci-ubuntu-clang-libstdc++-debug"
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-release",
       "configurePreset": "ci-ubuntu-clang-libstdc++-release"
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-debug",
+      "configurePreset": "ci-ubuntu-gcc-libstdc++-debug"
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-release",
+      "configurePreset": "ci-ubuntu-gcc-libstdc++-release"
     }
   ],
   "testPresets": [
-    {
-      "name": "ci-macos-clang-libc++-debug",
-      "configurePreset": "ci-macos-clang-libc++-debug",
-      "inherits": ["output-on-failure"]
-    },
-    {
-      "name": "ci-macos-clang-libc++-release",
-      "configurePreset": "ci-macos-clang-libc++-release",
-      "inherits": ["output-on-failure"]
-    },
-    {
-      "name": "ci-macos-clang-libstdc++-debug",
-      "configurePreset": "ci-macos-clang-libstdc++-debug",
-      "inherits": ["output-on-failure"]
-    },
     {
       "name": "ci-macos-clang-libstdc++-release",
       "configurePreset": "ci-macos-clang-libstdc++-release",
       "inherits": ["output-on-failure"]
     },
     {
-      "name": "ci-macos-gcc-libstdc++-debug",
-      "configurePreset": "ci-macos-gcc-libstdc++-debug",
+      "name": "ci-ubuntu-clang-libc++-debug",
+      "configurePreset": "ci-ubuntu-clang-libc++-debug",
       "inherits": ["output-on-failure"]
     },
     {
-      "name": "ci-macos-gcc-libstdc++-release",
-      "configurePreset": "ci-macos-gcc-libstdc++-release",
+      "name": "ci-ubuntu-clang-libc++-release",
+      "configurePreset": "ci-ubuntu-clang-libc++-release",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-clang-libstdc++-debug",
+      "configurePreset": "ci-ubuntu-clang-libstdc++-debug",
       "inherits": ["output-on-failure"]
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-release",
       "configurePreset": "ci-ubuntu-clang-libstdc++-release",
       "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-debug",
+      "configurePreset": "ci-ubuntu-gcc-libstdc++-debug",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-release",
+      "configurePreset": "ci-ubuntu-gcc-libstdc++-release",
+      "inherits": ["output-on-failure"]
     }
   ],
   "workflowPresets": [
-    {
-      "name": "ci-macos-clang-libc++-debug",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-macos-clang-libc++-debug"
-        },
-        {
-          "type": "build",
-          "name": "ci-macos-clang-libc++-debug"
-        },
-        {
-          "type": "test",
-          "name": "ci-macos-clang-libc++-debug"
-        }
-      ]
-    },
-    {
-      "name": "ci-macos-clang-libc++-release",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-macos-clang-libc++-release"
-        },
-        {
-          "type": "build",
-          "name": "ci-macos-clang-libc++-release"
-        },
-        {
-          "type": "test",
-          "name": "ci-macos-clang-libc++-release"
-        }
-      ]
-    },
-    {
-      "name": "ci-macos-clang-libstdc++-debug",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-macos-clang-libstdc++-debug"
-        },
-        {
-          "type": "build",
-          "name": "ci-macos-clang-libstdc++-debug"
-        },
-        {
-          "type": "test",
-          "name": "ci-macos-clang-libstdc++-debug"
-        }
-      ]
-    },
     {
       "name": "ci-macos-clang-libstdc++-release",
       "steps": [
@@ -319,36 +268,53 @@
       ]
     },
     {
-      "name": "ci-macos-gcc-libstdc++-debug",
+      "name": "ci-ubuntu-clang-libc++-debug",
       "steps": [
         {
           "type": "configure",
-          "name": "ci-macos-gcc-libstdc++-debug"
+          "name": "ci-ubuntu-clang-libc++-debug"
         },
         {
           "type": "build",
-          "name": "ci-macos-gcc-libstdc++-debug"
+          "name": "ci-ubuntu-clang-libc++-debug"
         },
         {
           "type": "test",
-          "name": "ci-macos-gcc-libstdc++-debug"
+          "name": "ci-ubuntu-clang-libc++-debug"
         }
       ]
     },
     {
-      "name": "ci-macos-gcc-libstdc++-release",
+      "name": "ci-ubuntu-clang-libc++-release",
       "steps": [
         {
           "type": "configure",
-          "name": "ci-macos-gcc-libstdc++-release"
+          "name": "ci-ubuntu-clang-libc++-release"
         },
         {
           "type": "build",
-          "name": "ci-macos-gcc-libstdc++-release"
+          "name": "ci-ubuntu-clang-libc++-release"
         },
         {
           "type": "test",
-          "name": "ci-macos-gcc-libstdc++-release"
+          "name": "ci-ubuntu-clang-libc++-release"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-clang-libstdc++-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-clang-libstdc++-debug"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-clang-libstdc++-debug"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-clang-libstdc++-debug"
         }
       ]
     },
@@ -366,6 +332,40 @@
         {
           "type": "test",
           "name": "ci-ubuntu-clang-libstdc++-release"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-gcc-libstdc++-debug"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-gcc-libstdc++-debug"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-gcc-libstdc++-debug"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-gcc-libstdc++-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-gcc-libstdc++-release"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-gcc-libstdc++-release"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-gcc-libstdc++-release"
         }
       ]
     }
