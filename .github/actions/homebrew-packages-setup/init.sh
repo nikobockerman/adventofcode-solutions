@@ -52,6 +52,9 @@ echo "::group::Outputs from init"
 
   # Tools to install
   echo "tools-to-install<<ENDTOOLS"
+  if [[ "${RUNNER_OS}" = "Linux" ]]; then
+    echo "binutils"
+  fi
   echo "gcc@${GCC_MAJOR_VERSION}"
   echo "llvm@${LLVM_MAJOR_VERSION}"
   echo "ENDTOOLS"
