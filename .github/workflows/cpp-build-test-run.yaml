@@ -30,9 +30,14 @@ jobs:
         buildType:
           - debug
           - release
+          - sanitizers
         exclude:
           - compiler: gcc
             cxxLib: libc++
+          - compiler: gcc
+            buildType: sanitizers
+          - cxxLib: libstdc++
+            buildType: sanitizers
         include:
           - os: ubuntu
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
@@ -90,6 +95,17 @@ jobs:
         name: Add brew binutils to path
         run: |
           echo "${HOMEBREW_PREFIX}/opt/binutils/bin" >> "${GITHUB_PATH}"
+        shell: bash
+
+      - if: matrix.buildType == 'sanitizers'
+        name: Configure sanitizers
+        run: |
+          {
+            echo "ASAN_OPTIONS=detect_leaks=1"
+            echo "UBSAN_OPTIONS=print_stacktrace=1"
+          } | tee -a "${GITHUB_ENV}"
+
+          echo "${HOMEBREW_PREFIX}/opt/llvm/bin" | tee -a "${GITHUB_PATH}"
         shell: bash
 
       - name: Run CMake workflow

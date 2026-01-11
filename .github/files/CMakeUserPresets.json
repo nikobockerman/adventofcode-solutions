@@ -29,6 +29,15 @@
       ]
     },
     {
+      "name": "ci-ubuntu-clang-libc++-sanitizers",
+      "inherits": ["_ci-common", "_ci-ubuntu-clang-libc++", "_ci-debug"],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-O1 -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-sanitize-merge $env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined $env{PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG}",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address,undefined $env{PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG}"
+      }
+    },
+    {
       "name": "ci-ubuntu-clang-libstdc++-debug",
       "inherits": [
         "_ci-common",
@@ -147,11 +156,13 @@
       "name": "_ci-clang-libc++",
       "hidden": true,
       "environment": {
-        "PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/llvm/include/c++/v1"
+        "PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/llvm/include/c++/v1",
+        "PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm/lib"
       },
       "cacheVariables": {
-        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm/lib",
-        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm/lib",
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}",
+        "CMAKE_EXE_LINKER_FLAGS": "$env{PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG}",
+        "CMAKE_SHARED_LINKER_FLAGS": "$env{PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG}",
         "CONAN_HOST_PROFILE": "${sourceDir}/conan-profile-clang-with-libc++;auto-cmake"
       }
     },
@@ -196,6 +207,10 @@
       "configurePreset": "ci-ubuntu-clang-libc++-release"
     },
     {
+      "name": "ci-ubuntu-clang-libc++-sanitizers",
+      "configurePreset": "ci-ubuntu-clang-libc++-sanitizers"
+    },
+    {
       "name": "ci-ubuntu-clang-libstdc++-debug",
       "configurePreset": "ci-ubuntu-clang-libstdc++-debug"
     },
@@ -226,6 +241,11 @@
     {
       "name": "ci-ubuntu-clang-libc++-release",
       "configurePreset": "ci-ubuntu-clang-libc++-release",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-clang-libc++-sanitizers",
+      "configurePreset": "ci-ubuntu-clang-libc++-sanitizers",
       "inherits": ["output-on-failure"]
     },
     {
@@ -298,6 +318,23 @@
         {
           "type": "test",
           "name": "ci-ubuntu-clang-libc++-release"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-clang-libc++-sanitizers",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-clang-libc++-sanitizers"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-clang-libc++-sanitizers"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-clang-libc++-sanitizers"
         }
       ]
     },
