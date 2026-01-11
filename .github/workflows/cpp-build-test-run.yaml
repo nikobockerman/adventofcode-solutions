@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos
+          - ubuntu
         compiler:
           - clang
           - gcc
@@ -34,17 +34,16 @@ jobs:
           - compiler: gcc
             cxxLib: libc++
         include:
-          - os: macos
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
-            runsOn: macos-15
-
           - os: ubuntu
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            runsOn: ubuntu-24.04
 
+          - os: macos
             compiler: clang
             cxxLib: libstdc++
             buildType: release
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            runsOn: ubuntu-24.04
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
+            runsOn: macos-15
 
     name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.cxxLib }} ${{ matrix.buildType }} - Build + test + run
     runs-on: ${{ matrix.runsOn }}
@@ -85,6 +84,12 @@ jobs:
         run: |
           brewPrefix=$(brew --prefix)
           echo "HOMEBREW_PREFIX=${brewPrefix}" | tr -d '\n' >> "${GITHUB_ENV}"
+        shell: bash
+
+      - if: matrix.os == 'ubuntu' && matrix.compiler == 'gcc'
+        name: Add brew binutils to path
+        run: |
+          echo "${HOMEBREW_PREFIX}/opt/binutils/bin" >> "${GITHUB_PATH}"
         shell: bash
 
       - name: Run CMake workflow
