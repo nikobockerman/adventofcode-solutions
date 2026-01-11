@@ -3,7 +3,7 @@ description: Setup packages through Homebrew
 inputs:
   cache-mode:
     default: use
-    description: "Mode of operation regarding cache: 'prepare' or 'use'"
+    description: "Mode of operation regarding cache: 'prepare', 'use' or 'clean'"
     required: false
   downloads-hash-from-prepare:
     description: "In 'use' mode, the hash of cached downloads to use. From output of an earlier 'prepare' mode run"
@@ -12,6 +12,9 @@ outputs:
   downloads-hash:
     description: "Hash of cached downloads. To be used with subsequent 'use' mode executions."
     value: ${{ steps.install.outputs.downloads-hash }}
+  clean-needed:
+    description: "'prepare' mode signals through this if 'clean' mode execution is needed"
+    value: ${{ steps.install.outputs.save-cache }}
 
 runs:
   using: composite
@@ -27,7 +30,6 @@ runs:
     - id: init
 
       env:
-        INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
         INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
         # Major versions of GCC and LLVM to use
         GCC_MAJOR_VERSION: 15
@@ -53,7 +55,7 @@ runs:
         INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
         TOOLS_TO_INSTALL: ${{ steps.init.outputs.tools-to-install }}
       run: |
-        # Install tools
+        # Fetch/Install tools
         "${GITHUB_ACTION_PATH}/install.sh"
       shell: bash
 

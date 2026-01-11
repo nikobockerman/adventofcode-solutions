@@ -67,6 +67,29 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-homebrew-ubuntu
 
+  # Homebrew cache clean
+  homebrew-cache-clean-macos:
+    if: needs.homebrew-cache-macos.outputs.clean-needed == 'true'
+    needs: homebrew-cache-macos
+    uses: ./.github/workflows/homebrew-clean-cache.yaml
+    with:
+      runner: macos-15
+      downloads-hash-from-prepare: ${{ needs.homebrew-cache-macos.outputs.downloads-hash }}
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-homebrew-macos
+
+  homebrew-cache-clean-ubuntu:
+    if: needs.homebrew-cache-ubuntu.outputs.clean-needed == 'true'
+    needs: homebrew-cache-ubuntu
+    uses: ./.github/workflows/homebrew-clean-cache.yaml
+    with:
+      runner: ubuntu-24.04
+      downloads-hash-from-prepare: ${{ needs.homebrew-cache-ubuntu.outputs.downloads-hash }}
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-homebrew-ubuntu
+
   # Checks for root
   check-prettier:
     needs: mise-cache-ubuntu
@@ -160,10 +183,13 @@ jobs:
       - ci-solvers-cpp
       - ci-solvers-python
       - ci-solvers-rust
+      - homebrew-cache-clean-macos
+      - homebrew-cache-clean-ubuntu
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
       - uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
         with:
+          allowed-skips: homebrew-cache-clean-macos, homebrew-cache-clean-ubuntu
           jobs: ${{ toJSON(needs) }}

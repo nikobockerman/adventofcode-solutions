@@ -9,7 +9,7 @@ case ${INPUT_CACHE_MODE} in
       exit 1
     fi
     ;;
-  use)
+  clean|use)
     ;;
   *)
     echo "::error::Unknown cache mode: ${INPUT_CACHE_MODE}"

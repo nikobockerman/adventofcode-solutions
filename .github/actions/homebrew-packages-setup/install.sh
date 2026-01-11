@@ -25,14 +25,21 @@ if [[ "${CACHE_HIT}" == "true" && "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" != "${i
 fi
 
 for tool in ${TOOLS_TO_INSTALL}; do
-  echo "::group::Install ${tool}"
-  brew install "${tool}"
+  if [[ "${INPUT_CACHE_MODE}" == "prepare" ]]; then
+    echo "::group::Fetch ${tool}"
+    brew fetch --deps "${tool}"
+  else
+    echo "::group::Install ${tool}"
+    brew install "${tool}"
+  fi
   echo "::endgroup::"
 done
 
-echo "::group::brew cleanup"
-brew cleanup --scrub
-echo "::endgroup::"
+if [[ "${INPUT_CACHE_MODE}" != "prepare" ]]; then
+  echo "::group::brew cleanup"
+  brew cleanup --scrub
+  echo "::endgroup::"
+fi
 
 echo "::group::Check changes to downloaded contents"
 downloadsHash=$(calculateDownloadsHash)
@@ -46,10 +53,12 @@ else
 fi
 echo "::endgroup::"
 
-if [[ "${INPUT_CACHE_MODE}" = "prepare" && "${downloadsChanged}" = "true" ]]; then
-  saveCache=true
-else
-  saveCache=false
+saveCache=false
+if [[ "${downloadsChanged}" == "true" ]]; then
+  case ${INPUT_CACHE_MODE} in
+    clean|prepare) saveCache=true;;
+    *) ;;
+  esac
 fi
 
 echo "::group::Outputs from install"

@@ -7,6 +7,9 @@ on:
         required: true
         type: string
     outputs:
+      clean-needed:
+        description: "homebrew-clean-cache execution is needed"
+        value: ${{ jobs.prepare-cache.outputs.clean-needed }}
       downloads-hash:
         description: Hash of cached downloads.
         value: ${{ jobs.prepare-cache.outputs.downloads-hash }}
@@ -24,6 +27,7 @@ jobs:
   prepare-cache:
     name: Prepare Homebrew cache
     outputs:
+      clean-needed: ${{ steps.prepare-cache.outputs.clean-needed }}
       downloads-hash: ${{ steps.prepare-cache.outputs.downloads-hash }}
     runs-on: ${{ inputs.runner }}
     timeout-minutes: 30
