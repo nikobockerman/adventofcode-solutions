@@ -34,6 +34,7 @@ cachePath="${brewCache}/downloads"
 
 echo "::group::Environment variable changes"
 {
+  echo "HOMEBREW_DISPLAY_INSTALL_TIMES=1"
   echo "HOMEBREW_NO_AUTO_UPDATE=1"
 } | tee -a "${GITHUB_ENV}"
 echo "::endgroup::"
