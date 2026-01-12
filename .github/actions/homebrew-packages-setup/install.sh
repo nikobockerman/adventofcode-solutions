@@ -46,10 +46,11 @@ else
 fi
 echo "::endgroup::"
 
-if [[ "${INPUT_CACHE_MODE}" = "prepare" && "${downloadsChanged}" = "true" ]]; then
-  saveCache=true
-else
-  saveCache=false
+saveCache=false
+if [[ "${INPUT_CACHE_MODE}" == "prepare" ]]; then
+  if [[ "${downloadsChanged}" = "true" ]] || ! [[ "${MATCHED_RESTORE_KEY}" =~ ^"${RESTORE_KEY_PREFIX}" ]]; then
+    saveCache=true
+  fi
 fi
 
 echo "::group::Outputs from install"

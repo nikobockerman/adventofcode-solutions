@@ -51,6 +51,8 @@ runs:
         CACHE_HIT: ${{ steps.cache-restore.outputs.cache-hit }}
         INPUT_CACHE_MODE: ${{ inputs.cache-mode }}
         INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
+        MATCHED_RESTORE_KEY: ${{ steps.cache-restore.outputs.cache-matched-key }}
+        RESTORE_KEY_PREFIX: ${{ steps.init.outputs.cache-key-prefix }}
         TOOLS_TO_INSTALL: ${{ steps.init.outputs.tools-to-install }}
       run: |
         # Install tools
