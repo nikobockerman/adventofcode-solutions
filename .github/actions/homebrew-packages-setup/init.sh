@@ -19,10 +19,20 @@ if ! command -v brew &>/dev/null; then
   echo "::endgroup::"
 fi
 
+toolsToInstall=(
+  "gcc@${GCC_MAJOR_VERSION}"
+  "llvm@${LLVM_MAJOR_VERSION}"
+)
+if [[ "${RUNNER_OS}" == "Linux" ]]; then
+  toolsToInstall+=("binutils")
+fi
+toolsToInstallLines=$(printf '%s\n' "${toolsToInstall[@]}")
+toolsToInstallHash=$(echo "${toolsToInstallLines}" | sha256sum | cut -d ' ' -f 1)
+toolsToInstallCacheKeyPart=$(IFS=-; echo "${toolsToInstall[*]}")
 
 # Values for cache key and restore-keys
 cacheKeyBase="homebrew-${RUNNER_OS}"
-cacheKeyPrefix="${cacheKeyBase}-gcc${GCC_MAJOR_VERSION}-llvm${LLVM_MAJOR_VERSION}"
+cacheKeyPrefix="${cacheKeyBase}-${toolsToInstallCacheKeyPart}-${toolsToInstallHash}"
 cacheKeyForRestore="${cacheKeyPrefix}"
 if [[ -n "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" ]]; then
   cacheKeyForRestore="${cacheKeyForRestore}-${INPUT_DOWNLOADS_HASH_FROM_PREPARE}"
@@ -53,11 +63,9 @@ echo "::group::Outputs from init"
 
   # Tools to install
   echo "tools-to-install<<ENDTOOLS"
-  if [[ "${RUNNER_OS}" = "Linux" ]]; then
-    echo "binutils"
-  fi
-  echo "gcc@${GCC_MAJOR_VERSION}"
-  echo "llvm@${LLVM_MAJOR_VERSION}"
+  for tool in "${toolsToInstall[@]}"; do
+    echo "${tool}"
+  done
   echo "ENDTOOLS"
 } | tee -a "${GITHUB_OUTPUT}"
 echo "::endgroup::"
