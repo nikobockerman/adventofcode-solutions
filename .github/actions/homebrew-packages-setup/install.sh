@@ -7,6 +7,12 @@ if [[ -z "${TOOLS_TO_INSTALL}" ]]; then
   exit 1
 fi
 
+skipInstalls=false
+if [[ "${INPUT_CACHE_MODE}" == "prepare" && "${GITHUB_EVENT_NAME}" == "pull_request" && "${MATCHED_RESTORE_KEY}" =~ ^"${RESTORE_KEY_PREFIX}" ]]; then
+  echo "Prepare mode for PR. Cache restored with a prefix match. Skipping all installs."
+  skipInstalls=true
+fi
+
 calculateDownloadsHash() {
   brewCache=$(brew --cache)
   brewDownloads=${brewCache}/downloads
@@ -24,33 +30,39 @@ if [[ "${CACHE_HIT}" == "true" && "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" != "${i
   exit 1
 fi
 
-for tool in ${TOOLS_TO_INSTALL}; do
-  echo "::group::Install ${tool}"
-  brew install "${tool}"
+if [[ "${skipInstalls}" == "false" ]]; then
+  for tool in ${TOOLS_TO_INSTALL}; do
+    echo "::group::Install ${tool}"
+    brew install "${tool}"
+    echo "::endgroup::"
+  done
+
+  echo "::group::brew cleanup"
+  brew cleanup --scrub
   echo "::endgroup::"
-done
 
-echo "::group::brew cleanup"
-brew cleanup --scrub
-echo "::endgroup::"
-
-echo "::group::Check changes to downloaded contents"
-downloadsHash=$(calculateDownloadsHash)
-echo "downloadsHash=${downloadsHash}"
-if [[ "${initialDownloadsHash}" = "${downloadsHash}" ]]; then
-  downloadsChanged=false
-  echo "Downloads were not changed by install/upgrade"
-else
-  downloadsChanged=true
-  echo "Downloads were changed during install/upgrade"
-fi
-echo "::endgroup::"
-
-saveCache=false
-if [[ "${INPUT_CACHE_MODE}" == "prepare" ]]; then
-  if [[ "${downloadsChanged}" = "true" ]] || ! [[ "${MATCHED_RESTORE_KEY}" =~ ^"${RESTORE_KEY_PREFIX}" ]]; then
-    saveCache=true
+  echo "::group::Check changes to downloaded contents"
+  downloadsHash=$(calculateDownloadsHash)
+  echo "downloadsHash=${downloadsHash}"
+  if [[ "${initialDownloadsHash}" = "${downloadsHash}" ]]; then
+    downloadsChanged=false
+    echo "Downloads were not changed by install/upgrade"
+  else
+    downloadsChanged=true
+    echo "Downloads were changed during install/upgrade"
   fi
+  echo "::endgroup::"
+
+  saveCache=false
+  if [[ "${INPUT_CACHE_MODE}" == "prepare" ]]; then
+    if [[ "${downloadsChanged}" = "true" ]] || ! [[ "${MATCHED_RESTORE_KEY}" =~ ^"${RESTORE_KEY_PREFIX}" ]]; then
+      saveCache=true
+    fi
+  fi
+else
+  # Installs skipped for PR.
+  downloadsHash=${initialDownloadsHash}
+  saveCache=false
 fi
 
 echo "::group::Outputs from install"
