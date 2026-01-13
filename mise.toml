@@ -4,6 +4,7 @@ python = "3.14.2"
 uv = "0.9.24"
 
 # Common tools
+"pipx:shellcheck-gha" = "0.1.2"
 prettier = "3.6.2"
 ruff = "0.14.11"
 shellcheck = "0.11.0"
@@ -69,6 +70,7 @@ depends = [
   "check:ruff",
   "check:ruff:format",
   "check:shellcheck",
+  "check:shellcheck-gha",
 
   "check:aoc-main",
   "check:solver:cpp",
@@ -99,6 +101,9 @@ run = "ruff check"
 
 [tasks."check:ruff:format"]
 run = "ruff format --check"
+
+[tasks."check:shellcheck-gha"]
+run = "shellcheck-gha --no-skip-unknown-files"
 
 [tasks."check:aoc-main"]
 run = "mise run check"
