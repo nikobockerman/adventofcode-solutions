@@ -127,6 +127,9 @@ runs:
         # Set final changes for rest of workflow
 
         echo "::group::Environment changes for rest of workflow"
-        echo "UV_PYTHON_DOWNLOADS=never" | tee -a "${GITHUB_ENV}"
+        {
+          echo "MISE_PREPARE_AUTO=false"
+          echo "UV_PYTHON_DOWNLOADS=never"
+        } | tee -a "${GITHUB_ENV}"
         echo "::endgroup::"
       shell: bash
