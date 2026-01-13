@@ -37,13 +37,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      - name: Restore mise project
+      - name: Check if cache matches
+        id: prepare-cache-check
+        uses: ./.github/actions/uv-project-setup
+        with:
+          cache-mode: prepare-check-match
+          directory: ${{ inputs.directory }}
+
+      - if: ${{ steps.prepare-cache-check.outputs.match == 'true' }}
+        name: Cache hit found
+        run: echo "Cache hit found. No need to prepare or check cache contents."
+
+      - if: ${{ steps.prepare-cache-check.outputs.match != 'true' }}
+        name: Restore mise project
         uses: ./.github/actions/mise-project-setup
         with:
           cache-mode: use
           directory: ${{ inputs.directory }}
 
-      - name: Prepare cache
+      - if: ${{ steps.prepare-cache-check.outputs.match != 'true' }}
+        name: Prepare cache
         uses: ./.github/actions/uv-project-setup
         with:
           cache-mode: prepare

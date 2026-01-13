@@ -26,7 +26,7 @@ if [[ -z "${CACHE_MODE}" ]]; then
   exit 1
 fi
 case "${CACHE_MODE}" in
-  prepare|use)
+  prepare|prepare-check-match|use)
     ;;
   *)
     echo "::error::Unknown cache mode: ${CACHE_MODE}"

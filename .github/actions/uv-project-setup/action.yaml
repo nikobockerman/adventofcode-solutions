@@ -3,11 +3,15 @@ description: Setup tools for uv project and install dependencies
 inputs:
   cache-mode:
     default: use
-    description: "Mode of operation regarding cache: 'prepare' or 'use'"
+    description: "Mode of operation regarding cache: 'prepare-check-match', 'prepare' or 'use'"
     required: false
   directory:
     description: Directory containing uv project.
     required: true
+outputs:
+  match:
+    description: In prepare-check-match mode, whether the cache matches.
+    value: ${{ steps.prepare-cache-check.outputs.match || 'false' }}
 
 runs:
   using: composite
@@ -21,15 +25,42 @@ runs:
         "${GITHUB_ACTION_PATH}/init.sh"
       shell: bash
 
-    - name: uv cache restore
-      id: cache-restore
+    - id: prepare-check-cache-match
+      if: steps.init.inputs.cache-mode == 'prepare-check-match'
+      name: uv cache check
+      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      with:
+        key: ${{ steps.init.outputs.cache-key }}
+        lookup-only: true
+        path: ${{ steps.init.outputs.cache-paths }}
+
+    - id: prepare-cache-check
+
+      env:
+        CACHE_MODE: ${{ inputs.cache-mode }}
+        EXACT_MATCH: ${{ steps.prepare-check-cache-match.outputs.cache-hit }}
+      run: |
+        # Check if cache mode is 'prepare-check-match' and exact match is true
+        match=false
+        if [[ "${CACHE_MODE}" == "prepare-check-match" && "${EXACT_MATCH}" == "true" ]]; then
+          echo "Exact match found in prepare mode. Skipping the rest of the action"
+          match=true
+        fi
+        echo "::group::Outputs from cache-check"
+        echo "match=${match}" | tee -a "${GITHUB_OUTPUT}"
+        echo "::endgroup::"
+      shell: bash
+
+    - id: cache-restore
+      if: inputs.cache-mode != 'prepare-check-match'
+      name: uv cache restore
       uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         key: ${{ steps.init.outputs.cache-key }}
         path: ${{ steps.init.outputs.cache-paths }}
         restore-keys: ${{ steps.init.outputs.cache-restore-keys }}
 
-    - if: steps.cache-restore.outputs.cache-hit != 'true'
+    - if: inputs.cache-mode != 'prepare-check-match' && steps.cache-restore.outputs.cache-hit != 'true'
 
       env:
         DIRECTORIES: ${{ steps.init.outputs.uv-install-directories }}
@@ -66,7 +97,8 @@ runs:
         key: ${{ steps.cache-restore.outputs.cache-primary-key }}
         path: ${{ steps.init.outputs.cache-paths }}
 
-    - env:
+    - if: inputs.cache-mode != 'prepare-check-match'
+      env:
         DIRECTORIES: ${{ steps.init.outputs.uv-install-directories }}
       run: |
         # Ensure dependencies are installed properly
@@ -80,7 +112,8 @@ runs:
         done
       shell: bash
 
-    - run: |
+    - if: inputs.cache-mode != 'prepare-check-match'
+      run: |
         # Adjust environment for rest of workflow
         echo "::group::Environment changes for rest of workflow"
         echo "Set uv to locked mode: UV_LOCKED=1"
