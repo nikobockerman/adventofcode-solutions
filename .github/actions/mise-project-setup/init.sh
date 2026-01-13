@@ -59,6 +59,7 @@ elif [[ ! -f "${DIRECTORY}/mise.toml" ]]; then
   exit 1
 fi
 
+mise_ceiling_path=$(dirname "${GITHUB_WORKSPACE}")
 mise_data_dir="${RUNNER_TEMP}/aoc-mise-data"
 
 # Isolate rustup used with mise.
@@ -79,6 +80,10 @@ echo "::group::Environment variable changes"
 
   echo -n "RUSTUP_HOME="
   echo "${rustup_home}" | tr -d '\n'
+  echo
+
+  echo -n "MISE_CEILING_PATHS="
+  echo "${mise_ceiling_path}" | tr -d '\n'
   echo
 
   echo "MISE_DEBUG=1"
