@@ -11,6 +11,12 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  # For pull requests, use PR identifier as group. For main branch, use unique identifier.
+  # -> PRs cancel in progress runs. Main executions run concurrently.
+  group: ${{ github.workflow }}-${{ github.ref_name == 'main' && github.run_id || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   # Mise cache prepare
   mise-cache-macos:
