@@ -72,15 +72,15 @@ runs:
         DIRECTORIES: ${{ steps.init.outputs.mise-install-directories }}
       run: |
         # Ensure tools are installed properly
-
+        set -euo pipefail
         err=false
-        for dir in $DIRECTORIES; do
-          echo "::group::Ensure dependencies: $dir"
-          pushd "$dir"
+        for dir in ${DIRECTORIES}; do
+          echo "::group::Ensure dependencies: ${dir}"
+          pushd "${dir}"
           mise ls --current
           count=$(mise ls --current --missing --no-header | wc -l)
-          if [ $count -gt 0 ]; then
-            echo "::error::Count of missing tools: $count"
+          if [[ ${count} -gt 0 ]]; then
+            echo "::error::Count of missing tools: ${count}"
             err=true
           else
             echo "Result of check: no missing tools"
@@ -89,7 +89,7 @@ runs:
           echo "::endgroup::"
         done
 
-        if [ "$err" = true ]; then
+        if [[ "${err}" == true ]]; then
           exit 1
         fi
       shell: bash
@@ -98,6 +98,6 @@ runs:
         # Set final changes for rest of workflow
 
         echo "::group::Environment changes for rest of workflow"
-        echo "UV_PYTHON_DOWNLOADS=never" | tee -a "$GITHUB_ENV"
+        echo "UV_PYTHON_DOWNLOADS=never" | tee -a "${GITHUB_ENV}"
         echo "::endgroup::"
       shell: bash

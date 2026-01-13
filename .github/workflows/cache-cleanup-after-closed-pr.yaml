@@ -25,15 +25,15 @@ jobs:
         id: resolve
         run: |
           # Resolve PR number
-          prNumber="${EVENT_PR_NUMBER:-$INPUT_PR_NUMBER}"
-          if [[ -z "$prNumber" ]]; then
+          prNumber="${EVENT_PR_NUMBER:-${INPUT_PR_NUMBER}}"
+          if [[ -z "${prNumber}" ]]; then
             echo "::error::Pull request number not provided"
             exit 1
           fi
 
           echo "::group::Outputs"
           {
-            echo "pr_number=$prNumber"
+            echo "pr_number=${prNumber}"
           } | tee -a "${GITHUB_OUTPUT}"
         shell: bash
 
