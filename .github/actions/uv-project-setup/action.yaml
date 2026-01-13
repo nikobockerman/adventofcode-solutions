@@ -12,12 +12,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Prepare variables
-      id: init
+    - id: init
       env:
         CACHE_MODE: ${{ inputs.cache-mode }}
         DIRECTORY: ${{ inputs.directory }}
-      run: "${GITHUB_ACTION_PATH}/init.sh"
+      run: |
+        # Prepare variables
+        "${GITHUB_ACTION_PATH}/init.sh"
       shell: bash
 
     - name: uv cache restore
@@ -29,26 +30,28 @@ runs:
         restore-keys: ${{ steps.init.outputs.cache-restore-keys }}
 
     - if: steps.cache-restore.outputs.cache-hit != 'true'
-      name: Install uv dependencies
 
       env:
         DIRECTORIES: ${{ steps.init.outputs.uv-install-directories }}
       run: |
-        set -x
+        # Install uv dependencies
+
+        set -euo pipefail
+
         # Unset in case it is set by an earlier run of this action
         unset UV_OFFLINE
 
-        for dir in $DIRECTORIES; do
-          echo "::group::Install uv dependencies: $dir"
-          pushd "$dir"
+        for dir in ${DIRECTORIES}; do
+          echo "::group::Install uv dependencies: ${dir}"
+          pushd "${dir}"
           uv sync --locked
           popd
           echo "::endgroup::"
         done
 
-        first_dir_with_uv=$(echo "$DIRECTORIES" | head -n 1)
+        first_dir_with_uv=$(echo "${DIRECTORIES}" | head -n 1)
         echo "::group::Prune uv cache"
-        pushd "$first_dir_with_uv"
+        pushd "${first_dir_with_uv}"
         # --ci switch removes build-system dependencies, unless they are pinned to specific version
         #uv cache prune --ci
         uv cache prune
@@ -63,28 +66,26 @@ runs:
         key: ${{ steps.cache-restore.outputs.cache-primary-key }}
         path: ${{ steps.init.outputs.cache-paths }}
 
-    - name: Ensure dependencies are installed properly
-      #if: steps.cache-restore.outputs.cache-hit != 'true'
-
-      env:
+    - env:
         DIRECTORIES: ${{ steps.init.outputs.uv-install-directories }}
       run: |
-        set -x
-        for dir in $DIRECTORIES; do
-          echo "::group::Ensure dependencies: $dir"
-          pushd "$dir"
+        # Ensure dependencies are installed properly
+        set -eu
+        for dir in ${DIRECTORIES}; do
+          echo "::group::Ensure dependencies: ${dir}"
+          pushd "${dir}"
           uv sync --locked --offline
           popd
           echo "::endgroup::"
         done
       shell: bash
 
-    - name: Adjust environment for rest of workflow
-      run: |
+    - run: |
+        # Adjust environment for rest of workflow
         echo "::group::Environment changes for rest of workflow"
         echo "Set uv to locked mode: UV_LOCKED=1"
-        echo "UV_LOCKED=1" >> "$GITHUB_ENV"
+        echo "UV_LOCKED=1" >> "${GITHUB_ENV}"
         echo "Set uv to offline mode: UV_OFFLINE=1"
-        echo "UV_OFFLINE=1" >> "$GITHUB_ENV"
+        echo "UV_OFFLINE=1" >> "${GITHUB_ENV}"
         echo "::endgroup::"
       shell: bash
