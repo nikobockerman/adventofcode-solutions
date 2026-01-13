@@ -103,6 +103,13 @@ jobs:
       directory: .
       task: check:shellcheck-config-enabled-optional-checks
 
+  check-shellcheck-gha:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:shellcheck-gha
+
   # CI workflows for projects in the repository
   ci-aoc-main:
     needs:
@@ -156,6 +163,7 @@ jobs:
       - check-ruff-format
       - check-shellcheck
       - check-shellcheck-config-enabled-optional-checks
+      - check-shellcheck-gha
       - ci-aoc-main
       - ci-solvers-cpp
       - ci-solvers-python
