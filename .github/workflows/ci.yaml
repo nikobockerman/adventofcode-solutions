@@ -116,6 +116,13 @@ jobs:
       directory: .
       task: check:shellcheck-gha
 
+  check-shfmt:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: .
+      task: check:shfmt
+
   # CI workflows for projects in the repository
   ci-aoc-main:
     needs:
@@ -170,6 +177,7 @@ jobs:
       - check-shellcheck
       - check-shellcheck-config-enabled-optional-checks
       - check-shellcheck-gha
+      - check-shfmt
       - ci-aoc-main
       - ci-solvers-cpp
       - ci-solvers-python
