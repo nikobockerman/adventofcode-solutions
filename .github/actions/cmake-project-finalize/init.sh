@@ -49,7 +49,6 @@ else
   saveCache=false
 fi
 
-
 echo "::group::Outputs from init"
 {
   echo "conan-cache-path=${CONAN_HOME}/p"

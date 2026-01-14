@@ -28,7 +28,10 @@ if [[ "${RUNNER_OS}" == "Linux" ]]; then
 fi
 toolsToInstallLines=$(printf '%s\n' "${toolsToInstall[@]}")
 toolsToInstallHash=$(echo "${toolsToInstallLines}" | sha256sum | cut -d ' ' -f 1)
-toolsToInstallCacheKeyPart=$(IFS=-; echo "${toolsToInstall[*]}")
+toolsToInstallCacheKeyPart=$(
+  IFS=-
+  echo "${toolsToInstall[*]}"
+)
 
 # Values for cache key and restore-keys
 cacheKeyBase="homebrew-${RUNNER_OS}"
