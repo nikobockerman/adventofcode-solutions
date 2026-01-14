@@ -8,6 +8,7 @@ uv = "0.9.25"
 prettier = "3.6.2"
 ruff = "0.14.11"
 shellcheck = "0.11.0"
+shfmt = "3.12.0"
 yq = "4.50.1"
 
 
@@ -71,6 +72,7 @@ depends = [
   "check:ruff:format",
   "check:shellcheck",
   "check:shellcheck-gha",
+  "check:shfmt",
 
   "check:aoc-main",
   "check:solver:cpp",
@@ -126,6 +128,7 @@ depends = [
   "fix:prettier",
   "fix:ruff",
   "fix:ruff:format",
+  "fix:shfmt",
 
   "fix:aoc-main",
   "fix:solver:cpp",
