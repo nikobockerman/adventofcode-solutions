@@ -30,16 +30,18 @@ jobs:
         buildType:
           - debug
           - release
-          - sanitizers
         exclude:
           - compiler: gcc
             cxxLib: libc++
-          - compiler: gcc
-            buildType: sanitizers
-          - cxxLib: libstdc++
-            buildType: sanitizers
         include:
           - os: ubuntu
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            runsOn: ubuntu-24.04
+
+          - os: ubuntu
+            compiler: clang
+            cxxLib: libc++
+            buildType: sanitizers
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
             runsOn: ubuntu-24.04
 
