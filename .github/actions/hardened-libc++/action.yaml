@@ -1,0 +1,56 @@
+name: Hardened libc++ with iterator bounds checks
+description: Build and cache a custom libc++ with iterator bounds checks enabled
+
+outputs:
+  install-dir:
+    description: "Path to the installed hardened libc++"
+    value: ${{ steps.init.outputs.installDir }}
+
+runs:
+  using: composite
+  steps:
+    - id: init
+
+      env:
+        # renovate: datasource=github-releases depName=llvm/llvm-project
+        LLVM_VERSION: 21.1.5
+      run: |
+        # Initialize hardened libc++ action
+        "${GITHUB_ACTION_PATH}/init.sh"
+      shell: bash
+
+    - id: cache-restore
+      name: Restore cached hardened llvm libc++
+      uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+      with:
+        key: llvm-libc++-hardened-${{ steps.init.outputs.llvmVersion }}-${{ hashFiles('.github/actions/hardened-libc++/build.sh') }}
+        path: ${{ steps.init.outputs.installDir }}
+
+    - id: checkout-llvm
+      name: Checkout LLVM project
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        repository: llvm/llvm-project
+        ref: llvmorg-${{ steps.init.outputs.llvmVersion }}
+        fetch-depth: 1
+        path: repo-llvm-project
+
+    - id: build
+      name: Build hardened libc++
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      env:
+        INSTALL_DIR: ${{ steps.init.outputs.installDir }}
+        LLVM_VERSION: ${{ steps.init.outputs.llvmVersion }}
+        LLVM_PROJECT_DIR: ${{ github.workspace }}/repo-llvm-project
+      run: |
+        # Build hardened llvm libc++
+        "${GITHUB_ACTION_PATH}/build.sh"
+      shell: bash
+
+    - if: steps.cache-restore.outputs.cache-hit != 'true'
+      name: Save hardened llvm libc++ cache
+      uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+      with:
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+        path: ${{ steps.init.outputs.installDir }}

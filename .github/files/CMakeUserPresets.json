@@ -38,6 +38,18 @@
       }
     },
     {
+      "name": "ci-ubuntu-clang-libc++-hardened",
+      "inherits": [
+        "_ci-common",
+        "_ci-ubuntu-clang-common",
+        "_ci-custom-hardened-libc++-for-clang",
+        "_ci-debug"
+      ],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-D_LIBCPP_DEBUG=1 -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG $env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG}"
+      }
+    },
+    {
       "name": "ci-ubuntu-clang-libstdc++-debug",
       "inherits": [
         "_ci-common",
@@ -179,6 +191,21 @@
       }
     },
     {
+      "name": "_ci-custom-hardened-libc++-for-clang",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG": "-stdlib++-isystem$penv{HARDENED_LIBCXX_DIR}/include/c++/v1",
+        "PRESET_EXE_LINKER_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG": "-stdlib=libc++ -L$penv{HARDENED_LIBCXX_DIR}/lib -lunwind -Wl,-rpath,$penv{HARDENED_LIBCXX_DIR}/lib",
+        "PRESET_SHARED_LINKER_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG": "-stdlib=libc++ -L$penv{HARDENED_LIBCXX_DIR}/lib -lunwind -Wl,-rpath,$penv{HARDENED_LIBCXX_DIR}/lib"
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG}",
+        "CMAKE_EXE_LINKER_FLAGS": "$env{PRESET_EXE_LINKER_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG}",
+        "CMAKE_SHARED_LINKER_FLAGS": "$env{PRESET_SHARED_LINKER_FLAGS_CUSTOM_HARDENED_LIBCXX_FOR_CLANG}",
+        "CONAN_HOST_PROFILE": "auto-cmake;${sourceDir}/conan-profile-clang-with-hardened-libc++"
+      }
+    },
+    {
       "name": "_ci-gcc-libstdc++-for-clang-macos",
       "hidden": true,
       "environment": {
@@ -209,6 +236,10 @@
     {
       "name": "ci-ubuntu-clang-libc++-sanitizers",
       "configurePreset": "ci-ubuntu-clang-libc++-sanitizers"
+    },
+    {
+      "name": "ci-ubuntu-clang-libc++-hardened",
+      "configurePreset": "ci-ubuntu-clang-libc++-hardened"
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-debug",
@@ -246,6 +277,11 @@
     {
       "name": "ci-ubuntu-clang-libc++-sanitizers",
       "configurePreset": "ci-ubuntu-clang-libc++-sanitizers",
+      "inherits": ["output-on-failure"]
+    },
+    {
+      "name": "ci-ubuntu-clang-libc++-hardened",
+      "configurePreset": "ci-ubuntu-clang-libc++-hardened",
       "inherits": ["output-on-failure"]
     },
     {
@@ -335,6 +371,23 @@
         {
           "type": "test",
           "name": "ci-ubuntu-clang-libc++-sanitizers"
+        }
+      ]
+    },
+    {
+      "name": "ci-ubuntu-clang-libc++-hardened",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "ci-ubuntu-clang-libc++-hardened"
+        },
+        {
+          "type": "build",
+          "name": "ci-ubuntu-clang-libc++-hardened"
+        },
+        {
+          "type": "test",
+          "name": "ci-ubuntu-clang-libc++-hardened"
         }
       ]
     },
