@@ -31,12 +31,11 @@ if [[ -z "${CACHE_MODE}" ]]; then
   exit 1
 fi
 case "${CACHE_MODE}" in
-  prepare|use)
-    ;;
-  *)
-    echo "::error::Unknown cache mode: ${CACHE_MODE}"
-    exit 1
-    ;;
+prepare | use) ;;
+*)
+  echo "::error::Unknown cache mode: ${CACHE_MODE}"
+  exit 1
+  ;;
 esac
 
 if [[ "${CACHE_MODE}" = "prepare" ]]; then
@@ -66,7 +65,6 @@ mise_data_dir="${RUNNER_TEMP}/aoc-mise-data"
 rustup_home="${RUNNER_TEMP}/aoc-rustup-home"
 # Isolate cargo used with mise.
 cargo_home="${RUNNER_TEMP}/aoc-cargo-home"
-
 
 echo "::group::Environment variable changes"
 {
@@ -109,7 +107,7 @@ echo "::group::Outputs from init"
       echo "solvers/python"
     fi
     echo "solvers/rust"
-  elif [[ "${DIRECTORY}" != "."  ]]; then
+  elif [[ "${DIRECTORY}" != "." ]]; then
     if [[ "${DIRECTORY}" != "aoc-main" ]]; then
       echo "aoc-main"
     fi
