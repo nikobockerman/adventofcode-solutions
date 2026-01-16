@@ -27,7 +27,7 @@ runs:
     - id: check-cache-match
       if: inputs.cache-mode == 'prepare'
       name: Mise cache check for exact match
-      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         key: mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-${{ hashFiles('solvers/*/mise.toml') }}
         lookup-only: true
@@ -52,7 +52,7 @@ runs:
     - id: cache-restore
       if: steps.cache-check.outputs.match != 'true'
       name: Mise cache restore
-      uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         key: mise-${{ runner.os }}-${{ steps.init.outputs.mise-version }}-${{ hashFiles('mise.toml') }}-${{ hashFiles('aoc-main/mise.toml') }}-${{ hashFiles('solvers/*/mise.toml') }}
         path: ${{ steps.init.outputs.cache-paths }}
@@ -90,7 +90,7 @@ runs:
 
     - if: inputs.cache-mode == 'prepare' && steps.cache-check.outputs.match != 'true' && steps.cache-restore.outputs.cache-hit != 'true'
       name: Save cache
-      uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         key: ${{ steps.cache-restore.outputs.cache-primary-key }}
         path: ${{ steps.init.outputs.cache-paths }}
