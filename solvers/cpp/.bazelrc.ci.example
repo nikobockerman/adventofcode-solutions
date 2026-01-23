@@ -1,0 +1,72 @@
+# CI-specific Bazel configurations
+# Copy this to .bazelrc.ci and customize for your CI environment
+
+# =============================================================================
+# Warning flags
+# =============================================================================
+build --cxxopt=-Wall
+build --cxxopt=-Wextra
+build --cxxopt=-Werror
+
+# =============================================================================
+# Build type configurations
+# =============================================================================
+build:dbg --compilation_mode=dbg
+build:dbg --cxxopt=-g
+build:dbg --strip=never
+
+build:opt --compilation_mode=opt
+build:opt --cxxopt=-O3
+build:opt --strip=always
+
+# =============================================================================
+# Compiler configurations
+# =============================================================================
+build:clang --action_env=CC=$HOMEBREW_PREFIX/opt/llvm/bin/clang
+build:clang --action_env=CXX=$HOMEBREW_PREFIX/opt/llvm/bin/clang++
+
+build:gcc --action_env=CC=$HOMEBREW_PREFIX/opt/gcc@15/bin/gcc-15
+build:gcc --action_env=CXX=$HOMEBREW_PREFIX/opt/gcc@15/bin/g++-15
+
+# =============================================================================
+# C++ standard library configurations
+# =============================================================================
+build:libstdc++ --cxxopt=-stdlib=libstdc++
+build:libstdc++ --linkopt=-stdlib=libstdc++
+build:libstdc++ --linkopt=-L$HOMEBREW_PREFIX/opt/gcc/lib/gcc/15
+
+build:libcxx --cxxopt=-stdlib=libc++
+build:libcxx --cxxopt=-stdlib++-isystem$HOMEBREW_PREFIX/opt/llvm/include/c++/v1
+build:libcxx --linkopt=-stdlib=libc++
+build:libcxx --linkopt=-L$HOMEBREW_PREFIX/opt/llvm/lib
+build:libcxx --linkopt=-Wl,-rpath,$HOMEBREW_PREFIX/opt/llvm/lib
+
+# =============================================================================
+# Sanitizer configurations
+# =============================================================================
+build:sanitizers --cxxopt=-O1
+build:sanitizers --cxxopt=-fsanitize=address,undefined
+build:sanitizers --cxxopt=-fno-sanitize-recover=all
+build:sanitizers --cxxopt=-fno-omit-frame-pointer
+build:sanitizers --cxxopt=-fno-optimize-sibling-calls
+build:sanitizers --linkopt=-fsanitize=address,undefined
+
+build:tsan --cxxopt=-fsanitize=thread
+build:tsan --linkopt=-fsanitize=thread
+
+# =============================================================================
+# Combined configurations matching CI workflows
+# =============================================================================
+build:ci-macos-clang-libstdc++-release --config=clang --config=libstdc++ --config=opt
+build:ci-ubuntu-clang-libc++-debug --config=clang --config=libcxx --config=dbg
+build:ci-ubuntu-clang-libc++-release --config=clang --config=libcxx --config=opt
+build:ci-ubuntu-clang-libc++-sanitizers --config=clang --config=libcxx --config=dbg --config=sanitizers
+build:ci-ubuntu-clang-libstdc++-debug --config=clang --config=libstdc++ --config=dbg
+build:ci-ubuntu-clang-libstdc++-release --config=clang --config=libstdc++ --config=opt
+build:ci-ubuntu-gcc-libstdc++-debug --config=gcc --config=libstdc++ --config=dbg
+build:ci-ubuntu-gcc-libstdc++-release --config=gcc --config=libstdc++ --config=opt
+
+# =============================================================================
+# Test output
+# =============================================================================
+test --test_output=errors

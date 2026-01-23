@@ -1,0 +1,96 @@
+# User-specific Bazel configurations
+# Copy this to .bazelrc.local and customize for your environment
+
+# =============================================================================
+# Optional: Import community presets for correctness and performance fixes
+# See: https://github.com/bazel-contrib/bazelrc-preset.bzl
+# =============================================================================
+# import %workspace%/bazel-presets/correctness.bazelrc
+# import %workspace%/bazel-presets/performance.bazelrc
+
+# =============================================================================
+# Warning flags
+# =============================================================================
+# build --cxxopt=-Wall
+# build --cxxopt=-Wextra
+# build --cxxopt=-Werror
+
+# =============================================================================
+# Build type configurations
+# =============================================================================
+build:dbg --compilation_mode=dbg
+build:dbg --cxxopt=-g
+build:dbg --strip=never
+
+build:opt --compilation_mode=opt
+build:opt --cxxopt=-O3
+build:opt --strip=always
+
+# =============================================================================
+# Compiler configurations - customize paths for your system
+# =============================================================================
+build:clang --action_env=CC=/opt/homebrew/opt/llvm/bin/clang
+build:clang --action_env=CXX=/opt/homebrew/opt/llvm/bin/clang++
+
+build:gcc --action_env=CC=/opt/homebrew/bin/gcc-15
+build:gcc --action_env=CXX=/opt/homebrew/bin/g++-15
+
+# =============================================================================
+# C++ standard library configurations
+# =============================================================================
+build:libstdc++ --cxxopt=-stdlib=libstdc++
+build:libstdc++ --linkopt=-stdlib=libstdc++
+
+build:libcxx --cxxopt=-stdlib=libc++
+build:libcxx --linkopt=-stdlib=libc++
+
+# =============================================================================
+# Debug standard library configurations
+# =============================================================================
+build:glibcxx-debug --cxxopt=-D_GLIBCXX_DEBUG
+build:libcpp-debug --cxxopt=-D_LIBCPP_DEBUG=1
+
+# =============================================================================
+# Sanitizer configurations
+# =============================================================================
+build:asan --cxxopt=-fsanitize=address
+build:asan --linkopt=-fsanitize=address
+
+build:ubsan --cxxopt=-fsanitize=undefined
+build:ubsan --linkopt=-fsanitize=undefined
+
+build:sanitizers --cxxopt=-fsanitize=address,undefined
+build:sanitizers --linkopt=-fsanitize=address,undefined
+build:sanitizers --cxxopt=-fno-omit-frame-pointer
+
+build:tsan --cxxopt=-fsanitize=thread
+build:tsan --linkopt=-fsanitize=thread
+
+# =============================================================================
+# clang-tidy configuration (requires bazel_clang_tidy setup)
+# =============================================================================
+# build:clang-tidy --aspects=@bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect
+# build:clang-tidy --output_groups=report
+
+# =============================================================================
+# Build caching
+# =============================================================================
+# build --action_env=CC_WRAPPER=/opt/homebrew/bin/sccache
+
+# =============================================================================
+# Combined configurations
+# =============================================================================
+build:clang-libstdc++ --config=clang --config=libstdc++
+build:clang-libcxx --config=clang --config=libcxx
+build:gcc-libstdc++ --config=gcc --config=libstdc++
+
+build:clang-libstdc++-dbg --config=clang-libstdc++ --config=dbg --config=glibcxx-debug
+build:clang-libcxx-dbg --config=clang-libcxx --config=dbg --config=libcpp-debug
+build:gcc-dbg --config=gcc-libstdc++ --config=dbg --config=glibcxx-debug
+
+build:clang-libstdc++-opt --config=clang-libstdc++ --config=opt
+build:clang-libcxx-opt --config=clang-libcxx --config=opt
+build:gcc-opt --config=gcc-libstdc++ --config=opt
+
+build:clang-libcxx-sanitizers --config=clang-libcxx --config=dbg --config=sanitizers
+build:clang-libcxx-tsan --config=clang-libcxx --config=dbg --config=tsan

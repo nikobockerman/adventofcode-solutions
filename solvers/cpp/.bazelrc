@@ -1,0 +1,5 @@
+common --enable_bzlmod
+
+build --cxxopt=-std=c++23
+
+try-import %workspace%/.bazelrc.local

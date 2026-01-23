@@ -9,5 +9,6 @@ __pycache__/
 
 /solvers/cpp/build*/
 /solvers/cpp/CMakeUserPresets*.json
+/solvers/cpp/bazel-*
 
 /solvers/rust/target/

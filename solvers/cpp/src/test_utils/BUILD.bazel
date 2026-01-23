@@ -1,0 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "test_utils",
+    srcs = ["test_utils.cpp"],
+    hdrs = ["test_utils.hpp"],
+    deps = [
+        "//src/lib",
+        "@googletest//:gtest",
+        "@spdlog",
+    ],
+    visibility = ["//visibility:public"],
+)

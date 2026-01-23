@@ -1,0 +1,77 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+
+cc_library(
+    name = "solver_interface",
+    hdrs = ["solver.hpp"],
+    visibility = ["//visibility:private"],
+    deps = ["//src/lib"],
+)
+
+cc_library(
+    name = "shared_main",
+    srcs = ["shared_main.cpp"],
+    linkstatic = True,
+    visibility = ["//visibility:private"],
+    deps = [
+        ":solver_interface",
+        "//src/lib",
+        "@spdlog",
+    ],
+)
+
+_SOLVER_FILES = glob(
+    ["y*_d*.cpp"],
+    exclude = ["*.test.cpp"],
+)
+
+_SOLVERS = [
+    solver_file[:-4]
+    for solver_file in _SOLVER_FILES
+]
+
+_ALL_SOLVERS = set(_SOLVERS)
+
+[
+    cc_library(
+        name = solver + "_impl",
+        srcs = [solver + ".cpp"],
+        visibility = ["//visibility:private"],
+        deps = [
+            ":solver_interface",
+            "//src/lib",
+        ],
+    )
+    for solver in _SOLVERS
+]
+
+[
+    cc_binary(
+        name = solver,
+        deps = [
+            ":" + solver + "_impl",
+            ":shared_main",
+        ],
+    )
+    for solver in _SOLVERS
+]
+
+_TEST_FILES = glob(["y*_d*.test.cpp"])
+
+_TESTS = [test_file[:-9] for test_file in _TEST_FILES]
+
+_ENABLED_TESTS = [test for test in _TESTS if test in _ALL_SOLVERS]
+
+[
+    cc_test(
+        name = test + "_test",
+        size = "small",
+        srcs = [test + ".test.cpp"],
+        deps = [
+            ":" + test + "_impl",
+            ":solver_interface",
+            "//src/lib",
+            "@googletest//:gtest_main",
+        ],
+    )
+    for test in _ENABLED_TESTS
+]
