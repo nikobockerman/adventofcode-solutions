@@ -1,6 +1,6 @@
 [tools]
 "pipx:clang-format" = "21.1.8"
-conan = "2.24.0"
+conan = "2.25.0"
 sccache = "0.12.0"
 
 [tasks.check]
