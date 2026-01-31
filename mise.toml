@@ -9,7 +9,7 @@ prettier = "3.6.2"
 ruff = "0.14.14"
 shellcheck = "0.11.0"
 shfmt = "3.12.0"
-yq = "4.50.1"
+yq = "4.52.1"
 
 
 [vars]
