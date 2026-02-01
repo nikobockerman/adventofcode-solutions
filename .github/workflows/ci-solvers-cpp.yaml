@@ -29,12 +29,19 @@ jobs:
       directory: solvers/cpp
       task: check:clang-format
 
+  check-gersemi:
+    uses: ./.github/workflows/mise-task.yaml
+    with:
+      directory: solvers/cpp
+      task: check:gersemi
+
   # Check for all green CI for C++
   check:
     if: always()
     needs:
       - build-test-run
       - check-clang-format
+      - check-gersemi
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 
