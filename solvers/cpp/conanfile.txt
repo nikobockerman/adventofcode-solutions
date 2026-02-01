@@ -6,7 +6,7 @@ gtest/1.17.0
 spdlog/*:use_std_fmt=True
 
 [generators]
-CMakeDeps
+CMakeConfigDeps
 
 [layout]
 cmake_layout
