@@ -1,7 +1,7 @@
 [tools]
 # Basic technologies used in the repository
 python = "3.14.2"
-uv = "0.9.30"
+uv = "0.10.0"
 
 # Common tools
 "pipx:shellcheck-gha" = "0.1.2"
