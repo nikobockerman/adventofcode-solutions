@@ -17,7 +17,9 @@ constexpr auto convert(const TRange& range) -> TResult {
 
   TResult value{};
   const auto* begin = &*range.begin();
-  const auto* pastEnd = &*range.end();
+  const auto size = std::ranges::size(range);
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  const auto* pastEnd = begin + size;
   auto [ptr, ec]{std::from_chars(begin, pastEnd, value)};
   if (ec == std::errc()) {
     return value;
