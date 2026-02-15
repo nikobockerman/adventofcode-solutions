@@ -1,0 +1,6 @@
+{% set libcxx_install_path = os.environ["HARDENED_LIBCXX_DIR"] %}
+
+[conf]
+tools.build:cxxflags=['-stdlib++-isystem{{ libcxx_install_path }}/include/c++/v1', '-D_LIBCPP_DEBUG=1', '-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG']
+tools.build:exelinkflags=['-stdlib=libc++', '-L{{ libcxx_install_path }}/lib', '-lunwind']
+tools.build:sharedlinkflags=['-stdlib=libc++', '-L{{ libcxx_install_path }}/lib', '-lunwind']

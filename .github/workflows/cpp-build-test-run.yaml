@@ -45,6 +45,13 @@ jobs:
             homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
             runsOn: ubuntu-24.04
 
+          - os: ubuntu
+            compiler: clang
+            cxxLib: libc++
+            buildType: hardened
+            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+            runsOn: ubuntu-24.04
+
           - os: macos
             compiler: clang
             cxxLib: libstdc++
@@ -103,6 +110,20 @@ jobs:
         name: Add brew binutils to path
         run: |
           echo "${HOMEBREW_PREFIX}/opt/binutils/bin" >> "${GITHUB_PATH}"
+        shell: bash
+
+      - id: setup-hardened-libcxx
+        if: matrix.cxxLib == 'libc++' && matrix.buildType == 'hardened'
+        name: Setup hardened libc++
+        uses: ./.github/actions/hardened-libc++
+
+      - if: matrix.cxxLib == 'libc++' && matrix.buildType == 'hardened'
+        name: Set env to hardened libc++ install dir for CMake and Conan configs
+
+        env:
+          HARDENED_LIBCXX_DIR: ${{ steps.setup-hardened-libcxx.outputs.install-dir }}
+        run: |
+          echo "HARDENED_LIBCXX_DIR=${HARDENED_LIBCXX_DIR}" | tr -d '\n' >> "${GITHUB_ENV}"
         shell: bash
 
       - if: matrix.buildType == 'sanitizers'
