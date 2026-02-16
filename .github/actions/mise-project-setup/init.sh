@@ -2,34 +2,7 @@
 
 set -euo pipefail
 
-# Verify GitHub Actions environment variables
-if [[ -z "${GITHUB_ENV}" ]]; then
-  echo "::error::GITHUB_ENV is not set"
-  exit 1
-fi
-if [[ -z "${GITHUB_OUTPUT}" ]]; then
-  echo "::error::GITHUB_OUTPUT is not set"
-  exit 1
-fi
-if [[ -z "${RUNNER_OS}" ]]; then
-  echo "::error::RUNNER_OS is not set"
-  exit 1
-fi
-if [[ -z "${RUNNER_TEMP}" ]]; then
-  echo "::error::RUNNER_TEMP is not set"
-  exit 1
-fi
-
 # Validate inputs
-if [[ -z "${MISE_VERSION}" ]]; then
-  echo "::error::MISE_VERSION is not set"
-  exit 1
-fi
-
-if [[ -z "${CACHE_MODE}" ]]; then
-  echo "::error::CACHE_MODE is not set"
-  exit 1
-fi
 case "${CACHE_MODE}" in
 prepare | use) ;;
 *)
