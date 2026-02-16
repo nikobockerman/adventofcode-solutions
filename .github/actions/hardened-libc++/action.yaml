@@ -13,7 +13,7 @@ runs:
 
       env:
         # renovate: datasource=github-releases depName=llvm/llvm-project extractVersion=^llvmorg-(?<version>.*)$
-        LLVM_VERSION: 21.1.5
+        LLVM_VERSION: 21.1.8
       run: |
         # Initialize hardened libc++ action
         "${GITHUB_ACTION_PATH}/init.sh"
