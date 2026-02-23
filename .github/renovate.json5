@@ -7,6 +7,7 @@
     "security:minimumReleaseAgeNpm",
   ],
 
+  commitHourlyLimit: 1,
   conan: {
     enabled: true,
   },
