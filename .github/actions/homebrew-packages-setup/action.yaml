@@ -31,6 +31,7 @@ runs:
         INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
         # Major versions of GCC and LLVM to use
         GCC_MAJOR_VERSION: 15
+        # renovate: datasource=github-releases depName=llvm/llvm-project extractVersion=^llvmorg-(?<version>\\d+)\\.\\d+\\.\\d+$
         LLVM_MAJOR_VERSION: 21
       run: |
         # Initialize action
