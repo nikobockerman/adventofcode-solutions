@@ -1,11 +1,12 @@
 {% set prefix = os.environ["HOMEBREW_PREFIX"] %}
+{% set llvmMajorVersion = os.environ["LLVM_MAJOR_VERSION"] %}
 
 [conf]
-tools.build:cxxflags=["-stdlib++-isystem{{ prefix }}/opt/llvm/include/c++/v1"]
+tools.build:cxxflags=["-stdlib++-isystem{{ prefix }}/opt/llvm@{{ llvmMajorVersion }}/include/c++/v1"]
 {% if platform.system() == "Darwin" %}
-tools.build:exelinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm/lib/c++"]
-tools.build:sharedlinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm/lib/c++"]
+tools.build:exelinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm@{{ llvmMajorVersion }}/lib/c++"]
+tools.build:sharedlinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm@{{ llvmMajorVersion }}/lib/c++"]
 {% elif platform.system() == "Linux" %}
-tools.build:exelinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm/lib"]
-tools.build:sharedlinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm/lib"]
+tools.build:exelinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm@{{ llvmMajorVersion }}/lib"]
+tools.build:sharedlinkflags=["-stdlib=libc++", "-L{{ prefix }}/opt/llvm@{{ llvmMajorVersion }}/lib"]
 {% endif %}

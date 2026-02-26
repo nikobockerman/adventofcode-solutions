@@ -145,31 +145,31 @@
       "name": "_ci-clang",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/llvm/bin/clang",
-        "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/llvm/bin/clang++"
+        "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/bin/clang",
+        "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/bin/clang++"
       }
     },
     {
       "name": "_ci-gcc",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@15/bin/gcc-15",
-        "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@15/bin/g++-15"
+        "CMAKE_C_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/bin/gcc-$penv{GCC_MAJOR_VERSION}",
+        "CMAKE_CXX_COMPILER": "$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/bin/g++-$penv{GCC_MAJOR_VERSION}"
       }
     },
     {
       "name": "_ci-clang-tidy",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_CXX_CLANG_TIDY": "$penv{HOMEBREW_PREFIX}/opt/llvm/bin/clang-tidy"
+        "CMAKE_CXX_CLANG_TIDY": "$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/bin/clang-tidy"
       }
     },
     {
       "name": "_ci-clang-libc++",
       "hidden": true,
       "environment": {
-        "PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/llvm/include/c++/v1",
-        "PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm/lib"
+        "PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/include/c++/v1",
+        "PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/lib"
       },
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}",
@@ -182,11 +182,11 @@
       "name": "_ci-gcc-libstdc++-for-clang-common",
       "hidden": true,
       "environment": {
-        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/gcc/include/c++/15"
+        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/include/c++/$penv{GCC_MAJOR_VERSION}"
       },
       "cacheVariables": {
-        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc/lib/gcc/15",
-        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc/lib/gcc/15",
+        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION}",
+        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION}",
         "CONAN_HOST_PROFILE": "${sourceDir}/conan-profile-gcc-libstd++-for-clang;auto-cmake"
       }
     },
@@ -209,14 +209,14 @@
       "name": "_ci-gcc-libstdc++-for-clang-macos",
       "hidden": true,
       "environment": {
-        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_MACOS": "-cxx-isystem$penv{HOMEBREW_PREFIX}/opt/gcc/include/c++/15/aarch64-apple-darwin24"
+        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_MACOS": "-cxx-isystem$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/include/c++/$penv{GCC_MAJOR_VERSION}/aarch64-apple-darwin24"
       }
     },
     {
       "name": "_ci-gcc-libstdc++-for-clang-ubuntu",
       "hidden": true,
       "environment": {
-        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU": "-cxx-isystem$penv{HOMEBREW_PREFIX}/opt/gcc/include/c++/15/x86_64-pc-linux-gnu"
+        "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU": "-cxx-isystem$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/include/c++/$penv{GCC_MAJOR_VERSION}/x86_64-pc-linux-gnu"
       }
     }
   ],
