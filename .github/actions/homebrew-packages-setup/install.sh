@@ -33,7 +33,7 @@ fi
 if [[ "${skipInstalls}" == "false" ]]; then
   for tool in ${TOOLS_TO_INSTALL}; do
     echo "::group::Install ${tool}"
-    brew install "${tool}"
+    brew install --quiet "${tool}"
     echo "::endgroup::"
   done
 
