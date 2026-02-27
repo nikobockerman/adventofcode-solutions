@@ -6,7 +6,7 @@ uv = "0.10.6"
 # Common tools
 "pipx:shellcheck-gha" = "0.1.2"
 prettier = "3.6.2"
-ruff = "0.15.2"
+ruff = "0.15.4"
 shellcheck = "0.11.0"
 shfmt = "3.12.0"
 yq = "4.52.4"
