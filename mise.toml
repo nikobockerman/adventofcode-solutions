@@ -4,6 +4,7 @@ python = "3.14.3"
 uv = "0.10.7"
 
 # Common tools
+"npm:pyright" = "1.1.408"
 "pipx:shellcheck-gha" = "0.1.2"
 prettier = "3.6.2"
 ruff = "0.15.4"
@@ -68,6 +69,7 @@ shell = "sh -c"
 [tasks.check]
 depends = [
   "check:prettier",
+  "check:pyright-repo",
   "check:ruff",
   "check:ruff:format",
   "check:shellcheck",

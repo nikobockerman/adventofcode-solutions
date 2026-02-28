@@ -1,5 +1,4 @@
 [tools]
-"npm:pyright" = "1.1.408"
 "pipx:mypy" = "1.19.1"
 
 [tasks.check]
