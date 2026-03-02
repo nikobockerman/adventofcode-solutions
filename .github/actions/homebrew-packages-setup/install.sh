@@ -31,6 +31,12 @@ if [[ "${CACHE_HIT}" == "true" && "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" != "${i
 fi
 
 if [[ "${skipInstalls}" == "false" ]]; then
+  if [[ "${INPUT_CACHE_MODE}" == "prepare" ]]; then
+    echo "::group::Update brew formulae"
+    brew update
+    echo "::endgroup::"
+  fi
+
   for tool in ${TOOLS_TO_INSTALL}; do
     echo "::group::Install ${tool}"
     brew install --quiet "${tool}"
