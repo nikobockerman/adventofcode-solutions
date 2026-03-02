@@ -22,9 +22,6 @@ build-backend = "uv_build"
 [tool.mypy]
 strict_optional = true
 
-[tool.pyright]
-typeCheckingMode = "strict"
-
 [tool.pytest]
 addopts = [
   "--import-mode=importlib",
