@@ -15,7 +15,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, TypeIs
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
@@ -31,6 +31,26 @@ def log_level(verbosity: int) -> int:
             return logging.INFO
         case _:
             return logging.DEBUG
+
+
+def is_str_list(val: Any) -> TypeIs[list[str]]:  # noqa: ANN401
+    if not isinstance(val, list):
+        return False
+    return all(isinstance(item, str) for item in val)  # pyright: ignore[reportUnknownVariableType]
+
+
+def load_inputs_db(inputs_db_file: pathlib.Path) -> list[str]:
+    if not inputs_db_file.exists():
+        return []
+
+    with inputs_db_file.open("r") as f:
+        data = json.load(f)
+
+    if not is_str_list(data):
+        msg = f"Invalid inputs.json file: expected list of strings, got {data}"
+        raise TypeError(msg)
+
+    return data
 
 
 def move_file_to_local_directory(
@@ -52,11 +72,7 @@ def move_file_to_local_directory(
 class FileRecords:
     def __init__(self, repo_root: pathlib.Path) -> None:
         self._inputs_db_file = repo_root / "inputs.json"
-        if self._inputs_db_file.exists():
-            with self._inputs_db_file.open("r") as f:
-                self._inputs_db = json.load(f)
-        else:
-            self._inputs_db = []
+        self._inputs_db = load_inputs_db(self._inputs_db_file)
 
     def contains(self, target_file_name: str) -> bool:
         return target_file_name in self._inputs_db
