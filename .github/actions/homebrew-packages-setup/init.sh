@@ -65,7 +65,6 @@ echo "::group::Outputs from init"
   echo "cache-key-for-restore=${cacheKeyForRestore}"
   echo "cache-restore-keys<<ENDKEYS"
   echo "${cacheKeyPrefix}-"
-  echo "${cacheKeyBase}-"
   echo "ENDKEYS"
 
   # Tools to install
