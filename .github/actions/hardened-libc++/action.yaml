@@ -1,6 +1,11 @@
 name: Hardened libc++ with iterator bounds checks
 description: Build and cache a custom libc++ with iterator bounds checks enabled
 
+inputs:
+  llvm-major-version:
+    description: "Major version of Homebrew LLVM used as compiler and cmake provider"
+    required: true
+
 outputs:
   install-dir:
     description: "Path to the installed hardened libc++"
@@ -23,7 +28,7 @@ runs:
       name: Restore cached hardened llvm libc++
       uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
-        key: llvm-libc++-hardened-${{ steps.init.outputs.llvmVersion }}-${{ hashFiles('.github/actions/hardened-libc++/build.sh') }}
+        key: llvm-libc++-hardened-${{ steps.init.outputs.llvmVersion }}-homebrew-llvm@${{ inputs.llvm-major-version }}-${{ hashFiles('.github/actions/hardened-libc++/build.sh') }}
         path: ${{ steps.init.outputs.installDir }}
 
     - id: checkout-llvm
@@ -43,6 +48,7 @@ runs:
         INSTALL_DIR: ${{ steps.init.outputs.installDir }}
         LLVM_VERSION: ${{ steps.init.outputs.llvmVersion }}
         LLVM_PROJECT_DIR: ${{ github.workspace }}/repo-llvm-project
+        LLVM_MAJOR_VERSION: ${{ inputs.llvm-major-version }}
       run: |
         # Build hardened llvm libc++
         "${GITHUB_ACTION_PATH}/build.sh"

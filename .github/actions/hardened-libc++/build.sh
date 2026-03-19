@@ -2,17 +2,11 @@
 
 set -euo pipefail
 
-# Determine compiler based on platform
-clang=$(command -v clang)
-clangpp=$(command -v clang++)
-
-clangDir=$(dirname "${clang}")
-clangppDir=$(dirname "${clangpp}")
-
-if [[ "${clangDir}" != "${clangppDir}" ]]; then
-  echo "::error::clang and clang++ are not in the same directory"
-  exit 1
-fi
+# Determine compiler and cmake paths from Homebrew LLVM
+llvmPrefix="$(brew --prefix "llvm@${LLVM_MAJOR_VERSION}")"
+llvmBin="${llvmPrefix}/bin"
+clang="${llvmBin}/clang"
+clangpp="${llvmBin}/clang++"
 
 echo "::group::Hardened libc++ build info"
 echo "LLVM version of source files: ${LLVM_VERSION}"
@@ -36,6 +30,8 @@ cmake -G Ninja \
   -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
   -DCMAKE_C_COMPILER="${clang}" \
   -DCMAKE_CXX_COMPILER="${clangpp}" \
+  -DLLVM_DIR="${llvmPrefix}/lib/cmake/llvm" \
+  -DClang_DIR="${llvmPrefix}/lib/cmake/clang" \
   -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
   -DLIBCXX_ABI_DEFINES="_LIBCPP_ABI_BOUNDED_ITERATORS;_LIBCPP_ABI_BOUNDED_ITERATORS_IN_STRING;_LIBCPP_ABI_BOUNDED_ITERATORS_IN_VECTOR;_LIBCPP_ABI_BOUNDED_UNIQUE_PTR;_LIBCPP_ABI_BOUNDED_ITERATORS_IN_STD_ARRAY"
 echo "::endgroup::"
