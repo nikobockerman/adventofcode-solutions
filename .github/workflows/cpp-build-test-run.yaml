@@ -116,6 +116,8 @@ jobs:
         if: matrix.cxxLib == 'libc++' && matrix.buildType == 'hardened'
         name: Setup hardened libc++
         uses: ./.github/actions/hardened-libc++
+        with:
+          llvm-major-version: ${{ env.LLVM_MAJOR_VERSION }}
 
       - if: matrix.cxxLib == 'libc++' && matrix.buildType == 'hardened'
         name: Set env to hardened libc++ install dir for CMake and Conan configs
