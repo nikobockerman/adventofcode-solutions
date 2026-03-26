@@ -1,7 +1,7 @@
 [tools]
 "pipx:clang-format" = "22.1.1"
 "pipx:gersemi" = "0.26.1"
-conan = "2.26.2"
+conan = "2.27.0"
 sccache = "0.12.0"
 
 [tasks.check]
