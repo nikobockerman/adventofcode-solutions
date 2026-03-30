@@ -32,7 +32,7 @@ runs:
 
     - name: Install CMake
       # TODO: Install cmake through mise
-      uses: lukka/get-cmake@b78306120111dc2522750771cfd09ee7ca723687 # v4.3.0
+      uses: lukka/get-cmake@ea83089aa35e08e459464341fe24ad024ee2466f # v4.3.1
 
     - id: sccache-version
       run: |
