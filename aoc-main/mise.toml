@@ -1,5 +1,5 @@
 [tools]
-"pipx:mypy" = "1.19.1"
+"pipx:mypy" = "1.20.0"
 
 [tasks.check]
 depends = [
