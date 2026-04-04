@@ -19,7 +19,7 @@
   },
   postUpdateOptions: ["npmDedupe"],
   rebaseWhen: "behind-base-branch",
-  schedule: ["* 0-13 * * 1-5"], // Weekdays, during night and working hours
+  schedule: ["* 8-13 * * 2-4"], // Tuesday-Thursday, during working day
   semanticCommits: "disabled",
   separateMinorPatch: true,
 
@@ -30,11 +30,11 @@
 
       automerge: true,
       minimumReleaseAge: "1 day", // 1 day delay to avoid errors installing very fresh version - https://github.com/jdx/mise/issues/2314
-      schedule: ["* 0-13 * * 5"], // Friday, during night and working hours
+      prPriority: -1, // Lowest priority
+      schedule: ["* 8-13 * * 4"], // Thursday, during working day
     },
     {
       description: "Automerge all updates",
-      matchManagers: ["!conan"],
       matchUpdateTypes: [
         "major",
         "minor",
