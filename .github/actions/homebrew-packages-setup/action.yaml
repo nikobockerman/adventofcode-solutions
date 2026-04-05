@@ -33,7 +33,7 @@ runs:
         # renovate: datasource=repology depName=gcc packageName=homebrew/gcc extractVersion=^(?<version>\d+)\.\d+\.\d+$
         GCC_MAJOR_VERSION: 15
         # renovate: datasource=repology depName=llvm packageName=homebrew/llvm extractVersion=^(?<version>\d+)\.\d+\.\d+$
-        LLVM_MAJOR_VERSION: 21
+        LLVM_MAJOR_VERSION: 22
       run: |
         # Initialize action
         "${GITHUB_ACTION_PATH}/init.sh"
