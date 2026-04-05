@@ -31,7 +31,7 @@ TEST(MyStrideView, One) {
   constexpr std::array<int, 1> one{1};
   auto processed = one | MyStride(2) | ranges::to<std::vector>();
   ASSERT_EQ(processed.size(), 1);
-  EXPECT_EQ(processed[0], 1);
+  EXPECT_EQ(processed.at(0), 1);
 }
 
 TEST(MyStrideView, ZeroStride) {

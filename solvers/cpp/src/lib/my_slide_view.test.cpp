@@ -21,10 +21,10 @@ TEST(MySlideView, BetweenPipes) {
   auto processed =
     data | views::drop(1) | MySlide(3) | views::take(4) | ranges::to<Sliced>();
   ASSERT_EQ(processed.size(), 4);
-  EXPECT_EQ(processed[0], "234");
-  EXPECT_EQ(processed[1], "345");
-  EXPECT_EQ(processed[2], "456");
-  EXPECT_EQ(processed[3], "567");
+  EXPECT_EQ(processed.at(0), "234");
+  EXPECT_EQ(processed.at(1), "345");
+  EXPECT_EQ(processed.at(2), "456");
+  EXPECT_EQ(processed.at(3), "567");
 }
 
 TEST(MySlideView, EmptyData) {
@@ -37,15 +37,15 @@ TEST(MySlideView, EqualSize) {
   const std::string one{"1"};
   auto processed = one | MySlide(1) | ranges::to<Sliced>();
   ASSERT_EQ(processed.size(), 1);
-  EXPECT_EQ(processed[0], "1");
+  EXPECT_EQ(processed.at(0), "1");
 }
 
 TEST(MySlideView, LastIncluded) {
   const std::string data{"12345"};
   auto processed = data | MySlide(2) | ranges::to<Sliced>();
   ASSERT_EQ(processed.size(), 4);
-  EXPECT_EQ(processed[0], "12");
-  EXPECT_EQ(processed[1], "23");
-  EXPECT_EQ(processed[2], "34");
-  EXPECT_EQ(processed[3], "45");
+  EXPECT_EQ(processed.at(0), "12");
+  EXPECT_EQ(processed.at(1), "23");
+  EXPECT_EQ(processed.at(2), "34");
+  EXPECT_EQ(processed.at(3), "45");
 }

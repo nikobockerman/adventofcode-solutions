@@ -22,8 +22,8 @@ TEST(MyChunkView, BetweenPipes) {
   auto processed =
     data | views::drop(1) | MyChunk(3) | views::take(2) | ranges::to<Chunked>();
   ASSERT_EQ(processed.size(), 2);
-  EXPECT_EQ(processed[0], "234");
-  EXPECT_EQ(processed[1], "567");
+  EXPECT_EQ(processed.at(0), "234");
+  EXPECT_EQ(processed.at(1), "567");
 }
 
 TEST(MyChunkView, EmptyData) {
@@ -36,13 +36,13 @@ TEST(MyChunkView, EqualSize) {
   const std::string one{"123"};
   auto processed = one | MyChunk(3) | ranges::to<Chunked>();
   ASSERT_EQ(processed.size(), 1);
-  EXPECT_EQ(processed[0], "123");
+  EXPECT_EQ(processed.at(0), "123");
 }
 
 TEST(MyChunkView, LargerThanInput) {
   const std::string data{"12345"};
   auto processed = data | MyChunk(4) | ranges::to<Chunked>();
   ASSERT_EQ(processed.size(), 2);
-  EXPECT_EQ(processed[0], "1234");
-  EXPECT_EQ(processed[1], "5");
+  EXPECT_EQ(processed.at(0), "1234");
+  EXPECT_EQ(processed.at(1), "5");
 }
