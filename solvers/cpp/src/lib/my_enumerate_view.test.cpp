@@ -32,10 +32,10 @@ TEST(MyEnumerateView, BetweenPipes) {
   auto processed = data | views::drop(1) | MyEnumerate | views::take(4) |
                    ranges::to<Enumerated>();
   ASSERT_EQ(processed.size(), 4);
-  EXPECT_EQ(processed[0], makeEnumeratedChar(0, '2'));
-  EXPECT_EQ(processed[1], makeEnumeratedChar(1, '3'));
-  EXPECT_EQ(processed[2], makeEnumeratedChar(2, '4'));
-  EXPECT_EQ(processed[3], makeEnumeratedChar(3, '5'));
+  EXPECT_EQ(processed.at(0), makeEnumeratedChar(0, '2'));
+  EXPECT_EQ(processed.at(1), makeEnumeratedChar(1, '3'));
+  EXPECT_EQ(processed.at(2), makeEnumeratedChar(2, '4'));
+  EXPECT_EQ(processed.at(3), makeEnumeratedChar(3, '5'));
 }
 
 TEST(MyEnumerateView, NoElements) {
@@ -48,16 +48,16 @@ TEST(MyEnumerateView, SingleElement) {
   const std::string one{"1"};
   auto processed = one | MyEnumerate | ranges::to<Enumerated>();
   ASSERT_EQ(processed.size(), 1);
-  EXPECT_EQ(processed[0], makeEnumeratedChar(0, '1'));
+  EXPECT_EQ(processed.at(0), makeEnumeratedChar(0, '1'));
 }
 
 TEST(MyEnumerateView, ManyElements) {
   const std::string data{"12345"};
   auto processed = data | MyEnumerate | ranges::to<Enumerated>();
   ASSERT_EQ(processed.size(), 5);
-  EXPECT_EQ(processed[0], makeEnumeratedChar(0, '1'));
-  EXPECT_EQ(processed[1], makeEnumeratedChar(1, '2'));
-  EXPECT_EQ(processed[2], makeEnumeratedChar(2, '3'));
-  EXPECT_EQ(processed[3], makeEnumeratedChar(3, '4'));
-  EXPECT_EQ(processed[4], makeEnumeratedChar(4, '5'));
+  EXPECT_EQ(processed.at(0), makeEnumeratedChar(0, '1'));
+  EXPECT_EQ(processed.at(1), makeEnumeratedChar(1, '2'));
+  EXPECT_EQ(processed.at(2), makeEnumeratedChar(2, '3'));
+  EXPECT_EQ(processed.at(3), makeEnumeratedChar(3, '4'));
+  EXPECT_EQ(processed.at(4), makeEnumeratedChar(4, '5'));
 }

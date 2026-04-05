@@ -74,7 +74,7 @@ auto applyOperator(const uint64_t eqResult, const uint64_t nextValue,
   if (index >= numbers.size()) {
     return std::nullopt;
   }
-  return std::make_pair(numbers[index], index + 1);
+  return std::make_pair(numbers.at(index), index + 1);
 }
 
 template <bool allowConcatenationOperator>
@@ -82,7 +82,7 @@ template <bool allowConcatenationOperator>
                                      const std::vector<uint64_t>& numbers)
   -> bool {
   std::priority_queue<EquationState> pq;
-  pq.emplace(numbers[0], numbers[1], 2);
+  pq.emplace(numbers.at(0), numbers.at(1), 2);
 
   constexpr auto operators = getOperators<allowConcatenationOperator>();
   while (!pq.empty()) {

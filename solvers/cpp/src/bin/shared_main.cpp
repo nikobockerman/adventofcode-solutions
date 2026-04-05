@@ -29,8 +29,8 @@ auto processArgs(const std::span<const char*> args) {
     throw std::runtime_error(
       std::format("Invalid number of arguments: {}", args.size()));
   }
-  auto verbosity = convert<std::uint8_t>(std::string_view{args[1]});
-  auto part = convert<std::uint8_t>(std::string_view{args[2]});
+  auto verbosity = convert<std::uint8_t>(std::string_view{args.at(1)});
+  auto part = convert<std::uint8_t>(std::string_view{args.at(2)});
 
   if (verbosity > 2) {
     throw std::runtime_error(
