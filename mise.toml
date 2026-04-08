@@ -4,7 +4,7 @@ python = "3.14.3"
 uv = "0.11.3"
 
 # Common tools
-"npm:pyright" = "1.1.408"
+"npm:basedpyright" = "1.38.2"
 "pipx:shellcheck-gha" = "0.1.2"
 prettier = "3.8.1"
 ruff = "0.15.7"
@@ -69,7 +69,7 @@ shell = "sh -c"
 [tasks.check]
 depends = [
   "check:prettier",
-  "check:pyright-repo",
+  "check:basedpyright-repo",
   "check:ruff",
   "check:ruff:format",
   "check:shellcheck",
@@ -100,8 +100,8 @@ fi
 prettier --ignore-path=.gitignore --ignore-path=.prettierignore "$userIgnoreArg" --check .
 """
 
-[tasks."check:pyright-repo"]
-run = "pyright"
+[tasks."check:basedpyright-repo"]
+run = "basedpyright"
 
 [tasks."check:ruff"]
 run = "ruff check"
