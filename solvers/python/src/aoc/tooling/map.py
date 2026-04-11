@@ -291,7 +291,7 @@ class Map2d[Map2dDataType = str]:
         map_ = self
         for _ in range(count):
             if direction is RotationDirection.Clockwise:
-                map_ = map_.__rotate_once_clockwise()  # noqa: SLF001
+                map_ = map_.__rotate_once_clockwise()
             elif direction is RotationDirection.Counterclockwise:
                 map_ = map_.__rotate_once_counterclockwise()  # noqa: SLF001
             else:
