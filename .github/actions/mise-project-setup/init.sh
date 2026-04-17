@@ -3,6 +3,11 @@
 set -euo pipefail
 
 # Validate inputs
+if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+  echo "::error::GITHUB_TOKEN environment variable must be set and non-empty"
+  exit 1
+fi
+
 case "${CACHE_MODE}" in
 prepare | use) ;;
 *)

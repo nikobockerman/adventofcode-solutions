@@ -17,6 +17,9 @@ jobs:
 
       - name: Restore mise project
         uses: ./.github/actions/mise-project-setup
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           directory: solvers/python
 

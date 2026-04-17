@@ -49,6 +49,9 @@ jobs:
 
       - name: Restore mise tools
         uses: ./.github/actions/mise-project-setup
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           directory: .
 
