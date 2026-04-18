@@ -3,6 +3,11 @@
 set -euo pipefail
 
 # Validate inputs
+if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+  echo "::error::github.token context variable must be available"
+  exit 1
+fi
+
 case "${CACHE_MODE}" in
 prepare | use) ;;
 *)
