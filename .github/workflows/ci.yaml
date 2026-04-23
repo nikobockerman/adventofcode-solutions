@@ -81,12 +81,12 @@ jobs:
       directory: .
       task: check:prettier
 
-  check-pyright-repo:
+  check-basedpyright-repo:
     needs: mise-cache-ubuntu
     uses: ./.github/workflows/mise-task.yaml
     with:
       directory: .
-      task: check:pyright-repo
+      task: check:basedpyright-repo
 
   check-ruff:
     needs: mise-cache-ubuntu
@@ -179,7 +179,7 @@ jobs:
     if: always()
     needs:
       - check-prettier
-      - check-pyright-repo
+      - check-basedpyright-repo
       - check-ruff
       - check-ruff-format
       - check-shellcheck

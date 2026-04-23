@@ -4,7 +4,7 @@
 [tasks.check]
 depends = [
   "check:mypy",
-  "check:pyright",
+  "check:basedpyright",
   "check:pytest",
 ]
 
@@ -16,8 +16,8 @@ pythonVersion=$(cat pyproject.toml | yq -p toml '.project.requires-python' | sed
 mypy --python-executable "${pythonExecutable}" --python-version "${pythonVersion}" .
 """
 
-[tasks."check:pyright"]
-run = "uv run pyright"
+[tasks."check:basedpyright"]
+run = "uv run basedpyright"
 
 [tasks."check:pytest"]
 run = "uv run pytest"

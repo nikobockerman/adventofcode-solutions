@@ -38,13 +38,13 @@ jobs:
       directory: ${{ inputs.directory }}
       task: check:mypy
 
-  check-pyright:
+  check-basedpyright:
     if: always() && contains(fromJSON('["skipped", "success"]'), needs.uv-cache.result)
     needs: uv-cache
     uses: ./.github/workflows/mise-uv-task.yaml
     with:
       directory: ${{ inputs.directory }}
-      task: check:pyright
+      task: check:basedpyright
 
   run-all:
     if: inputs.directory != 'aoc-main'
@@ -65,7 +65,7 @@ jobs:
     if: always()
     needs:
       - check-mypy
-      - check-pyright
+      - check-basedpyright
       - run-all
       - test-pytest
     runs-on: ubuntu-24.04
