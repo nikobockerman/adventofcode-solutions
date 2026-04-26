@@ -97,7 +97,7 @@
     {
       "name": "_ci-ubuntu-clang-libc++",
       "hidden": true,
-      "inherits": ["_ci-ubuntu-clang-common", "_ci-clang-libc++"],
+      "inherits": ["_ci-ubuntu-clang-common", "_ci-clang-libc++-linux"],
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}"
       }
@@ -165,17 +165,18 @@
       }
     },
     {
-      "name": "_ci-clang-libc++",
+      "name": "_ci-clang-libc++-linux",
       "hidden": true,
       "environment": {
         "PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/include/c++/v1",
-        "PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/lib -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/lib"
+        "PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG": "-stdlib=libc++ -L$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/lib -lunwind"
       },
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBCPP_FOR_CLANG}",
         "CMAKE_EXE_LINKER_FLAGS": "$env{PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG}",
         "CMAKE_SHARED_LINKER_FLAGS": "$env{PRESET_LINKER_FLAGS_LIBCPP_FOR_CLANG}",
-        "CONAN_HOST_PROFILE": "${sourceDir}/conan-profile-clang-with-libc++;auto-cmake"
+        "CMAKE_BUILD_RPATH": "$penv{HOMEBREW_PREFIX}/opt/llvm@$penv{LLVM_MAJOR_VERSION}/lib",
+        "CONAN_HOST_PROFILE": "auto-cmake;${sourceDir}/conan-profile-clang-with-libc++"
       }
     },
     {
