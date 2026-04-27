@@ -1,0 +1,8 @@
+# Conan 2 settings_user.yml — merged with the built-in settings.yml.
+# Adds an optional free-form ABI tag for clang. Used by sanitizer profiles
+# to encode the LLVM patch version into package_id, so that a Homebrew
+# llvm bump invalidates cached Conan binaries whose libc++/ASan runtime
+# ABI no longer matches the application's.
+compiler:
+  clang:
+    abi_extra: [null, ANY]
