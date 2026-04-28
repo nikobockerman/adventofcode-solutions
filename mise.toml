@@ -109,8 +109,14 @@ run = "ruff check"
 [tasks."check:ruff:format"]
 run = "ruff format --check"
 
+[tasks."check:shellcheck-gha:actions"]
+run = "shellcheck-gha --no-skip-unknown-files .github/actions"
+
+[tasks."check:shellcheck-gha:workflows"]
+run = "shellcheck-gha --no-skip-unknown-files .github/workflows"
+
 [tasks."check:shellcheck-gha"]
-run = "shellcheck-gha --no-skip-unknown-files"
+depends = ["check:shellcheck-gha:actions", "check:shellcheck-gha:workflows"]
 
 [tasks."check:aoc-main"]
 run = "mise run check"
