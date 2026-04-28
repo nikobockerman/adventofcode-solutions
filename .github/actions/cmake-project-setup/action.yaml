@@ -60,5 +60,6 @@ runs:
         cp .github/files/CMakeUserPresets.json solvers/cpp/
         cp .github/files/conan-profile-clang-with-hardened-libc++ solvers/cpp/
         cp .github/files/conan-profile-clang-with-libc++ solvers/cpp/
+        cp .github/files/conan-profile-clang-with-libc++-sanitizers solvers/cpp/
         cp .github/files/conan-profile-gcc-libstd++-for-clang solvers/cpp/
       shell: bash

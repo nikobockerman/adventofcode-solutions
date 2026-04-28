@@ -6,6 +6,11 @@ conanHome=${RUNNER_TEMP}/aoc-conan-home
 
 export CONAN_HOME="${conanHome}"
 
+echo "::group::Install settings_user.yml"
+mkdir -p "${CONAN_HOME}"
+cp "${GITHUB_WORKSPACE}/.github/files/settings_user.yml" "${CONAN_HOME}/"
+echo "::endgroup::"
+
 echo "::group::Detect Conan profile"
 pushd solvers/cpp
 conan profile detect

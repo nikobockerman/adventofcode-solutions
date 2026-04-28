@@ -1,0 +1,10 @@
+{# Sanitizer-only profile. Encodes the LLVM patch version into
+   compiler.abi_extra so Conan's package_id changes whenever Homebrew
+   bumps LLVM's patch version, invalidating cached gtest/spdlog binaries
+   whose libc++ ASan-runtime ABI no longer matches. #}
+{% set llvmFullVersion = os.environ["LLVM_FULL_VERSION"] %}
+
+include(conan-profile-clang-with-libc++)
+
+[settings]
+compiler.abi_extra=sanitizers-{{ llvmFullVersion }}

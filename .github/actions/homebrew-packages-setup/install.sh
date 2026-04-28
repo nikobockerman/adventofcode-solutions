@@ -7,6 +7,8 @@ if [[ -z "${TOOLS_TO_INSTALL}" ]]; then
   exit 1
 fi
 
+llvmFullVersion=""
+
 skipInstalls=false
 if [[ "${INPUT_CACHE_MODE}" == "prepare" && "${GITHUB_EVENT_NAME}" == "pull_request" && "${MATCHED_RESTORE_KEY}" =~ ^"${RESTORE_KEY_PREFIX}" ]]; then
   echo "Prepare mode for PR. Cache restored with a prefix match. Skipping all installs."
@@ -47,6 +49,19 @@ if [[ "${skipInstalls}" == "false" ]]; then
   brew cleanup --scrub
   echo "::endgroup::"
 
+  echo "::group::Determine LLVM full version"
+  brewLlvmListOutput=$(brew list --versions "llvm@${LLVM_MAJOR_VERSION}")
+  if [[ -z "${brewLlvmListOutput}" ]]; then
+    echo "::error::brew list --versions llvm@${LLVM_MAJOR_VERSION} returned empty output"
+    exit 1
+  fi
+  llvmFullVersion=$(echo "${brewLlvmListOutput}" | awk '{print $NF}')
+  if ! [[ "${llvmFullVersion}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "::error::Could not parse LLVM full version from: ${brewLlvmListOutput}"
+    exit 1
+  fi
+  echo "::endgroup::"
+
   echo "::group::Check changes to downloaded contents"
   downloadsHash=$(calculateDownloadsHash)
   echo "downloadsHash=${downloadsHash}"
@@ -70,6 +85,14 @@ else
   downloadsHash=${initialDownloadsHash}
   saveCache=false
 fi
+
+echo "::group::Environment variable changes"
+{
+  if [[ -n "${llvmFullVersion}" ]]; then
+    echo "LLVM_FULL_VERSION=${llvmFullVersion}"
+  fi
+} | tee -a "${GITHUB_ENV}"
+echo "::endgroup::"
 
 echo "::group::Outputs from install"
 {
