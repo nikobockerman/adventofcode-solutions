@@ -34,26 +34,14 @@ runs:
       # TODO: Install cmake through mise
       uses: lukka/get-cmake@7bfc9baacbbdcb5e37957ad05c3546b3e222be3c # v4.3.2
 
-    - id: sccache-version
-      run: |
-        # Determine sccache version
-        set -euo pipefail
-        pushd solvers/cpp
-        sccache_version=$(mise tool sccache --active | tr -d '\n')
-        echo "version=v${sccache_version}" | tee -a "${GITHUB_OUTPUT}"
-        popd
-      shell: bash
-
-    - name: Setup sccache
-      # TODO: Use sccache from mise when it's possible to avoid installing it via this action
-      uses: Mozilla-Actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+    - name: Configure and start sccache
+      env:
+        SCCACHE_GHA_ENABLED: "true"
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
       with:
-        version: ${{ steps.sccache-version.outputs.version }}
-
-    - run: |
-        # Enable sccache for C++
-        echo "SCCACHE_GHA_ENABLED=true" | tee -a "${GITHUB_ENV}"
-      shell: bash
+        script: |
+          const { execFileSync } = require('child_process');
+          execFileSync('sccache', ['--start-server'], { stdio: 'inherit' });
 
     - run: |
         # Prepare files
