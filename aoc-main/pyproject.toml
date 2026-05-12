@@ -9,7 +9,7 @@ dependencies = [
 [dependency-groups]
 dev = [
   "pytest ==9.0.3",
-  "types-PyYAML ==6.0.12.20260408"
+  "types-PyYAML ==6.0.12.20260510"
 ]
 
 [project.scripts]
