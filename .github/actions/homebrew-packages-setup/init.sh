@@ -33,9 +33,16 @@ toolsToInstallCacheKeyPart=$(
   echo "${toolsToInstall[*]}"
 )
 
+# Scope the cache key to the Homebrew commit currently on the runner.
+# Bottles downloaded under one Homebrew version may fail to install under
+# another, so a runner-image Homebrew bump must invalidate the cache.
+brewRepository=$(brew --repository)
+brewCommit=$(git -C "${brewRepository}" rev-parse --short=12 HEAD)
+brewCommitCacheKeyPart="brew${brewCommit}"
+
 # Values for cache key and restore-keys
 cacheKeyBase="homebrew-${RUNNER_OS}"
-cacheKeyPrefix="${cacheKeyBase}-${toolsToInstallCacheKeyPart}-${toolsToInstallHash}"
+cacheKeyPrefix="${cacheKeyBase}-${brewCommitCacheKeyPart}-${toolsToInstallCacheKeyPart}-${toolsToInstallHash}"
 cacheKeyForRestore="${cacheKeyPrefix}"
 if [[ -n "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" ]]; then
   cacheKeyForRestore="${cacheKeyForRestore}-${INPUT_DOWNLOADS_HASH_FROM_PREPARE}"
