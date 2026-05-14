@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-# Isolate all 'brew' calls in this script from auto-update so the captured
-# Homebrew commit reflects the runner image exactly. The same value is also
-# written to GITHUB_ENV below for subsequent action steps.
+# Disable Homebrew's implicit auto-update on 'brew install'; we update
+# explicitly below so the captured Homebrew commit is the one we deliberately
+# advanced to, not one snuck in by auto-update mid-install. The same value is
+# also written to GITHUB_ENV below for subsequent action steps.
 export HOMEBREW_NO_AUTO_UPDATE=1
 
 # Ensure brew is in path. Needed on Ubuntu runner
@@ -38,9 +39,17 @@ toolsToInstallCacheKeyPart=$(
   echo "${toolsToInstall[*]}"
 )
 
-# Scope the cache key to the Homebrew commit currently on the runner.
-# Bottles downloaded under one Homebrew version may fail to install under
-# another, so a runner-image Homebrew bump must invalidate the cache.
+# Update Homebrew before capturing its commit. The runner-image Homebrew is
+# not guaranteed to be reliable for 'brew install' as-shipped, and both
+# prepare and use jobs need to converge on the same upstream HEAD so their
+# cache keys (and the bottles produced under them) match.
+echo "::group::Update brew formulae"
+brew update
+echo "::endgroup::"
+
+# Scope the cache key to the post-update Homebrew commit. Bottles downloaded
+# under one Homebrew version may fail to install under another, so any change
+# to the upstream commit we land on must invalidate the cache.
 brewRepository=$(brew --repository)
 brewCommit=$(git -C "${brewRepository}" rev-parse --short=12 HEAD)
 brewCommitCacheKeyPart="brew${brewCommit}"
