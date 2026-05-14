@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+# Isolate all 'brew' calls in this script from auto-update so the captured
+# Homebrew commit reflects the runner image exactly. The same value is also
+# written to GITHUB_ENV below for subsequent action steps.
+export HOMEBREW_NO_AUTO_UPDATE=1
+
 # Ensure brew is in path. Needed on Ubuntu runner
 if ! command -v brew &>/dev/null; then
   linuxHomebrewBin="/home/linuxbrew/.linuxbrew/bin"
