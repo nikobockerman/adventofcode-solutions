@@ -55,22 +55,23 @@ def remove_cache(entry: CacheEntry) -> None:
 def main() -> None:
     pr = int(os.environ["usage_pr"])  # noqa: SIM112
     print(f"Removing caches for PR {pr}")
+    seen: set[int] = set()
     counter = 0
     total_count = 0
     while True:
-        caches = list_caches(pr)
+        raw = list_caches(pr)
+        caches = [c for c in raw if c.id not in seen]
         if not caches:
             print(f"Removed {counter} caches for PR {pr}")
             break
         total_count += len(caches)
-        total_str = str(total_count)
-        if len(caches) == LIMIT:
-            total_str += "+"
+        total_str = f"{total_count}+" if len(raw) == LIMIT else str(total_count)
 
         for cache in caches:
             counter += 1
             print(f"Removing cache: {counter}/{total_str}: {cache.key}")
             remove_cache(cache)
+            seen.add(cache.id)
 
 
 if __name__ == "__main__":
