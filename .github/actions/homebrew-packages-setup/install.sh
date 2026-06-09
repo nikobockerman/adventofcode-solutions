@@ -50,7 +50,7 @@ if [[ "${skipInstalls}" == "false" ]]; then
     exit 1
   fi
   llvmFullVersion=$(echo "${brewLlvmListOutput}" | awk '{print $NF}')
-  if ! [[ "${llvmFullVersion}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  if ! [[ "${llvmFullVersion}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(_[0-9]+)?$ ]]; then
     echo "::error::Could not parse LLVM full version from: ${brewLlvmListOutput}"
     exit 1
   fi
