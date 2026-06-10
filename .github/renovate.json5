@@ -11,6 +11,16 @@
   conan: {
     enabled: true,
   },
+  customDatasources: {
+    // Tracks the version Homebrew ships (not upstream releases, which land
+    // before Homebrew bottles exist), via https://formulae.brew.sh.
+    homebrew: {
+      defaultRegistryUrlTemplate: "https://formulae.brew.sh/api/formula/{{packageName}}.json",
+      transformTemplates: [
+        '{"releases": [{"version": versions.stable}], "homepage": homepage, "sourceUrl": urls.stable.url}',
+      ],
+    },
+  },
   "git-submodules": {
     enabled: true,
   },
