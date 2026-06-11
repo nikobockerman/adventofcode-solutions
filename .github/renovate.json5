@@ -42,6 +42,10 @@
       minimumReleaseAge: "1 day", // 1 day delay to avoid errors installing very fresh version - https://github.com/jdx/mise/issues/2314
       prPriority: -1, // Lowest priority
       schedule: ["* 0-13 * * 4"], // Thursday, midnight through working day
+      // mise uses CalVer (YEAR.MONTH.COUNTER), not SemVer. Collapse the
+      // year/month/counter splits into one branch that tracks the latest release.
+      separateMajorMinor: false,
+      separateMinorPatch: false, // override repo-wide separateMinorPatch:true for mise
     },
     {
       description: "Automerge all updates",
