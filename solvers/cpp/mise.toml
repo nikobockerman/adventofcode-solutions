@@ -1,6 +1,6 @@
 [tools]
 "pipx:clang-format" = "22.1.5"
-"pipx:gersemi" = "0.27.5"
+"pipx:gersemi" = "0.27.7"
 conan = "2.28.1"
 sccache = "0.15.0"
 
