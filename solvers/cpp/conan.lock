@@ -5,7 +5,7 @@
         "gtest/1.17.0#5224b3b3ff3b4ce1133cbdd27d53ee7d%1755784855.585"
     ],
     "build_requires": [
-        "cmake/4.3.2#c740c22f711eb5ef0cec51c40b84657b%1776934625.055"
+        "cmake/4.3.2#5bae0b181463ca4dc3e924a981367ee6%1779785720.872"
     ],
     "python_requires": [],
     "config_requires": []
