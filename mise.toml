@@ -1,7 +1,7 @@
 [tools]
 # Basic technologies used in the repository
 python = "3.14.6"
-uv = "0.11.21"
+uv = "0.11.23"
 
 # Common tools
 "npm:pyright" = "1.1.410"
