@@ -20,7 +20,7 @@ runs:
 
     - id: cache-conan-packages
       name: Restore Conan packages cache
-      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
       with:
         # Use an intentionally non-matching suffix so that restores only use the prefixes below.
         # The full key is only used when saving a new cache entry.
