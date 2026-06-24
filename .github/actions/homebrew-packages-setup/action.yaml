@@ -31,7 +31,7 @@ runs:
         INPUT_DOWNLOADS_HASH_FROM_PREPARE: ${{ inputs.downloads-hash-from-prepare }}
         # Major versions of GCC and LLVM to use
         # renovate: datasource=custom.homebrew depName=gcc extractVersion=^(?<version>\d+)\.\d+\.\d+$
-        GCC_MAJOR_VERSION: 15
+        GCC_MAJOR_VERSION: 16
         # renovate: datasource=custom.homebrew depName=llvm extractVersion=^(?<version>\d+)\.\d+\.\d+$
         LLVM_MAJOR_VERSION: 22
       run: |
