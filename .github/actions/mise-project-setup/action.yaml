@@ -19,7 +19,7 @@ runs:
         DIRECTORY: ${{ inputs.directory }}
         GITHUB_TOKEN: ${{ github.token }}
         # renovate: datasource=github-releases depName=jdx/mise extractVersion=^v(?<version>.*)$
-        MISE_VERSION: 2026.6.11
+        MISE_VERSION: 2026.6.13
       run: |
         # Initialize mise-project-setup action
         "${GITHUB_ACTION_PATH}/init.sh"
