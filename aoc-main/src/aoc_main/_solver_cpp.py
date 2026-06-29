@@ -1,14 +1,13 @@
 import asyncio
-import json
 import os
-import pathlib
 from dataclasses import dataclass
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING
 
-from aoc_main import _logging, _solvers, _types
+from aoc_main import _cmake_presets, _logging, _solvers, _types
 
 if TYPE_CHECKING:
+    import pathlib
     from collections.abc import Iterable
 
 _logger = _logging.logger
@@ -57,51 +56,31 @@ class _CMakeBuildError(_solvers.SolverPrepareError):
 
 
 class _CMakeConfigResolver:
-    @cached_property
-    def configure_preset_name(self) -> str:
-        return self._resolve_configure_preset()
+    """Selects which CMake presets to use, then defers parsing to ``CMakePresets``.
+
+    The *selection* (which configure or workflow preset to use, read from
+    environment variables) lives here; the *parsing* of the preset files lives
+    in :mod:`aoc_main._cmake_presets`.
+    """
 
     @cached_property
     def solver_root_dir(self) -> pathlib.Path:
         return _solvers.get_solver_root_dir(_solvers.Solver.Cpp)
 
     @cached_property
+    def _presets(self) -> _cmake_presets.CMakePresets:
+        return _cmake_presets.CMakePresets(self.solver_root_dir)
+
+    @cached_property
+    def configure_preset_name(self) -> str:
+        return self._resolve_configure_preset()
+
+    @cached_property
     def binary_dir(self) -> pathlib.Path:
-        return self._resolve_binary_dir()
-
-    @cached_property
-    def _cmake_user_presets(self) -> dict[str, Any]:
-        return self._load_cmake_preset_file(
-            self.solver_root_dir / "CMakeUserPresets.json"
-        )
-
-    @cached_property
-    def _cmake_presets(self) -> dict[str, Any]:
-        return self._load_cmake_preset_file(self.solver_root_dir / "CMakePresets.json")
-
-    @staticmethod
-    def _load_cmake_preset_file(preset_file: pathlib.Path) -> dict[str, Any]:
-        if not preset_file.exists():
-            return {}
-        return json.loads(preset_file.read_text())
-
-    def _get_preset(
-        self,
-        preset_type: Literal["build", "configure", "workflow"],
-        name: str,
-    ) -> Any | None:  # noqa: ANN401
-        for presets in (self._cmake_user_presets, self._cmake_presets):
-            preset = next(
-                (
-                    preset
-                    for preset in presets.get(f"{preset_type}Presets", {})
-                    if preset["name"] == name
-                ),
-                None,
-            )
-            if preset is not None:
-                return preset
-        return None
+        try:
+            return self._presets.binary_dir(self.configure_preset_name)
+        except _cmake_presets.CMakePresetError as e:
+            raise _CppSolverConfigureError(str(e)) from e
 
     def _resolve_configure_preset(self) -> str:
         configure_preset_name = os.environ.get(_ENV_PRESET_CONFIGURE)
@@ -117,56 +96,15 @@ class _CMakeConfigResolver:
             return _DEFAULT_CONFIGURE_PRESET
 
         _logger.debug("Using workflow preset: %s", workflow_preset_name)
-        workflow_preset = self._get_preset("workflow", workflow_preset_name)
-        if workflow_preset is None:
-            msg = f"Requested workflow preset not found: {workflow_preset_name}"
-            raise _CppSolverConfigureError(msg)
-
         try:
-            configure_preset_name = next(
-                step["name"]
-                for step in workflow_preset["steps"]
-                if step["type"] == "configure"
+            configure_preset_name = self._presets.workflow_configure_preset_name(
+                workflow_preset_name
             )
-        except KeyError as e:
-            msg = (
-                f"Invalid CMake Preset json for workflow preset: {workflow_preset_name}"
-            )
-            raise _CppSolverConfigureError(msg) from e
-        except StopIteration:
-            msg = f"No configure step found for workflow: {workflow_preset_name}"
-            raise _CppSolverConfigureError(msg) from None
+        except _cmake_presets.CMakePresetError as e:
+            raise _CppSolverConfigureError(str(e)) from e
 
         _logger.debug("Using configure preset: %s", configure_preset_name)
-        assert configure_preset_name is not None
         return configure_preset_name
-
-    def _resolve_binary_dir(self) -> pathlib.Path:
-        configure_preset_names = [self.configure_preset_name]
-        while configure_preset_names:
-            configure_preset_name = configure_preset_names.pop(0)
-            configure_preset = self._get_preset("configure", configure_preset_name)
-            if configure_preset is None:
-                msg = f"Configure preset not found: {configure_preset_name}"
-                raise _CppSolverConfigureError(msg)
-
-            binary_dir = configure_preset.get("binaryDir")
-            if binary_dir is not None:
-                _logger.debug(
-                    "Found binaryDir from preset %s: %s",
-                    configure_preset_name,
-                    binary_dir,
-                )
-                return pathlib.Path(binary_dir)
-
-            _logger.debug(
-                "Binary dir not found for preset %s. Checking inherited presets",
-                configure_preset_name,
-            )
-            configure_preset_names.extend(configure_preset.get("inherits", []))
-
-        error = f"binaryDir not found for configure preset {self.configure_preset_name}"
-        raise _CppSolverConfigureError(error)
 
 
 class SolverCpp:
