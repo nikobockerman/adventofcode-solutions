@@ -21,7 +21,7 @@ runs:
 
     - if: steps.init.outputs.save-cache == 'true'
       name: Cache Conan packages
-      uses: actions/cache/save@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         key: ${{ inputs.conan-cache-key-prefix }}-${{ hashFiles('solvers/cpp/conan.lock') }}-${{ steps.init.outputs.packages-hash }}
         path: ${{ steps.init.outputs.conan-cache-path }}
