@@ -4,7 +4,7 @@ python = "3.14.6"
 uv = "0.11.24"
 
 # Common tools
-"npm:pyright" = "1.1.410"
+"npm:pyright" = "1.1.411"
 "pipx:shellcheck-gha" = "0.1.2"
 prettier = "3.8.5"
 ruff = "0.15.19"
