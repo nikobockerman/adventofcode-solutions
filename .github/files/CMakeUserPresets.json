@@ -55,9 +55,13 @@
       "inherits": [
         "_ci-common",
         "_ci-ubuntu-clang-libstdc++",
+        "_ci-libstdc++-debug",
         "_ci-debug",
         "_ci-clang-tidy"
-      ]
+      ],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_DEBUG} $env{PRESET_CXX_FLAGS_GCC_CLANG} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON} $env{PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_UBUNTU}"
+      }
     },
     {
       "name": "ci-ubuntu-clang-libstdc++-release",
@@ -70,7 +74,15 @@
     },
     {
       "name": "ci-ubuntu-gcc-libstdc++-debug",
-      "inherits": ["_ci-common", "_ci-ubuntu-gcc", "_ci-debug"]
+      "inherits": [
+        "_ci-common",
+        "_ci-ubuntu-gcc",
+        "_ci-libstdc++-debug",
+        "_ci-debug"
+      ],
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_DEBUG} $env{PRESET_CXX_FLAGS_GCC_CLANG}"
+      }
     },
     {
       "name": "ci-ubuntu-gcc-libstdc++-release",
@@ -126,6 +138,16 @@
       "inherits": ["gcc-clang-flags", "_ci-gcc"],
       "cacheVariables": {
         "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_GCC_CLANG}"
+      }
+    },
+    {
+      "name": "_ci-libstdc++-debug",
+      "hidden": true,
+      "environment": {
+        "PRESET_CXX_FLAGS_LIBSTDCPP_DEBUG": "-D_GLIBCXX_DEBUG"
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "$env{PRESET_CXX_FLAGS_LIBSTDCPP_DEBUG}"
       }
     },
     {
