@@ -186,8 +186,8 @@
         "PRESET_CXX_FLAGS_LIBSTDCPP_FOR_CLANG_COMMON": "-stdlib++-isystem$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/include/c++/$penv{GCC_MAJOR_VERSION}"
       },
       "cacheVariables": {
-        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION}",
-        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION}",
+        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION} -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION}",
+        "CMAKE_SHARED_LINKER_FLAGS": "-stdlib=libstdc++ -L$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION} -Wl,-rpath,$penv{HOMEBREW_PREFIX}/opt/gcc@$penv{GCC_MAJOR_VERSION}/lib/gcc/$penv{GCC_MAJOR_VERSION}",
         "CONAN_HOST_PROFILE": "auto-cmake;${sourceDir}/conan-profile-gcc-libstd++-for-clang"
       }
     },
