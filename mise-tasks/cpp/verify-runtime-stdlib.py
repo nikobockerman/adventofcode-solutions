@@ -85,6 +85,8 @@ def _iter_binaries(build_dir: Path) -> Iterator[Path]:
 def _resolved_libs_linux(binary: Path) -> dict[str, str]:
     # One ldd call yields "SONAME => /resolved/path" (or "=> not found") per dependency.
     libs: dict[str, str] = {}
+    verbose = _run(["ldd", "-v", str(binary)])
+    _logger.info("DEBUG: ldd -v %s: %s", binary, verbose)
     for line in _run(["ldd", str(binary)]).splitlines():
         fields = line.split()
         if "=>" not in fields:
