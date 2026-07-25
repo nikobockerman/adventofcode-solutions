@@ -145,6 +145,37 @@ jobs:
           cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
           workflowPreset: ${{ steps.preset-name.outputs.name }}
 
+      - name: DEBUG - readelf
+        if: matrix.os == 'ubuntu'
+        run: |
+          set +e
+
+          echo "::group::libstdc++"
+          readelf -d /home/linuxbrew/.linuxbrew/opt/gcc@16/lib/gcc/current/libstdc++.so.6
+          echo "::endgroup::"
+          sleep 1
+          echo "::group::libc++"
+          readelf -d /home/linuxbrew/.linuxbrew/opt/llvm@22/lib/libc++.so.1
+          echo "::endgroup::"
+          sleep 1
+
+          for f in solvers/cpp/build/y20*_d*; do
+            echo "::group::${f}"
+            readelf -d "${f}"
+            echo "::endgroup::"
+            sleep 1
+          done
+
+          echo "::group::y2022_d01 deeper analysis"
+          exe=solvers/cpp/build/y2022_d01
+          set -x
+          readelf -d "${exe}"
+          ldd -v "${exe}"
+          ls -la /home/linuxbrew/.linuxbrew/lib/gcc/current/libstdc++.so.6
+          ls -la /home/linuxbrew/.linuxbrew/lib/libstdc++.so.6
+          echo "::endgroup::"
+        shell: bash
+
       - name: Restore aoc-main uv project
         uses: ./.github/actions/uv-project-setup
         with:
