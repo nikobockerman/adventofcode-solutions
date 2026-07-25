@@ -145,6 +145,32 @@ jobs:
           cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
           workflowPreset: ${{ steps.preset-name.outputs.name }}
 
+      - name: Verify runtime C++ standard library
+        env:
+          MATRIX_BUILDTYPE: ${{ matrix.buildType }}
+          MATRIX_CXXLIB: ${{ matrix.cxxLib }}
+        run: |
+          case "${MATRIX_CXXLIB}" in
+            libstdc++)
+              stdlib=libstdc++
+              expectedPrefix="${HOMEBREW_PREFIX}/opt/gcc@${GCC_MAJOR_VERSION}"
+              ;;
+            libc++)
+              stdlib=libc++
+              if [[ "${MATRIX_BUILDTYPE}" == "hardened" ]]; then
+                expectedPrefix="${HARDENED_LIBCXX_DIR}"
+              else
+                expectedPrefix="${HOMEBREW_PREFIX}/opt/llvm@${LLVM_MAJOR_VERSION}"
+              fi
+              ;;
+            *)
+              echo "::error::Unknown cxxLib: ${MATRIX_CXXLIB}"
+              exit 1
+              ;;
+          esac
+          mise run cpp:verify-runtime-stdlib -- solvers/cpp/build "${stdlib}" "${expectedPrefix}"
+        shell: bash
+
       - name: Restore aoc-main uv project
         uses: ./.github/actions/uv-project-setup
         with:
