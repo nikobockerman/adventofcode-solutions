@@ -129,21 +129,53 @@ jobs:
         shell: bash
 
       - if: matrix.buildType == 'sanitizers'
-        name: Configure sanitizers
-        run: |
-          {
-            echo "ASAN_OPTIONS=detect_leaks=1"
-            echo "UBSAN_OPTIONS=print_stacktrace=1"
-          } | tee -a "${GITHUB_ENV}"
-
-          echo "${HOMEBREW_PREFIX}/opt/llvm/bin" | tee -a "${GITHUB_PATH}"
+        name: Add LLVM to path for sanitizers
+        run: echo "${HOMEBREW_PREFIX}/opt/llvm/bin" | tee -a "${GITHUB_PATH}"
         shell: bash
 
-      - name: Run CMake workflow
-        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
-        with:
-          cmakeListsTxtPath: solvers/cpp/CMakeLists.txt
-          workflowPreset: ${{ steps.preset-name.outputs.name }}
+      - name: Generate C++ CI configuration
+        env:
+          MATRIX_BUILDTYPE: ${{ matrix.buildType }}
+          MATRIX_COMPILER: ${{ matrix.compiler }}
+          MATRIX_CXXLIB: ${{ matrix.cxxLib }}
+          MATRIX_OS: ${{ matrix.os }}
+        run: |
+          python3 .github/scripts/generate-cpp-ci-config.py \
+            --os "${MATRIX_OS}" \
+            --compiler "${MATRIX_COMPILER}" \
+            --cxx-lib "${MATRIX_CXXLIB}" \
+            --build-type "${MATRIX_BUILDTYPE}"
+
+          echo "::group::Generated solvers/cpp/CMakeUserPresets.json"
+          cat solvers/cpp/CMakeUserPresets.json
+          echo "::endgroup::"
+
+          echo "::group::Generated solvers/cpp/ci.env"
+          cat solvers/cpp/ci.env
+          echo "::endgroup::"
+
+          echo "::group::Generated solvers/cpp/conan-profile-ci"
+          cat solvers/cpp/conan-profile-ci
+          echo "::endgroup::"
+        shell: bash
+
+      - name: Configure CMake
+        working-directory: solvers/cpp
+        run: cmake --preset ci
+        shell: bash
+
+      - name: Build CMake project
+        working-directory: solvers/cpp
+        run: cmake --build build/
+        shell: bash
+
+      - name: Test CMake project
+        working-directory: solvers/cpp
+        run: |
+          # shellcheck source=/dev/null
+          source ci.env
+          ctest --test-dir build/ --output-on-failure
+        shell: bash
 
       - name: Verify runtime C++ standard library
         env:
@@ -184,8 +216,12 @@ jobs:
       - name: Run all solutions
         env:
           AOC_CPP_SKIP_PREPARE: "1"
-          AOC_CPP_WORKFLOW_PRESET: ${{ steps.preset-name.outputs.name }}
-        run: mise run aoc:all -- --solver cpp
+          AOC_CPP_PRESET: ci
+        run: |
+          # shellcheck source=/dev/null
+          source solvers/cpp/ci.env
+          mise run aoc:all -- --solver cpp
+        shell: bash
 
       - continue-on-error: true
         if: always()

@@ -1,5 +1,5 @@
 name: CMake project setup
-description: Setup cmake, conan and CMakeUserPresets.json
+description: Set up CMake, Conan, and sccache
 inputs:
   conan-cache-key-prefix:
     description: Prefix for the conan cache key
@@ -42,12 +42,3 @@ runs:
         script: |
           const { execFileSync } = require('child_process');
           execFileSync('sccache', ['--start-server'], { stdio: 'inherit' });
-
-    - run: |
-        # Prepare files
-        cp .github/files/CMakeUserPresets.json solvers/cpp/
-        cp .github/files/conan-profile-clang-with-hardened-libc++ solvers/cpp/
-        cp .github/files/conan-profile-clang-with-libc++ solvers/cpp/
-        cp .github/files/conan-profile-clang-with-libc++-sanitizers solvers/cpp/
-        cp .github/files/conan-profile-gcc-libstd++-for-clang solvers/cpp/
-      shell: bash
