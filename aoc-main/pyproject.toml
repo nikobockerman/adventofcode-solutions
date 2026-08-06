@@ -34,3 +34,13 @@ extend = "../ruff.toml"
 [tool.ruff.lint.extend-per-file-ignores]
 "src/aoc_main/main.py" = ["T201"]
 "tests/**/*.py" = ["INP001"]
+
+[tool.uv]
+# Gates transitive dependencies, which Renovate's minimumReleaseAge cannot reach
+# through lockFileMaintenance. Kept equal to that window so no dependency enters
+# by any path before it has been public for 14 days.
+#
+# Direct dependencies are pinned with ==, so a pin younger than this window
+# resolves to nothing rather than merely waiting: forcing an update early from
+# Renovate's Dependency Dashboard fails here with "no solution found".
+exclude-newer = "14 days"
