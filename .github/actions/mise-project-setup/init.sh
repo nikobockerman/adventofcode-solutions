@@ -63,6 +63,7 @@ echo "::group::Environment variable changes"
   echo
 
   echo "MISE_DEBUG=1"
+  echo "MISE_TASK_SHOW_FULL_CMD=true"
   echo "RUST_LOG=uv=debug"
 } | tee -a "${GITHUB_ENV}"
 echo "::endgroup::"
