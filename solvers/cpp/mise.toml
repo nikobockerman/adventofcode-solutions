@@ -4,6 +4,9 @@
 conan = "2.31.2"
 sccache = "0.17.0"
 
+[env]
+SCCACHE_CLIENT_SIDE = "true"
+
 [tasks.check]
 depends = [
   "check:clang-format",
