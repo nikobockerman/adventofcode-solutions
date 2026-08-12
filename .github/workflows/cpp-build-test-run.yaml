@@ -15,51 +15,44 @@ permissions:
   contents: read
 
 jobs:
+  # The generator that configures each build owns the list of builds too
+  matrix:
+    name: Resolve build matrix
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup tools through mise
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: .
+
+      - id: matrix
+        name: Generate build matrix
+
+        env:
+          HOMEBREW_HASH_MACOS: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
+          HOMEBREW_HASH_UBUNTU: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
+        run: |
+          matrix=$(python3 .github/scripts/generate-cpp-ci-config.py matrix \
+            --homebrew-downloads-hash-macos "${HOMEBREW_HASH_MACOS}" \
+            --homebrew-downloads-hash-ubuntu "${HOMEBREW_HASH_UBUNTU}")
+          echo "matrix=${matrix}" | tee -a "${GITHUB_OUTPUT}"
+        shell: bash
+
   build-test-run:
     strategy:
       fail-fast: false
-      matrix:
-        os:
-          - ubuntu
-        compiler:
-          - clang
-          - gcc
-        cxxLib:
-          - libc++
-          - libstdc++
-        buildType:
-          - debug
-          - release
-        exclude:
-          - compiler: gcc
-            cxxLib: libc++
-        include:
-          - os: ubuntu
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            runsOn: ubuntu-24.04
-
-          - os: ubuntu
-            compiler: clang
-            cxxLib: libc++
-            buildType: sanitizers
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            runsOn: ubuntu-24.04
-
-          - os: ubuntu
-            compiler: clang
-            cxxLib: libc++
-            buildType: hardened
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-ubuntu }}
-            runsOn: ubuntu-24.04
-
-          - os: macos
-            compiler: clang
-            cxxLib: libstdc++
-            buildType: release
-            homebrew-downloads-hash-from-prepare: ${{ inputs.homebrew-downloads-hash-from-prepare-macos }}
-            runsOn: macos-15
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
 
     name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.cxxLib }} ${{ matrix.buildType }} - Build + test + run
+    needs: matrix
     runs-on: ${{ matrix.runsOn }}
     timeout-minutes: 30
 
@@ -140,7 +133,7 @@ jobs:
           MATRIX_CXXLIB: ${{ matrix.cxxLib }}
           MATRIX_OS: ${{ matrix.os }}
         run: |
-          python3 .github/scripts/generate-cpp-ci-config.py \
+          python3 .github/scripts/generate-cpp-ci-config.py config \
             --os "${MATRIX_OS}" \
             --compiler "${MATRIX_COMPILER}" \
             --cxx-lib "${MATRIX_CXXLIB}" \
