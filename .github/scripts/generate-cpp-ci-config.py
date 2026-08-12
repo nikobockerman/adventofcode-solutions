@@ -81,8 +81,9 @@ def _github_include(
     # environments, so they follow GitHub's casing rather than Python's.
     #
     # `runId` identifies one matrix job among all of them, for uses such as
-    # per-scenario cache keys. Joining every field keeps it unique by construction,
-    # including if the entry ever grows another axis.
+    # per-scenario cache keys. Joining every field carries a new axis into it
+    # automatically; `_emit_matrix` checks that the results stay distinct, since
+    # joining can alias if an axis value ever contains the separator.
     return {
         "os": entry.os,
         "compiler": entry.compiler,
@@ -412,6 +413,11 @@ def _emit_matrix(args: argparse.Namespace) -> None:
         "ubuntu": args.homebrew_downloads_hash_ubuntu,
     }
     include = [_github_include(entry, homebrew_hashes) for entry in _MATRIX]
+    # Two jobs sharing a runId would quietly share one Conan cache bucket, each
+    # restoring the other's packages and rebuilding anyway. Nothing downstream
+    # would fail, so catch it here.
+    run_ids = {entry["runId"] for entry in include}
+    assert len(run_ids) == len(include), "runId values are not unique"
     # One line, so the caller can assign it to a `$GITHUB_OUTPUT` variable.
     print(json.dumps({"include": include}))
 
