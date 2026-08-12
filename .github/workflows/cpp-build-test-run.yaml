@@ -57,19 +57,6 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - id: preset-name
-        name: Define workflow preset name
-
-        env:
-          MATRIX_BUILDTYPE: ${{ matrix.buildType }}
-          MATRIX_COMPILER: ${{ matrix.compiler }}
-          MATRIX_CXXLIB: ${{ matrix.cxxLib }}
-          MATRIX_OS: ${{ matrix.os }}
-        run: |
-          name="ci-${MATRIX_OS}-${MATRIX_COMPILER}-${MATRIX_CXXLIB}-${MATRIX_BUILDTYPE}"
-          echo "name=${name}" | tee -a "${GITHUB_OUTPUT}"
-        shell: bash
-
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -90,7 +77,7 @@ jobs:
         name: Setup CMake project
         uses: ./.github/actions/cmake-project-setup
         with:
-          conan-cache-key-prefix: conan-${{ steps.preset-name.outputs.name }}
+          conan-cache-key-prefix: conan-${{ matrix.runId }}
 
       - if: matrix.os == 'ubuntu'
         name: Specify HOMEBREW_PREFIX
@@ -225,5 +212,5 @@ jobs:
       - name: Finalize cmake project
         uses: ./.github/actions/cmake-project-finalize
         with:
-          conan-cache-key-prefix: conan-${{ steps.preset-name.outputs.name }}
+          conan-cache-key-prefix: conan-${{ matrix.runId }}
           conan-cache-matched-key: ${{ steps.setup-cmake-project.outputs.conan-cache-matched-key }}
