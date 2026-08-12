@@ -79,11 +79,16 @@ def _github_include(
 ) -> dict[str, str]:
     # Key names are read by the workflow's job name, `if:` conditions and step
     # environments, so they follow GitHub's casing rather than Python's.
+    #
+    # `runId` identifies one matrix job among all of them, for uses such as
+    # per-scenario cache keys. Joining every field keeps it unique by construction,
+    # including if the entry ever grows another axis.
     return {
         "os": entry.os,
         "compiler": entry.compiler,
         "cxxLib": entry.cxx_lib,
         "buildType": entry.build_type,
+        "runId": "-".join(entry),
         "runsOn": _RUNNERS[entry.os],
         "homebrew-downloads-hash-from-prepare": homebrew_hashes[entry.os],
     }
