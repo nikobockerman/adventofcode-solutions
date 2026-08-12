@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate concrete C++ CI configuration for one workflow matrix entry."""
+"""Generate the C++ CI build matrix and the configuration for one matrix entry."""
 
 from __future__ import annotations
 
@@ -9,10 +9,38 @@ import os
 import shlex
 import sys
 from pathlib import Path
-from typing import Final
+from typing import Final, NamedTuple
 
 _REPOSITORY_ROOT: Final = Path(__file__).resolve().parents[2]
 _CPP_DIR: Final = _REPOSITORY_ROOT / "solvers" / "cpp"
+
+
+class _MatrixEntry(NamedTuple):
+    """One C++ build scenario: which compiler, standard library and build type."""
+
+    os: str
+    compiler: str
+    cxx_lib: str
+    build_type: str
+
+
+# Runner image hosting each operating system.
+_RUNNERS: Final = {"macos": "macos-15", "ubuntu": "ubuntu-24.04"}
+
+# Every scenario CI builds. The workflow obtains its job list from the `matrix`
+# subcommand rather than declaring one, so this table is the only place the set of
+# scenarios is written down and the two cannot drift apart.
+_MATRIX: Final = (
+    _MatrixEntry("ubuntu", "clang", "libc++", "debug"),
+    _MatrixEntry("ubuntu", "clang", "libc++", "release"),
+    _MatrixEntry("ubuntu", "clang", "libc++", "sanitizers"),
+    _MatrixEntry("ubuntu", "clang", "libc++", "hardened"),
+    _MatrixEntry("ubuntu", "clang", "libstdc++", "debug"),
+    _MatrixEntry("ubuntu", "clang", "libstdc++", "release"),
+    _MatrixEntry("ubuntu", "gcc", "libstdc++", "debug"),
+    _MatrixEntry("ubuntu", "gcc", "libstdc++", "release"),
+    _MatrixEntry("macos", "clang", "libstdc++", "release"),
+)
 
 
 class ConfigurationError(ValueError):
@@ -29,7 +57,7 @@ class MissingEnvironmentError(ConfigurationError):
 class UnsupportedMatrixError(ConfigurationError):
     """Raised when the workflow matrix specifies an unsupported build."""
 
-    def __init__(self, matrix: tuple[str, str, str, str]) -> None:
+    def __init__(self, matrix: _MatrixEntry) -> None:
         super().__init__(f"Unsupported C++ CI matrix entry: {', '.join(matrix)}")
 
 
@@ -41,20 +69,24 @@ def _required_environment(name: str) -> str:
 
 
 def _validate_matrix(args: argparse.Namespace) -> None:
-    valid = {
-        ("ubuntu", "clang", "libc++", "debug"),
-        ("ubuntu", "clang", "libc++", "release"),
-        ("ubuntu", "clang", "libc++", "sanitizers"),
-        ("ubuntu", "clang", "libc++", "hardened"),
-        ("ubuntu", "clang", "libstdc++", "debug"),
-        ("ubuntu", "clang", "libstdc++", "release"),
-        ("ubuntu", "gcc", "libstdc++", "debug"),
-        ("ubuntu", "gcc", "libstdc++", "release"),
-        ("macos", "clang", "libstdc++", "release"),
-    }
-    matrix = (args.os, args.compiler, args.cxx_lib, args.build_type)
-    if matrix not in valid:
+    matrix = _MatrixEntry(args.os, args.compiler, args.cxx_lib, args.build_type)
+    if matrix not in _MATRIX:
         raise UnsupportedMatrixError(matrix)
+
+
+def _github_include(
+    entry: _MatrixEntry, homebrew_hashes: dict[str, str]
+) -> dict[str, str]:
+    # Key names are read by the workflow's job name, `if:` conditions and step
+    # environments, so they follow GitHub's casing rather than Python's.
+    return {
+        "os": entry.os,
+        "compiler": entry.compiler,
+        "cxxLib": entry.cxx_lib,
+        "buildType": entry.build_type,
+        "runsOn": _RUNNERS[entry.os],
+        "homebrew-downloads-hash-from-prepare": homebrew_hashes[entry.os],
+    }
 
 
 def _profile_path() -> str:
@@ -334,19 +366,52 @@ def _write_environment(path: Path, args: argparse.Namespace) -> None:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--os", choices=("ubuntu", "macos"), required=True)
-    parser.add_argument("--compiler", choices=("clang", "gcc"), required=True)
-    parser.add_argument("--cxx-lib", choices=("libc++", "libstdc++"), required=True)
-    parser.add_argument(
-        "--build-type",
-        choices=("debug", "release", "sanitizers", "hardened"),
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    config = subparsers.add_parser(
+        "config", help="Write the CMake, environment and Conan files for one entry"
+    )
+    config.add_argument(
+        "--os", choices=sorted({entry.os for entry in _MATRIX}), required=True
+    )
+    config.add_argument(
+        "--compiler",
+        choices=sorted({entry.compiler for entry in _MATRIX}),
         required=True,
     )
+    config.add_argument(
+        "--cxx-lib",
+        choices=sorted({entry.cxx_lib for entry in _MATRIX}),
+        required=True,
+    )
+    config.add_argument(
+        "--build-type",
+        choices=sorted({entry.build_type for entry in _MATRIX}),
+        required=True,
+    )
+    config.add_argument("--output-dir", default=_CPP_DIR, type=Path)
+
+    matrix = subparsers.add_parser(
+        "matrix", help="Print the workflow build matrix as JSON"
+    )
+    # Defaulted rather than required: `workflow_dispatch` runs supply no hashes.
+    matrix.add_argument("--homebrew-downloads-hash-macos", default="")
+    matrix.add_argument("--homebrew-downloads-hash-ubuntu", default="")
+
     return parser.parse_args()
 
 
-def main() -> int:
-    args = _parse_args()
+def _emit_matrix(args: argparse.Namespace) -> None:
+    homebrew_hashes = {
+        "macos": args.homebrew_downloads_hash_macos,
+        "ubuntu": args.homebrew_downloads_hash_ubuntu,
+    }
+    include = [_github_include(entry, homebrew_hashes) for entry in _MATRIX]
+    # One line, so the caller can assign it to a `$GITHUB_OUTPUT` variable.
+    print(json.dumps({"include": include}))
+
+
+def _write_configuration(args: argparse.Namespace) -> int:
     try:
         _validate_matrix(args)
         cache_variables, conan_profile = _configuration(args)
@@ -365,12 +430,22 @@ def main() -> int:
             }
         ],
     }
-    (_CPP_DIR / "CMakeUserPresets.json").write_text(
+    output_dir: Path = args.output_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "CMakeUserPresets.json").write_text(
         json.dumps(preset, indent=2) + "\n", encoding="utf-8"
     )
-    _write_environment(_CPP_DIR / "ci.env", args)
-    (_CPP_DIR / "conan-profile-ci").write_text(conan_profile, encoding="utf-8")
+    _write_environment(output_dir / "ci.env", args)
+    (output_dir / "conan-profile-ci").write_text(conan_profile, encoding="utf-8")
     return 0
+
+
+def main() -> int:
+    args = _parse_args()
+    if args.command == "matrix":
+        _emit_matrix(args)
+        return 0
+    return _write_configuration(args)
 
 
 if __name__ == "__main__":
