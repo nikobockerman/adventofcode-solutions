@@ -1,6 +1,6 @@
 [requires]
 spdlog/1.17.0
-gtest/1.17.0
+gtest/1.18.0
 
 [options]
 spdlog/*:use_std_fmt=True
