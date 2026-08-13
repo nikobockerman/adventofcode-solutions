@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shlex
@@ -13,6 +14,11 @@ from typing import Final, NamedTuple
 
 _REPOSITORY_ROOT: Final = Path(__file__).resolve().parents[2]
 _CPP_DIR: Final = _REPOSITORY_ROOT / "solvers" / "cpp"
+
+# Six bytes render as twelve hex characters: enough to separate the handful of
+# flag sets written below, while leaving compiler.abi_extra readable in the
+# workflow log.
+_ABI_HASH_BYTES: Final = 6
 
 
 class _MatrixEntry(NamedTuple):
@@ -127,18 +133,31 @@ def _conf_lines(profile: _ConanProfile) -> list[str]:
     return lines
 
 
+def _conf_hash(conf: list[str]) -> str:
+    # BLAKE2 takes the output length as an algorithm parameter, so a short digest
+    # is the hash itself rather than a truncation applied afterwards.
+    return hashlib.blake2b(
+        "\n".join(conf).encode(), digest_size=_ABI_HASH_BYTES
+    ).hexdigest()
+
+
 def _render_profile(profile: _ConanProfile) -> str:
     conf = _conf_lines(profile)
-    if not (profile.abi_extra_parts or conf):
-        return "# This matrix entry needs no add-on to the auto-detected profile.\n"
-
-    lines: list[str] = []
-    if profile.abi_extra_parts:
-        abi_extra = "-".join(profile.abi_extra_parts)
-        lines.extend(["[settings]", f"compiler.abi_extra={abi_extra}", ""])
+    abi_extra_parts = list(profile.abi_extra_parts)
     if conf:
-        lines.extend(["[conf]", *conf])
-    return "\n".join([*lines, ""])
+        # The digest names a set of flags, so it exists only when there are some.
+        abi_extra_parts.append(_conf_hash(conf))
+
+    sections: list[list[str]] = []
+    if abi_extra_parts:
+        sections.append(
+            ["[settings]", f"compiler.abi_extra={'-'.join(abi_extra_parts)}"]
+        )
+    if conf:
+        sections.append(["[conf]", *conf])
+    if not sections:
+        return "# This matrix entry needs no add-on to the auto-detected profile.\n"
+    return "\n\n".join("\n".join(section) for section in sections) + "\n"
 
 
 def _add_clang_compilers(cache_variables: dict[str, str], llvm_prefix: str) -> None:
@@ -199,6 +218,7 @@ def _hardened_libcxx_configuration(
         }
     )
     profile = _ConanProfile(
+        abi_extra_parts=("libc++", "hardened"),
         cxxflags=(libcxx_flags, *hardening_flags),
         linkflags=conan_linker_flags,
     )
@@ -252,12 +272,13 @@ def _clang_libcxx_configuration(
         f"{llvm_prefix}/lib/c++" if os_name == "macos" else f"{llvm_prefix}/lib"
     )
     # The sanitizer flags stay out of the profile: dependencies are built without
-    # sanitizers, but they must not be shared with a non-sanitizer build, because
-    # the ASan runtime they are linked against belongs to this exact LLVM.
-    abi_extra_parts: tuple[str, ...] = ()
+    # sanitizers, so the flag hash cannot separate them from a plain libc++
+    # build. They still must not share binaries, because the ASan runtime those
+    # are linked against belongs to this exact LLVM — hence the explicit tag.
+    abi_extra_parts = ("libc++",)
     if sanitizers:
         llvm_full_version = _required_environment("LLVM_FULL_VERSION")
-        abi_extra_parts = (f"sanitizers-{llvm_full_version}",)
+        abi_extra_parts = (*abi_extra_parts, f"sanitizers-{llvm_full_version}")
 
     profile = _ConanProfile(
         abi_extra_parts=abi_extra_parts,
