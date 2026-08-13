@@ -43,6 +43,11 @@ class _ConanProfile(NamedTuple):
     # Conan has no combined link-flags conf; the same list feeds exe and shared.
     linkflags: tuple[str, ...] = ()
 
+    def __bool__(self) -> bool:
+        # A NamedTuple is a tuple, so an add-on with every field empty is still
+        # three elements long and would otherwise be truthy.
+        return any((self.abi_extra_parts, self.cxxflags, self.linkflags))
+
 
 # Runner image hosting each operating system.
 _RUNNERS: Final = {"macos": "macos-15", "ubuntu": "ubuntu-24.04"}
@@ -181,8 +186,7 @@ def _native_gcc_configuration(
             "CMAKE_CXX_FLAGS": " ".join(flags),
         }
     )
-    # Native GCC builds dependencies exactly as Conan detects them, so no
-    # CONAN_HOST_PROFILE is set either.
+    # Native GCC builds dependencies exactly as Conan detects them.
     return cache_variables, _ConanProfile()
 
 
@@ -214,7 +218,6 @@ def _hardened_libcxx_configuration(
             "CMAKE_CXX_FLAGS": " ".join([*hardening_flags, *flags, libcxx_flags]),
             "CMAKE_EXE_LINKER_FLAGS": cmake_linker_flags,
             "CMAKE_SHARED_LINKER_FLAGS": cmake_linker_flags,
-            "CONAN_HOST_PROFILE": _profile_path(),
         }
     )
     profile = _ConanProfile(
@@ -262,7 +265,6 @@ def _clang_libcxx_configuration(
             "CMAKE_CXX_FLAGS": " ".join(cxx_flags),
             "CMAKE_EXE_LINKER_FLAGS": cmake_linker_flags,
             "CMAKE_SHARED_LINKER_FLAGS": cmake_linker_flags,
-            "CONAN_HOST_PROFILE": _profile_path(),
         }
     )
     if not sanitizers:
@@ -319,7 +321,6 @@ def _clang_libstdcxx_configuration(
             "CMAKE_CXX_FLAGS": " ".join([*flags, *libstdcxx_flags]),
             "CMAKE_EXE_LINKER_FLAGS": cmake_linker_flags,
             "CMAKE_SHARED_LINKER_FLAGS": cmake_linker_flags,
-            "CONAN_HOST_PROFILE": _profile_path(),
             "CMAKE_CXX_CLANG_TIDY": f"{llvm_prefix}/bin/clang-tidy",
         }
     )
@@ -331,7 +332,9 @@ def _clang_libstdcxx_configuration(
     return cache_variables, profile
 
 
-def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], _ConanProfile]:
+def _toolchain_configuration(
+    args: argparse.Namespace,
+) -> tuple[dict[str, str], _ConanProfile]:
     homebrew_prefix = _required_environment("HOMEBREW_PREFIX")
     flags = ["-Wall", "-Wextra", "-Werror"]
     cache_variables: dict[str, str] = {
@@ -369,6 +372,16 @@ def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], _ConanProf
             raise AssertionError(
                 (args.os, args.compiler, args.cxx_lib, args.build_type)
             )
+
+
+def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], _ConanProfile]:
+    cache_variables, profile = _toolchain_configuration(args)
+    # The add-on profile is always written, but pointing Conan at it only makes a
+    # difference when it carries something: a matrix entry whose dependencies are
+    # built exactly as Conan detects them keeps the auto-detected profile alone.
+    if profile:
+        cache_variables["CONAN_HOST_PROFILE"] = _profile_path()
+    return cache_variables, profile
 
 
 def _write_environment(path: Path, args: argparse.Namespace) -> None:
