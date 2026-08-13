@@ -24,6 +24,20 @@ class _MatrixEntry(NamedTuple):
     build_type: str
 
 
+class _ConanProfile(NamedTuple):
+    """The Conan profile add-on layered on the auto-detected profile.
+
+    Every field is what the profile *means*; `_render_profile` decides how it is
+    spelled, so all matrix entries produce the same shape of file.
+    """
+
+    # Joined with "-" into compiler.abi_extra, which participates in package_id.
+    abi_extra_parts: tuple[str, ...] = ()
+    cxxflags: tuple[str, ...] = ()
+    # Conan has no combined link-flags conf; the same list feeds exe and shared.
+    linkflags: tuple[str, ...] = ()
+
+
 # Runner image hosting each operating system.
 _RUNNERS: Final = {"macos": "macos-15", "ubuntu": "ubuntu-24.04"}
 
@@ -100,6 +114,33 @@ def _profile_path() -> str:
     return "auto-cmake;${sourceDir}/conan-profile-ci"
 
 
+def _conf_lines(profile: _ConanProfile) -> list[str]:
+    # Conan reads a conf value back as a Python literal, so json.dumps is both a
+    # correct spelling and one that quotes and escapes every flag the same way.
+    lines: list[str] = []
+    if profile.cxxflags:
+        lines.append(f"tools.build:cxxflags={json.dumps(profile.cxxflags)}")
+    if profile.linkflags:
+        flags = json.dumps(profile.linkflags)
+        lines.append(f"tools.build:exelinkflags={flags}")
+        lines.append(f"tools.build:sharedlinkflags={flags}")
+    return lines
+
+
+def _render_profile(profile: _ConanProfile) -> str:
+    conf = _conf_lines(profile)
+    if not (profile.abi_extra_parts or conf):
+        return "# This matrix entry needs no add-on to the auto-detected profile.\n"
+
+    lines: list[str] = []
+    if profile.abi_extra_parts:
+        abi_extra = "-".join(profile.abi_extra_parts)
+        lines.extend(["[settings]", f"compiler.abi_extra={abi_extra}", ""])
+    if conf:
+        lines.extend(["[conf]", *conf])
+    return "\n".join([*lines, ""])
+
+
 def _add_clang_compilers(cache_variables: dict[str, str], llvm_prefix: str) -> None:
     cache_variables.update(
         {
@@ -111,7 +152,7 @@ def _add_clang_compilers(cache_variables: dict[str, str], llvm_prefix: str) -> N
 
 def _native_gcc_configuration(
     cache_variables: dict[str, str], homebrew_prefix: str, flags: list[str]
-) -> tuple[dict[str, str], str]:
+) -> tuple[dict[str, str], _ConanProfile]:
     gcc_major_version = _required_environment("GCC_MAJOR_VERSION")
     gcc_prefix = f"{homebrew_prefix}/opt/gcc@{gcc_major_version}"
     cache_variables.update(
@@ -121,63 +162,45 @@ def _native_gcc_configuration(
             "CMAKE_CXX_FLAGS": " ".join(flags),
         }
     )
-    profile = (
-        "# Native GCC uses Conan's auto-detected profile; no add-on is required.\n"
-    )
-    return cache_variables, profile
+    # Native GCC builds dependencies exactly as Conan detects them, so no
+    # CONAN_HOST_PROFILE is set either.
+    return cache_variables, _ConanProfile()
 
 
 def _hardened_libcxx_configuration(
     cache_variables: dict[str, str], homebrew_prefix: str, flags: list[str]
-) -> tuple[dict[str, str], str]:
+) -> tuple[dict[str, str], _ConanProfile]:
     llvm_major_version = _required_environment("LLVM_MAJOR_VERSION")
     llvm_prefix = f"{homebrew_prefix}/opt/llvm@{llvm_major_version}"
     hardened_libcxx_dir = _required_environment("HARDENED_LIBCXX_DIR")
     _add_clang_compilers(cache_variables, llvm_prefix)
-    cmake_linker_flags = " ".join(
-        [
-            "-stdlib=libc++",
-            f"-L{hardened_libcxx_dir}/lib",
-            "-lunwind",
-            f"-Wl,-rpath,{hardened_libcxx_dir}/lib",
-        ]
+    libcxx_flags = f"-stdlib++-isystem{hardened_libcxx_dir}/include/c++/v1"
+    hardening_flags = (
+        "-D_LIBCPP_DEBUG=1",
+        "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG",
     )
-    conan_linker_flags = ", ".join(
-        [
-            "'-stdlib=libc++'",
-            f"'-L{hardened_libcxx_dir}/lib'",
-            "'-lunwind'",
-        ]
+    conan_linker_flags = (
+        "-stdlib=libc++",
+        f"-L{hardened_libcxx_dir}/lib",
+        "-lunwind",
+    )
+    # Dependencies are found through the Conan-generated CMake config, so only
+    # the application needs the runtime search path baked in.
+    cmake_linker_flags = " ".join(
+        [*conan_linker_flags, f"-Wl,-rpath,{hardened_libcxx_dir}/lib"]
     )
 
     cache_variables.update(
         {
-            "CMAKE_CXX_FLAGS": " ".join(
-                [
-                    "-D_LIBCPP_DEBUG=1",
-                    "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG",
-                    *flags,
-                    f"-stdlib++-isystem{hardened_libcxx_dir}/include/c++/v1",
-                ]
-            ),
+            "CMAKE_CXX_FLAGS": " ".join([*hardening_flags, *flags, libcxx_flags]),
             "CMAKE_EXE_LINKER_FLAGS": cmake_linker_flags,
             "CMAKE_SHARED_LINKER_FLAGS": cmake_linker_flags,
             "CONAN_HOST_PROFILE": _profile_path(),
         }
     )
-    profile = "\n".join(
-        [
-            "[conf]",
-            (
-                "tools.build:cxxflags=['-stdlib++-isystem"
-                f"{hardened_libcxx_dir}/include/c++/v1', "
-                "'-D_LIBCPP_DEBUG=1', "
-                "'-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG']"
-            ),
-            f"tools.build:exelinkflags=[{conan_linker_flags}]",
-            f"tools.build:sharedlinkflags=[{conan_linker_flags}]",
-            "",
-        ]
+    profile = _ConanProfile(
+        cxxflags=(libcxx_flags, *hardening_flags),
+        linkflags=conan_linker_flags,
     )
     return cache_variables, profile
 
@@ -189,7 +212,7 @@ def _clang_libcxx_configuration(
     os_name: str,
     *,
     sanitizers: bool,
-) -> tuple[dict[str, str], str]:
+) -> tuple[dict[str, str], _ConanProfile]:
     llvm_major_version = _required_environment("LLVM_MAJOR_VERSION")
     llvm_prefix = f"{homebrew_prefix}/opt/llvm@{llvm_major_version}"
     libcxx_flags = f"-stdlib++-isystem{llvm_prefix}/include/c++/v1"
@@ -228,27 +251,20 @@ def _clang_libcxx_configuration(
     profile_library_dir = (
         f"{llvm_prefix}/lib/c++" if os_name == "macos" else f"{llvm_prefix}/lib"
     )
-    conan_linker_flags = ", ".join(
-        [
-            '"-stdlib=libc++"',
-            f'"-L{profile_library_dir}"',
-        ]
-    )
-    profile_lines = [
-        "[conf]",
-        f'tools.build:cxxflags=["{libcxx_flags}"]',
-        f"tools.build:exelinkflags=[{conan_linker_flags}]",
-        f"tools.build:sharedlinkflags=[{conan_linker_flags}]",
-    ]
+    # The sanitizer flags stay out of the profile: dependencies are built without
+    # sanitizers, but they must not be shared with a non-sanitizer build, because
+    # the ASan runtime they are linked against belongs to this exact LLVM.
+    abi_extra_parts: tuple[str, ...] = ()
     if sanitizers:
         llvm_full_version = _required_environment("LLVM_FULL_VERSION")
-        profile_lines = [
-            "[settings]",
-            f"compiler.abi_extra=sanitizers-{llvm_full_version}",
-            "",
-            *profile_lines,
-        ]
-    return cache_variables, "\n".join([*profile_lines, ""])
+        abi_extra_parts = (f"sanitizers-{llvm_full_version}",)
+
+    profile = _ConanProfile(
+        abi_extra_parts=abi_extra_parts,
+        cxxflags=(libcxx_flags,),
+        linkflags=("-stdlib=libc++", f"-L{profile_library_dir}"),
+    )
+    return cache_variables, profile
 
 
 def _clang_libstdcxx_configuration(
@@ -256,62 +272,45 @@ def _clang_libstdcxx_configuration(
     homebrew_prefix: str,
     flags: list[str],
     os_name: str,
-) -> tuple[dict[str, str], str]:
+) -> tuple[dict[str, str], _ConanProfile]:
     gcc_major_version = _required_environment("GCC_MAJOR_VERSION")
     llvm_major_version = _required_environment("LLVM_MAJOR_VERSION")
     gcc_prefix = f"{homebrew_prefix}/opt/gcc@{gcc_major_version}"
     llvm_prefix = f"{homebrew_prefix}/opt/llvm@{llvm_major_version}"
     target = "aarch64-apple-darwin24" if os_name == "macos" else "x86_64-pc-linux-gnu"
     _add_clang_compilers(cache_variables, llvm_prefix)
-    cmake_linker_flags = " ".join(
-        [
-            "-stdlib=libstdc++",
-            f"-L{gcc_prefix}/lib/gcc/{gcc_major_version}",
-            f"-Wl,-rpath,{gcc_prefix}/lib/gcc/{gcc_major_version}",
-        ]
+    libstdcxx_flags = (
+        f"-stdlib++-isystem{gcc_prefix}/include/c++/{gcc_major_version}",
+        f"-cxx-isystem{gcc_prefix}/include/c++/{gcc_major_version}/{target}",
     )
-    conan_linker_flags = ", ".join(
-        [
-            '"-stdlib=libstdc++"',
-            f'"-L{gcc_prefix}/lib/gcc/{gcc_major_version}"',
-        ]
+    conan_linker_flags = (
+        "-stdlib=libstdc++",
+        f"-L{gcc_prefix}/lib/gcc/{gcc_major_version}",
+    )
+    # Dependencies are found through the Conan-generated CMake config, so only
+    # the application needs the runtime search path baked in.
+    cmake_linker_flags = " ".join(
+        [*conan_linker_flags, f"-Wl,-rpath,{gcc_prefix}/lib/gcc/{gcc_major_version}"]
     )
 
     cache_variables.update(
         {
-            "CMAKE_CXX_FLAGS": " ".join(
-                [
-                    *flags,
-                    f"-stdlib++-isystem{gcc_prefix}/include/c++/{gcc_major_version}",
-                    f"-cxx-isystem{gcc_prefix}/include/c++/{gcc_major_version}/{target}",
-                ]
-            ),
+            "CMAKE_CXX_FLAGS": " ".join([*flags, *libstdcxx_flags]),
             "CMAKE_EXE_LINKER_FLAGS": cmake_linker_flags,
             "CMAKE_SHARED_LINKER_FLAGS": cmake_linker_flags,
             "CONAN_HOST_PROFILE": _profile_path(),
             "CMAKE_CXX_CLANG_TIDY": f"{llvm_prefix}/bin/clang-tidy",
         }
     )
-    profile = "\n".join(
-        [
-            "[settings]",
-            f"compiler.abi_extra=libstdc++-gcc-{gcc_major_version}",
-            "",
-            "[conf]",
-            (
-                "tools.build:cxxflags=["
-                f'"-stdlib++-isystem{gcc_prefix}/include/c++/{gcc_major_version}", '
-                f'"-cxx-isystem{gcc_prefix}/include/c++/{gcc_major_version}/{target}"]'
-            ),
-            f"tools.build:exelinkflags=[{conan_linker_flags}]",
-            f"tools.build:sharedlinkflags=[{conan_linker_flags}]",
-            "",
-        ]
+    profile = _ConanProfile(
+        abi_extra_parts=(f"libstdc++-gcc-{gcc_major_version}",),
+        cxxflags=libstdcxx_flags,
+        linkflags=conan_linker_flags,
     )
     return cache_variables, profile
 
 
-def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], str]:
+def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], _ConanProfile]:
     homebrew_prefix = _required_environment("HOMEBREW_PREFIX")
     flags = ["-Wall", "-Wextra", "-Werror"]
     cache_variables: dict[str, str] = {
@@ -447,7 +446,9 @@ def _write_configuration(args: argparse.Namespace) -> int:
         json.dumps(preset, indent=2) + "\n", encoding="utf-8"
     )
     _write_environment(output_dir / "ci.env", args)
-    (output_dir / "conan-profile-ci").write_text(conan_profile, encoding="utf-8")
+    (output_dir / "conan-profile-ci").write_text(
+        _render_profile(conan_profile), encoding="utf-8"
+    )
     return 0
 
 
