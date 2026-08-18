@@ -4,9 +4,9 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
+import re
 import shlex
 import sys
 from pathlib import Path
@@ -14,11 +14,6 @@ from typing import Final, NamedTuple
 
 _REPOSITORY_ROOT: Final = Path(__file__).resolve().parents[2]
 _CPP_DIR: Final = _REPOSITORY_ROOT / "solvers" / "cpp"
-
-# Six bytes render as twelve hex characters: enough to separate the handful of
-# flag sets written below, while leaving compiler.abi_extra readable in the
-# workflow log.
-_ABI_HASH_BYTES: Final = 6
 
 
 class _MatrixEntry(NamedTuple):
@@ -37,16 +32,18 @@ class _ConanProfile(NamedTuple):
     spelled, so all matrix entries produce the same shape of file.
     """
 
-    # Joined with "-" into compiler.abi_extra, which participates in package_id.
-    abi_extra_parts: tuple[str, ...] = ()
     cxxflags: tuple[str, ...] = ()
     # Conan has no combined link-flags conf; the same list feeds exe and shared.
     linkflags: tuple[str, ...] = ()
+    # Not a build flag: an opaque discriminator for toolchain identity that the
+    # flags themselves do not spell out.
+    abi_tag: str = ""
 
     def __bool__(self) -> bool:
         # A NamedTuple is a tuple, so an add-on with every field empty is still
-        # three elements long and would otherwise be truthy.
-        return any((self.abi_extra_parts, self.cxxflags, self.linkflags))
+        # as long as it has fields and would otherwise be truthy. Iterating it
+        # covers whatever fields exist, so a new one needs nothing here.
+        return any(self)
 
 
 # Runner image hosting each operating system.
@@ -125,44 +122,42 @@ def _profile_path() -> str:
     return "auto-cmake;${sourceDir}/conan-profile-ci"
 
 
-def _conf_lines(profile: _ConanProfile) -> list[str]:
-    # Conan reads a conf value back as a Python literal, so json.dumps is both a
-    # correct spelling and one that quotes and escapes every flag the same way.
-    lines: list[str] = []
+# A [conf] value is either one string or a list of flags; Conan spells the two
+# differently and the distinction has to survive as far as json.dumps.
+type _ConfValue = str | tuple[str, ...]
+
+
+def _conf_entries(profile: _ConanProfile) -> list[tuple[str, _ConfValue]]:
+    entries: list[tuple[str, _ConfValue]] = []
+    if profile.abi_tag:
+        entries.append(("user.aoc:abi", profile.abi_tag))
     if profile.cxxflags:
-        lines.append(f"tools.build:cxxflags={json.dumps(profile.cxxflags)}")
+        entries.append(("tools.build:cxxflags", profile.cxxflags))
     if profile.linkflags:
-        flags = json.dumps(profile.linkflags)
-        lines.append(f"tools.build:exelinkflags={flags}")
-        lines.append(f"tools.build:sharedlinkflags={flags}")
-    return lines
-
-
-def _conf_hash(conf: list[str]) -> str:
-    # BLAKE2 takes the output length as an algorithm parameter, so a short digest
-    # is the hash itself rather than a truncation applied afterwards.
-    return hashlib.blake2b(
-        "\n".join(conf).encode(), digest_size=_ABI_HASH_BYTES
-    ).hexdigest()
+        entries.append(("tools.build:exelinkflags", profile.linkflags))
+        entries.append(("tools.build:sharedlinkflags", profile.linkflags))
+    return entries
 
 
 def _render_profile(profile: _ConanProfile) -> str:
-    conf = _conf_lines(profile)
-    abi_extra_parts = list(profile.abi_extra_parts)
-    if conf:
-        # The digest names a set of flags, so it exists only when there are some.
-        abi_extra_parts.append(_conf_hash(conf))
-
-    sections: list[list[str]] = []
-    if abi_extra_parts:
-        sections.append(
-            ["[settings]", f"compiler.abi_extra={'-'.join(abi_extra_parts)}"]
-        )
-    if conf:
-        sections.append(["[conf]", *conf])
-    if not sections:
+    entries = _conf_entries(profile)
+    if not entries:
         return "# This matrix entry needs no add-on to the auto-detected profile.\n"
-    return "\n\n".join("\n".join(section) for section in sections) + "\n"
+
+    # tools.info.package_id:confs names the confs Conan folds into package_id, so
+    # a dependency binary stops matching once the flags it was built with change.
+    # Conan matches each entry with re.match, which anchors at the start only,
+    # hence the "$". Deriving the names from the section above keeps a conf added
+    # there later from silently staying out of package_id.
+    patterns = [f"{re.escape(name)}$" for name, _ in entries]
+    # Conan reads a conf value back as a Python literal, so json.dumps is both a
+    # correct spelling and one that quotes and escapes every value the same way.
+    lines = [
+        "[conf]",
+        f"tools.info.package_id:confs={json.dumps(patterns)}",
+        *(f"{name}={json.dumps(value)}" for name, value in entries),
+    ]
+    return "\n".join([*lines, ""])
 
 
 def _add_clang_compilers(cache_variables: dict[str, str], llvm_prefix: str) -> None:
@@ -221,9 +216,7 @@ def _hardened_libcxx_configuration(
         }
     )
     profile = _ConanProfile(
-        abi_extra_parts=("libc++", "hardened"),
-        cxxflags=(libcxx_flags, *hardening_flags),
-        linkflags=conan_linker_flags,
+        cxxflags=(libcxx_flags, *hardening_flags), linkflags=conan_linker_flags
     )
     return cache_variables, profile
 
@@ -274,16 +267,12 @@ def _clang_libcxx_configuration(
         f"{llvm_prefix}/lib/c++" if os_name == "macos" else f"{llvm_prefix}/lib"
     )
     # The sanitizer flags stay out of the profile: dependencies are built without
-    # sanitizers, so the flag hash cannot separate them from a plain libc++
-    # build. They still must not share binaries, because the ASan runtime those
-    # are linked against belongs to this exact LLVM — hence the explicit tag.
-    abi_extra_parts = ("libc++",)
-    if sanitizers:
-        llvm_full_version = _required_environment("LLVM_FULL_VERSION")
-        abi_extra_parts = (*abi_extra_parts, f"sanitizers-{llvm_full_version}")
-
+    # sanitizers, so no flag separates them from a plain libc++ build. They still
+    # must not outlive this exact LLVM, whose libc++ and ASan runtime the
+    # application links against — only its major version reaches the flags above.
+    abi_tag = f"llvm-{_required_environment('LLVM_FULL_VERSION')}" if sanitizers else ""
     profile = _ConanProfile(
-        abi_extra_parts=abi_extra_parts,
+        abi_tag=abi_tag,
         cxxflags=(libcxx_flags,),
         linkflags=("-stdlib=libc++", f"-L{profile_library_dir}"),
     )
@@ -325,7 +314,6 @@ def _clang_libstdcxx_configuration(
         }
     )
     profile = _ConanProfile(
-        abi_extra_parts=(f"libstdc++-gcc-{gcc_major_version}",),
         cxxflags=libstdcxx_flags,
         linkflags=conan_linker_flags,
     )
