@@ -210,7 +210,8 @@ def _verify(binaries: list[Path], sonames: list[str], expected_prefix: str) -> b
 def main() -> bool:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    build_dir = Path(os.environ["usage_build_dir"])  # noqa: SIM112
+    cwd = Path(os.environ["MISE_ORIGINAL_CWD"])
+    build_dir = cwd / Path(os.environ["usage_build_dir"])  # noqa: SIM112
     stdlib = os.environ["usage_stdlib"]  # noqa: SIM112
     expected_prefix = os.environ["usage_expected_prefix"].rstrip("/")  # noqa: SIM112
 
