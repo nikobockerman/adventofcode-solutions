@@ -190,6 +190,7 @@ def _hardened_libcxx_configuration(
 ) -> tuple[dict[str, str], _ConanProfile]:
     llvm_major_version = _required_environment("LLVM_MAJOR_VERSION")
     llvm_prefix = f"{homebrew_prefix}/opt/llvm@{llvm_major_version}"
+    hardened_abi_tag = _required_environment("HARDENED_ABI_TAG")
     hardened_libcxx_dir = _required_environment("HARDENED_LIBCXX_DIR")
     _add_clang_compilers(cache_variables, llvm_prefix)
     libcxx_flags = f"-stdlib++-isystem{hardened_libcxx_dir}/include/c++/v1"
@@ -215,8 +216,14 @@ def _hardened_libcxx_configuration(
             "CMAKE_SHARED_LINKER_FLAGS": cmake_linker_flags,
         }
     )
+    # The hardened libc++ installs to a fixed path, so every flag above stays
+    # identical when a new one is built there. The tag is the only thing that
+    # separates dependencies built against one libc++ from another; its value is
+    # that build's cache key, so the two decisions cannot drift apart.
     profile = _ConanProfile(
-        cxxflags=(libcxx_flags, *hardening_flags), linkflags=conan_linker_flags
+        abi_tag=hardened_abi_tag,
+        cxxflags=(libcxx_flags, *hardening_flags),
+        linkflags=conan_linker_flags,
     )
     return cache_variables, profile
 

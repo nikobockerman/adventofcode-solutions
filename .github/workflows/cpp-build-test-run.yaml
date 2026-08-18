@@ -100,12 +100,21 @@ jobs:
           llvm-major-version: ${{ env.LLVM_MAJOR_VERSION }}
 
       - if: matrix.cxxLib == 'libc++' && matrix.buildType == 'hardened'
-        name: Set env to hardened libc++ install dir for CMake and Conan configs
+        name: Set env vars from hardened libc++ for configuration generation
 
         env:
+          HARDENED_ABI_TAG: ${{ steps.setup-hardened-libcxx.outputs.abi-tag }}
           HARDENED_LIBCXX_DIR: ${{ steps.setup-hardened-libcxx.outputs.install-dir }}
         run: |
-          echo "HARDENED_LIBCXX_DIR=${HARDENED_LIBCXX_DIR}" | tr -d '\n' >> "${GITHUB_ENV}"
+          set -euo pipefail
+
+          {
+            echo "HARDENED_ABI_TAG=${HARDENED_ABI_TAG}"
+
+            echo -n "HARDENED_LIBCXX_DIR="
+            echo "${HARDENED_LIBCXX_DIR}" | tr -d '\n'
+            echo
+          } | tee -a "${GITHUB_ENV}"
         shell: bash
 
       - if: matrix.buildType == 'sanitizers'
