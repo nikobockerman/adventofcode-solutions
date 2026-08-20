@@ -7,6 +7,9 @@ inputs:
     required: true
 
 outputs:
+  abi-tag:
+    description: "Identity of the hardened libc++ build; its cache key doubles as an ABI tag"
+    value: ${{ steps.cache-restore.outputs.cache-primary-key }}
   install-dir:
     description: "Path to the installed hardened libc++"
     value: ${{ steps.init.outputs.installDir }}
