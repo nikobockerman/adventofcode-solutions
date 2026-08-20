@@ -1,6 +1,6 @@
 [tools]
 # Basic technologies used in the repository
-python = "3.14.6"
+python = "3.14.7"
 uv = "0.12.2"
 
 # Common tools
