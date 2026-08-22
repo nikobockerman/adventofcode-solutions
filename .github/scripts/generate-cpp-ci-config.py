@@ -15,6 +15,8 @@ from typing import Final, NamedTuple
 _REPOSITORY_ROOT: Final = Path(__file__).resolve().parents[2]
 _CPP_DIR: Final = _REPOSITORY_ROOT / "solvers" / "cpp"
 
+_GLIBCXX_DEBUG_FLAGS: Final = ("-D_GLIBCXX_DEBUG", "-D_GLIBCXX_DEBUG_PEDANTIC")
+
 
 class _MatrixEntry(NamedTuple):
     """One C++ build scenario: which compiler, standard library and build type."""
@@ -170,19 +172,25 @@ def _add_clang_compilers(cache_variables: dict[str, str], llvm_prefix: str) -> N
 
 
 def _native_gcc_configuration(
-    cache_variables: dict[str, str], homebrew_prefix: str, flags: list[str]
+    cache_variables: dict[str, str],
+    homebrew_prefix: str,
+    flags: list[str],
+    *,
+    glibcxx_debug: bool,
 ) -> tuple[dict[str, str], _ConanProfile]:
     gcc_major_version = _required_environment("GCC_MAJOR_VERSION")
     gcc_prefix = f"{homebrew_prefix}/opt/gcc@{gcc_major_version}"
+    debug_flags = _GLIBCXX_DEBUG_FLAGS if glibcxx_debug else ()
     cache_variables.update(
         {
             "CMAKE_C_COMPILER": f"{gcc_prefix}/bin/gcc-{gcc_major_version}",
             "CMAKE_CXX_COMPILER": f"{gcc_prefix}/bin/g++-{gcc_major_version}",
-            "CMAKE_CXX_FLAGS": " ".join(flags),
+            "CMAKE_CXX_FLAGS": " ".join([*debug_flags, *flags]),
         }
     )
-    # Native GCC builds dependencies exactly as Conan detects them.
-    return cache_variables, _ConanProfile()
+    # With no macros the add-on is empty, which builds dependencies exactly as
+    # Conan detects them.
+    return cache_variables, _ConanProfile(cxxflags=debug_flags)
 
 
 def _hardened_libcxx_configuration(
@@ -337,8 +345,14 @@ def _toolchain_configuration(
     }
 
     match args.compiler, args.cxx_lib, args.build_type:
-        case "gcc", "libstdc++", "debug" | "release":
-            return _native_gcc_configuration(cache_variables, homebrew_prefix, flags)
+        case "gcc", "libstdc++", "debug":
+            return _native_gcc_configuration(
+                cache_variables, homebrew_prefix, flags, glibcxx_debug=True
+            )
+        case "gcc", "libstdc++", "release":
+            return _native_gcc_configuration(
+                cache_variables, homebrew_prefix, flags, glibcxx_debug=False
+            )
         case "clang", "libc++", "hardened":
             return _hardened_libcxx_configuration(
                 cache_variables, homebrew_prefix, flags
