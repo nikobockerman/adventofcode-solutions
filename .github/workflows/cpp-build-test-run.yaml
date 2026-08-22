@@ -31,7 +31,8 @@ jobs:
       - name: Setup tools through mise
         uses: ./.github/actions/mise-project-setup
         with:
-          directory: .
+          directories: .
+          path-directory: .
 
       - id: matrix
         name: Generate build matrix
@@ -71,7 +72,11 @@ jobs:
       - name: Setup tools through mise
         uses: ./.github/actions/mise-project-setup
         with:
-          directory: solvers/cpp
+          directories: |
+            .
+            aoc-main
+            solvers/cpp
+          path-directory: solvers/cpp
 
       - id: setup-cmake-project
         name: Setup CMake project

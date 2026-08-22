@@ -1,0 +1,68 @@
+name: Checks - Python projects
+on:
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  # Every check that also needs a uv virtual environment
+  checks:
+    name: Run checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Restore tools
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directories: |
+            .
+            aoc-main
+            solvers/python
+          path-directory: .
+
+      - name: Restore uv projects
+        uses: ./.github/actions/uv-project-setup
+        with:
+          directory: solvers/python
+
+      - parallel:
+          - name: aoc-main - check:mypy
+
+            run: mise run check:mypy
+            shell: bash
+            working-directory: aoc-main
+
+          - name: aoc-main - check:pyright
+
+            run: mise run check:pyright
+            shell: bash
+            working-directory: aoc-main
+
+          - name: aoc-main - check:pytest
+
+            run: mise run check:pytest
+            shell: bash
+            working-directory: aoc-main
+
+          - name: solvers/python - check:mypy
+
+            run: mise run check:mypy
+            shell: bash
+            working-directory: solvers/python
+
+          - name: solvers/python - check:pyright
+
+            run: mise run check:pyright
+            shell: bash
+            working-directory: solvers/python
+
+          - name: solvers/python - check:pytest
+
+            run: mise run check:pytest
+            shell: bash
+            working-directory: solvers/python

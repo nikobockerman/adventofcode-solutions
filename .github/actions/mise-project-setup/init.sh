@@ -17,23 +17,67 @@ prepare | use) ;;
 esac
 
 if [[ "${CACHE_MODE}" = "prepare" ]]; then
-  if [[ -n "${DIRECTORY}" ]]; then
-    echo "::error::Directory must be empty for prepare mode"
+  if [[ -n "${DIRECTORIES}" ]]; then
+    echo "::error::Directories must be empty for prepare mode"
     exit 1
   fi
 
-  DIRECTORY="."
+  if [[ -n "${PATH_DIRECTORY}" ]]; then
+    echo "::error::Path directory must be empty for prepare mode"
+    exit 1
+  fi
+
+  # Use of mise tools in CI on different OSes for solvers:
+  #   - C++: macOS and Ubuntu
+  #   - Python: Ubuntu
+  #   - Rust: macOS and Ubuntu
+  DIRECTORIES=". aoc-main solvers/cpp solvers/rust"
+  if [[ "${RUNNER_OS}" = "Linux" ]]; then
+    DIRECTORIES="${DIRECTORIES} solvers/python"
+  fi
 fi
 
-if [[ -z "${DIRECTORY}" ]]; then
-  echo "::error::Empty DIRECTORY is not supported"
+if [[ -z "${DIRECTORIES}" ]]; then
+  echo "::error::Empty DIRECTORIES is not supported"
   exit 1
-elif [[ ! -d "${DIRECTORY}" ]]; then
-  echo "::error::Directory does not exist: ${DIRECTORY}"
-  exit 1
-elif [[ ! -f "${DIRECTORY}/mise.toml" ]]; then
-  echo "::error::Directory does not contain mise.toml: ${DIRECTORY}"
-  exit 1
+fi
+
+deduplicated=""
+for directory in ${DIRECTORIES}; do
+  case " ${deduplicated} " in
+  *" ${directory} "*) continue ;;
+  *) ;;
+  esac
+  deduplicated="${deduplicated} ${directory}"
+done
+DIRECTORIES=${deduplicated# }
+
+for directory in ${DIRECTORIES}; do
+  if [[ ! -d "${directory}" ]]; then
+    echo "::error::Directory does not exist: ${directory}"
+    exit 1
+  elif [[ ! -f "${directory}/mise.toml" ]]; then
+    echo "::error::Directory does not contain mise.toml: ${directory}"
+    exit 1
+  fi
+done
+
+if [[ "${CACHE_MODE}" = "use" ]]; then
+  if [[ -z "${PATH_DIRECTORY}" ]]; then
+    echo "::error::Empty PATH_DIRECTORY is not supported"
+    exit 1
+  fi
+
+  path_directory_listed=false
+  for directory in ${DIRECTORIES}; do
+    if [[ "${directory}" = "${PATH_DIRECTORY}" ]]; then
+      path_directory_listed=true
+    fi
+  done
+  if [[ "${path_directory_listed}" != true ]]; then
+    echo "::error::Path directory is not one of the directories: ${PATH_DIRECTORY}"
+    exit 1
+  fi
 fi
 
 mise_ceiling_path=$(dirname "${GITHUB_WORKSPACE}")
@@ -74,24 +118,9 @@ echo "::group::Outputs from init"
 
   # Install directories
   echo "mise-install-directories<<ENDDIRS"
-  echo "."
-  if [[ "${CACHE_MODE}" = "prepare" ]]; then
-    echo "aoc-main"
-    # Use of mise tools in CI on different OSes for solvers:
-    #   - C++: macOS and Ubuntu
-    #   - Python: Ubuntu
-    #   - Rust: macOS and Ubuntu
-    echo "solvers/cpp"
-    if [[ "${RUNNER_OS}" = "Linux" ]]; then
-      echo "solvers/python"
-    fi
-    echo "solvers/rust"
-  elif [[ "${DIRECTORY}" != "." ]]; then
-    if [[ "${DIRECTORY}" != "aoc-main" ]]; then
-      echo "aoc-main"
-    fi
-    echo "${DIRECTORY}"
-  fi
+  for directory in ${DIRECTORIES}; do
+    echo "${directory}"
+  done
   echo "ENDDIRS"
 
   # Mise cache paths

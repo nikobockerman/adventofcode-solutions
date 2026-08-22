@@ -1,0 +1,89 @@
+name: Checks - mise tools
+on:
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  # Every check that needs only the tools mise installs
+  checks:
+    name: Run checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Restore tools
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directories: |
+            .
+            solvers/cpp
+            solvers/rust
+          path-directory: .
+
+      - parallel:
+          - name: check:prettier
+
+            run: mise run check:prettier
+            shell: bash
+
+          - name: check:pyright-repo
+
+            run: mise run check:pyright-repo
+            shell: bash
+
+          - name: check:ruff
+
+            env:
+              RUFF_CACHE_DIR: ${{ runner.temp }}/ruff-cache-check
+            run: mise run check:ruff
+            shell: bash
+
+          - name: check:ruff:format
+
+            env:
+              RUFF_CACHE_DIR: ${{ runner.temp }}/ruff-cache-format
+            run: mise run check:ruff:format
+            shell: bash
+
+          - name: check:shellcheck
+
+            run: mise run check:shellcheck
+            shell: bash
+
+          - name: check:shellcheck-config-enabled-optional-checks
+
+            run: mise run check:shellcheck-config-enabled-optional-checks
+            shell: bash
+
+          - name: check:shellcheck-gha
+
+            run: mise run check:shellcheck-gha
+            shell: bash
+
+          - name: check:shfmt
+
+            run: mise run check:shfmt
+            shell: bash
+
+          - name: solvers/cpp - check:clang-format
+
+            run: mise run check:clang-format
+            shell: bash
+            working-directory: solvers/cpp
+
+          - name: solvers/cpp - check:gersemi
+
+            run: mise run check:gersemi
+            shell: bash
+            working-directory: solvers/cpp
+
+          - name: solvers/rust - check:rustfmt
+
+            run: mise run check:rustfmt
+            shell: bash
+            working-directory: solvers/rust

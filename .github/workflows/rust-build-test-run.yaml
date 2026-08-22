@@ -46,7 +46,11 @@ jobs:
       - name: Setup tools through mise
         uses: ./.github/actions/mise-project-setup
         with:
-          directory: solvers/rust
+          directories: |
+            .
+            aoc-main
+            solvers/rust
+          path-directory: solvers/rust
 
       - name: Setup rust cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2

@@ -35,7 +35,7 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-mise-root-ubuntu
 
-  # uv cache prepare for aoc-main
+  # uv cache prepare
   uv-cache-aoc-main-macos:
     needs: mise-cache-macos
     uses: ./.github/workflows/mise-uv-prepare-cache.yaml
@@ -56,6 +56,16 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-ubuntu
 
+  uv-cache-solvers-python-ubuntu:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
+    with:
+      directory: solvers/python
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-uv-solvers-python-ubuntu
+
   # Homebrew cache prepare
   homebrew-cache-macos:
     uses: ./.github/workflows/homebrew-prepare-cache.yaml
@@ -73,74 +83,19 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-homebrew-ubuntu
 
-  # Checks for root
-  check-prettier:
+  # Checks
+  checks-mise:
     needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:prettier
+    uses: ./.github/workflows/checks-mise.yaml
 
-  check-pyright-repo:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:pyright-repo
-
-  check-ruff:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:ruff
-
-  check-ruff-format:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:ruff:format
-
-  check-shellcheck:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shellcheck
-
-  check-shellcheck-config-enabled-optional-checks:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shellcheck-config-enabled-optional-checks
-
-  check-shellcheck-gha:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shellcheck-gha
-
-  check-shfmt:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shfmt
-
-  # CI workflows for projects in the repository
-  ci-aoc-main:
+  checks-python:
     needs:
       - mise-cache-ubuntu
-      - uv-cache-aoc-main-ubuntu
-    uses: ./.github/workflows/ci-python-project.yaml
-    with:
-      directory: aoc-main
+      - uv-cache-solvers-python-ubuntu
+    uses: ./.github/workflows/checks-python.yaml
 
-  # CI for C++ solvers
-  ci-solvers-cpp:
+  # Run the solvers
+  solvers-cpp:
     needs:
       - homebrew-cache-macos
       - homebrew-cache-ubuntu
@@ -148,48 +103,37 @@ jobs:
       - mise-cache-ubuntu
       - uv-cache-aoc-main-macos
       - uv-cache-aoc-main-ubuntu
-    uses: ./.github/workflows/ci-solvers-cpp.yaml
+    uses: ./.github/workflows/cpp-build-test-run.yaml
     secrets: inherit
     with:
       homebrew-downloads-hash-from-prepare-macos: ${{ needs.homebrew-cache-macos.outputs.downloads-hash }}
       homebrew-downloads-hash-from-prepare-ubuntu: ${{ needs.homebrew-cache-ubuntu.outputs.downloads-hash }}
 
-  # CI for Python solvers
-  ci-solvers-python:
+  solvers-python:
     needs:
       - mise-cache-ubuntu
-      - uv-cache-aoc-main-ubuntu
-    uses: ./.github/workflows/ci-python-project.yaml
+      - uv-cache-solvers-python-ubuntu
+    uses: ./.github/workflows/python-run.yaml
     secrets: inherit
-    with:
-      directory: solvers/python
 
-  # CI for Rust solvers
-  ci-solvers-rust:
+  solvers-rust:
     needs:
       - mise-cache-macos
       - mise-cache-ubuntu
       - uv-cache-aoc-main-macos
       - uv-cache-aoc-main-ubuntu
-    uses: ./.github/workflows/ci-solvers-rust.yaml
+    uses: ./.github/workflows/rust-build-test-run.yaml
     secrets: inherit
 
   # Check for all green CI
   check:
     if: always()
     needs:
-      - check-prettier
-      - check-pyright-repo
-      - check-ruff
-      - check-ruff-format
-      - check-shellcheck
-      - check-shellcheck-config-enabled-optional-checks
-      - check-shellcheck-gha
-      - check-shfmt
-      - ci-aoc-main
-      - ci-solvers-cpp
-      - ci-solvers-python
-      - ci-solvers-rust
+      - checks-mise
+      - checks-python
+      - solvers-cpp
+      - solvers-python
+      - solvers-rust
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 

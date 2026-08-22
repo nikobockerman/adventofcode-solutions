@@ -41,7 +41,11 @@ jobs:
         uses: ./.github/actions/mise-project-setup
         with:
           cache-mode: use
-          directory: ${{ inputs.directory }}
+          directories: |
+            .
+            aoc-main
+            ${{ inputs.directory }}
+          path-directory: ${{ inputs.directory }}
 
       - name: Prepare cache
         uses: ./.github/actions/uv-project-setup

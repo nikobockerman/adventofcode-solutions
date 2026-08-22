@@ -5,8 +5,16 @@ inputs:
     default: use
     description: "Mode of operation regarding cache: 'prepare' or 'use'"
     required: false
-  directory:
-    description: Directory where mise and tools will be used in. Must be set to "" if `cache-mode` is "prepare".
+  directories:
+    description: |
+      Newline separated list of directories where mise and tools will be used in.
+      Must be set to "" if `cache-mode` is "prepare".
+    required: true
+  path-directory:
+    description: |
+      Directory whose tools are placed on PATH, for steps that call a tool directly instead of
+      through `mise run`. Must be one of `directories`.
+      Must be set to "" if `cache-mode` is "prepare".
     required: true
 
 runs:
@@ -16,7 +24,8 @@ runs:
 
       env:
         CACHE_MODE: ${{ inputs.cache-mode }}
-        DIRECTORY: ${{ inputs.directory }}
+        DIRECTORIES: ${{ inputs.directories }}
+        PATH_DIRECTORY: ${{ inputs.path-directory }}
         GITHUB_TOKEN: ${{ github.token }}
         # renovate: datasource=github-releases depName=jdx/mise extractVersion=^v(?<version>.*)$
         MISE_VERSION: 2026.8.2
@@ -75,7 +84,7 @@ runs:
         cache_save: false
         install: false
         version: ${{ steps.init.outputs.mise-version }}
-        working_directory: ${{ inputs.directory }}
+        working_directory: ${{ inputs.path-directory }}
 
     - if: steps.cache-check.outputs.match != 'true' && steps.cache-restore.outputs.cache-hit != 'true'
 

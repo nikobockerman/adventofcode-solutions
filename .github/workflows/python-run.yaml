@@ -15,12 +15,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Restore mise project
+      - name: Restore tools
         uses: ./.github/actions/mise-project-setup
         with:
-          directory: solvers/python
+          directories: |
+            .
+            aoc-main
+            solvers/python
+          path-directory: .
 
-      - name: Restore uv project
+      - name: Restore uv projects
         uses: ./.github/actions/uv-project-setup
         with:
           directory: solvers/python
@@ -32,3 +36,4 @@ jobs:
 
       - name: Run aoc
         run: mise run aoc:all -- --solver python
+        shell: bash

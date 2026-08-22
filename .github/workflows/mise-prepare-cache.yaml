@@ -30,4 +30,5 @@ jobs:
         uses: ./.github/actions/mise-project-setup
         with:
           cache-mode: prepare
-          directory: ""
+          directories: ""
+          path-directory: ""
