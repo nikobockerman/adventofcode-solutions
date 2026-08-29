@@ -73,62 +73,10 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-homebrew-ubuntu
 
-  # Checks for root
-  check-prettier:
+  # Checks
+  checks-mise:
     needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:prettier
-
-  check-pyright-repo:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:pyright-repo
-
-  check-ruff:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:ruff
-
-  check-ruff-format:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:ruff:format
-
-  check-shellcheck:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shellcheck
-
-  check-shellcheck-config-enabled-optional-checks:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shellcheck-config-enabled-optional-checks
-
-  check-shellcheck-gha:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shellcheck-gha
-
-  check-shfmt:
-    needs: mise-cache-ubuntu
-    uses: ./.github/workflows/mise-task.yaml
-    with:
-      directory: .
-      task: check:shfmt
+    uses: ./.github/workflows/checks-mise.yaml
 
   # CI workflows for projects in the repository
   ci-aoc-main:
@@ -178,14 +126,7 @@ jobs:
   check:
     if: always()
     needs:
-      - check-prettier
-      - check-pyright-repo
-      - check-ruff
-      - check-ruff-format
-      - check-shellcheck
-      - check-shellcheck-config-enabled-optional-checks
-      - check-shellcheck-gha
-      - check-shfmt
+      - checks-mise
       - ci-aoc-main
       - ci-solvers-cpp
       - ci-solvers-python
