@@ -68,30 +68,41 @@ echo "::group::Environment variable changes"
 } | tee -a "${GITHUB_ENV}"
 echo "::endgroup::"
 
+install_directories="."
+if [[ "${CACHE_MODE}" = "prepare" ]]; then
+  install_directories="${install_directories} aoc-main"
+  # Use of mise tools in CI on different OSes for solvers:
+  #   - C++: macOS and Ubuntu
+  #   - Python: Ubuntu
+  #   - Rust: macOS and Ubuntu
+  install_directories="${install_directories} solvers/cpp"
+  if [[ "${RUNNER_OS}" = "Linux" ]]; then
+    install_directories="${install_directories} solvers/python"
+  fi
+  install_directories="${install_directories} solvers/rust"
+elif [[ "${DIRECTORY}" != "." ]]; then
+  install_directories="${install_directories} aoc-main ${DIRECTORY}"
+fi
+
+deduplicated=""
+for directory in ${install_directories}; do
+  case " ${deduplicated} " in
+  *" ${directory} "*) continue ;;
+  *) ;;
+  esac
+  deduplicated="${deduplicated} ${directory}"
+done
+install_directories=${deduplicated# }
+
 echo "::group::Outputs from init"
 {
   echo "mise-version=${MISE_VERSION}"
 
   # Install directories
   echo "mise-install-directories<<ENDDIRS"
-  echo "."
-  if [[ "${CACHE_MODE}" = "prepare" ]]; then
-    echo "aoc-main"
-    # Use of mise tools in CI on different OSes for solvers:
-    #   - C++: macOS and Ubuntu
-    #   - Python: Ubuntu
-    #   - Rust: macOS and Ubuntu
-    echo "solvers/cpp"
-    if [[ "${RUNNER_OS}" = "Linux" ]]; then
-      echo "solvers/python"
-    fi
-    echo "solvers/rust"
-  elif [[ "${DIRECTORY}" != "." ]]; then
-    if [[ "${DIRECTORY}" != "aoc-main" ]]; then
-      echo "aoc-main"
-    fi
-    echo "${DIRECTORY}"
-  fi
+  for directory in ${install_directories}; do
+    echo "${directory}"
+  done
   echo "ENDDIRS"
 
   # Mise cache paths
