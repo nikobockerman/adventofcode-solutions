@@ -35,7 +35,7 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-mise-root-ubuntu
 
-  # uv cache prepare for aoc-main
+  # uv cache prepare
   uv-cache-aoc-main-macos:
     needs: mise-cache-macos
     uses: ./.github/workflows/mise-uv-prepare-cache.yaml
@@ -55,6 +55,16 @@ jobs:
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-uv-aoc-main-ubuntu
+
+  uv-cache-solvers-python-ubuntu:
+    needs: mise-cache-ubuntu
+    uses: ./.github/workflows/mise-uv-prepare-cache.yaml
+    with:
+      directory: solvers/python
+      runner: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-uv-solvers-python-ubuntu
 
   # Homebrew cache prepare
   homebrew-cache-macos:
@@ -78,14 +88,29 @@ jobs:
     needs: mise-cache-ubuntu
     uses: ./.github/workflows/checks-mise.yaml
 
-  # CI workflows for projects in the repository
-  ci-aoc-main:
+  checks-aoc-main:
     needs:
       - mise-cache-ubuntu
       - uv-cache-aoc-main-ubuntu
-    uses: ./.github/workflows/ci-python-project.yaml
+    uses: ./.github/workflows/checks-python.yaml
     with:
       directory: aoc-main
+
+  checks-solvers-python:
+    needs:
+      - mise-cache-ubuntu
+      - uv-cache-solvers-python-ubuntu
+    uses: ./.github/workflows/checks-python.yaml
+    with:
+      directory: solvers/python
+
+  # Run the Python solvers
+  solvers-python:
+    needs:
+      - mise-cache-ubuntu
+      - uv-cache-solvers-python-ubuntu
+    uses: ./.github/workflows/python-run.yaml
+    secrets: inherit
 
   # CI for C++ solvers
   ci-solvers-cpp:
@@ -102,16 +127,6 @@ jobs:
       homebrew-downloads-hash-from-prepare-macos: ${{ needs.homebrew-cache-macos.outputs.downloads-hash }}
       homebrew-downloads-hash-from-prepare-ubuntu: ${{ needs.homebrew-cache-ubuntu.outputs.downloads-hash }}
 
-  # CI for Python solvers
-  ci-solvers-python:
-    needs:
-      - mise-cache-ubuntu
-      - uv-cache-aoc-main-ubuntu
-    uses: ./.github/workflows/ci-python-project.yaml
-    secrets: inherit
-    with:
-      directory: solvers/python
-
   # CI for Rust solvers
   ci-solvers-rust:
     needs:
@@ -126,11 +141,12 @@ jobs:
   check:
     if: always()
     needs:
+      - checks-aoc-main
       - checks-mise
-      - ci-aoc-main
+      - checks-solvers-python
       - ci-solvers-cpp
-      - ci-solvers-python
       - ci-solvers-rust
+      - solvers-python
     runs-on: ubuntu-24.04
     timeout-minutes: 5
 
