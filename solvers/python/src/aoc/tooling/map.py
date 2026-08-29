@@ -163,16 +163,19 @@ class Map2d[Map2dDataType = str]:
 
     @overload
     def iter_data(
-        self, *, direction: IterDirection
-    ) -> Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]: ...
-    @overload
-    def iter_data(
         self, *, direction: Literal[IterDirection.Rows] = IterDirection.Rows
     ) -> Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]: ...
     @overload
     def iter_data(
-        self, first_y: Y, first_x: X, *, direction: IterDirection
+        self, *, direction: Literal[IterDirection.Columns]
     ) -> Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]: ...
+    @overload
+    def iter_data(
+        self, *, direction: IterDirection
+    ) -> (
+        Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]
+        | Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]
+    ): ...
     @overload
     def iter_data(
         self,
@@ -181,6 +184,37 @@ class Map2d[Map2dDataType = str]:
         *,
         direction: Literal[IterDirection.Rows] = IterDirection.Rows,
     ) -> Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]: ...
+    @overload
+    def iter_data(
+        self, first_y: Y, first_x: X, *, direction: Literal[IterDirection.Columns]
+    ) -> Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]: ...
+    @overload
+    def iter_data(
+        self, first_y: Y, first_x: X, *, direction: IterDirection
+    ) -> (
+        Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]
+        | Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]
+    ): ...
+    @overload
+    def iter_data(
+        self,
+        first_y: Y,
+        first_x: X,
+        last_y: Y,
+        last_x: X,
+        *,
+        direction: Literal[IterDirection.Rows] = IterDirection.Rows,
+    ) -> Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]: ...
+    @overload
+    def iter_data(
+        self,
+        first_y: Y,
+        first_x: X,
+        last_y: Y,
+        last_x: X,
+        *,
+        direction: Literal[IterDirection.Columns],
+    ) -> Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]: ...
     @overload
     def iter_data(
         self,
@@ -190,17 +224,10 @@ class Map2d[Map2dDataType = str]:
         last_x: X,
         *,
         direction: IterDirection,
-    ) -> Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]: ...
-    @overload
-    def iter_data(
-        self,
-        first_y: Y,
-        first_x: X,
-        last_y: Y,
-        last_x: X,
-        *,
-        direction: Literal[IterDirection.Rows] = IterDirection.Rows,
-    ) -> Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]: ...
+    ) -> (
+        Iterable[tuple[Y, Iterable[tuple[X, Map2dDataType]]]]
+        | Iterable[tuple[X, Iterable[tuple[Y, Map2dDataType]]]]
+    ): ...
 
     def iter_data(
         self,
