@@ -73,6 +73,7 @@ runs:
       with:
         cache: false
         cache_save: false
+        export_path: false
         install: false
         version: ${{ steps.init.outputs.mise-version }}
         working_directory: ${{ inputs.directory }}
