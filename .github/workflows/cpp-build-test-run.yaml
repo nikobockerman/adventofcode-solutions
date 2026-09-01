@@ -217,6 +217,7 @@ jobs:
         name: sccache stats
         run: sccache --show-stats
         shell: bash
+        working-directory: solvers/cpp
 
       - name: Finalize cmake project
         uses: ./.github/actions/cmake-project-finalize
