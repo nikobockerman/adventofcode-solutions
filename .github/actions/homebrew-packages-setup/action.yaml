@@ -33,7 +33,7 @@ runs:
         # renovate: datasource=custom.homebrew depName=gcc extractVersion=^(?<version>\d+)\.\d+\.\d+$
         GCC_MAJOR_VERSION: 16
         # renovate: datasource=custom.homebrew depName=llvm extractVersion=^(?<version>\d+)\.\d+\.\d+$
-        LLVM_MAJOR_VERSION: 22
+        LLVM_MAJOR_VERSION: 23
       run: |
         # Initialize action
         "${GITHUB_ACTION_PATH}/init.sh"
