@@ -56,6 +56,10 @@ jobs:
     runs-on: ${{ matrix.runsOn }}
     timeout-minutes: 30
 
+    defaults:
+      run:
+        working-directory: solvers/cpp
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -129,37 +133,35 @@ jobs:
           MATRIX_CXXLIB: ${{ matrix.cxxLib }}
           MATRIX_OS: ${{ matrix.os }}
         run: |
-          python3 .github/scripts/generate-cpp-ci-config.py config \
+          python3 "${GITHUB_WORKSPACE}"/.github/scripts/generate-cpp-ci-config.py \
+            config \
             --os "${MATRIX_OS}" \
             --compiler "${MATRIX_COMPILER}" \
             --cxx-lib "${MATRIX_CXXLIB}" \
             --build-type "${MATRIX_BUILDTYPE}"
 
-          echo "::group::Generated solvers/cpp/CMakeUserPresets.json"
-          cat solvers/cpp/CMakeUserPresets.json
+          echo "::group::Generated CMakeUserPresets.json"
+          cat CMakeUserPresets.json
           echo "::endgroup::"
 
-          echo "::group::Generated solvers/cpp/ci.env"
-          cat solvers/cpp/ci.env
+          echo "::group::Generated ci.env"
+          cat ci.env
           echo "::endgroup::"
 
-          echo "::group::Generated solvers/cpp/conan-profile-ci"
-          cat solvers/cpp/conan-profile-ci
+          echo "::group::Generated conan-profile-ci"
+          cat conan-profile-ci
           echo "::endgroup::"
         shell: bash
 
       - name: Configure CMake
-        working-directory: solvers/cpp
         run: cmake --preset ci
         shell: bash
 
       - name: Build CMake project
-        working-directory: solvers/cpp
         run: cmake --build build/
         shell: bash
 
       - name: Test CMake project
-        working-directory: solvers/cpp
         run: |
           # shellcheck source=/dev/null
           source ci.env
@@ -189,7 +191,7 @@ jobs:
               exit 1
               ;;
           esac
-          mise run cpp:verify-runtime-stdlib -- solvers/cpp/build "${stdlib}" "${expectedPrefix}"
+          mise run cpp:verify-runtime-stdlib -- build "${stdlib}" "${expectedPrefix}"
         shell: bash
 
       - name: Restore aoc-main uv project
@@ -208,7 +210,7 @@ jobs:
           AOC_CPP_PRESET: ci
         run: |
           # shellcheck source=/dev/null
-          source solvers/cpp/ci.env
+          source ci.env
           mise run aoc:all -- --solver cpp
         shell: bash
 
@@ -217,7 +219,6 @@ jobs:
         name: sccache stats
         run: sccache --show-stats
         shell: bash
-        working-directory: solvers/cpp
 
       - name: Finalize cmake project
         uses: ./.github/actions/cmake-project-finalize
