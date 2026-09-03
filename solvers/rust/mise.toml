@@ -7,7 +7,22 @@ depends = [
 ]
 
 [tasks."check:rustfmt"]
-run = "cargo fmt --check"
+run = """
+cargo fmt --check
+
+#set -x
+warnings=$(
+  cargo fmt --check 2>&1 \
+  | grep "Warning:" \
+  | grep hex_literal_case \
+  | grep "unstable features" \
+  | wc -l \
+  | tr -d '[:space:]')
+if [ "$warnings" -gt 0 ]; then
+    echo "Found $warnings warnings" >&2
+    exit 1
+fi
+"""
 
 [tasks.fix]
 depends = [
