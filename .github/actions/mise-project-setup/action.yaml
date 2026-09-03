@@ -133,6 +133,8 @@ runs:
 
         echo "::group::Environment changes for rest of workflow"
         {
+          echo "MISE_NOT_FOUND_AUTO_INSTALL=false"
+          echo "MISE_NOT_FOUND_SYSTEM_FALLBACK=false"
           echo "MISE_OFFLINE=true"
           echo "MISE_PREPARE_AUTO=false"
           echo "UV_PYTHON_DOWNLOADS=never"
