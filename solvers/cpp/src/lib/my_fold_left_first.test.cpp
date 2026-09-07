@@ -1,7 +1,9 @@
 #define TEST_MY_FOLD_LEFT_FIRST
 #include "my_fold_left_first.hpp"
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_fold >= 202207L
+// TODO: Remove when older than llvm 23 are no longer desired
+#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_fold >= 202207L && \
+  _LIBCPP_VERSION < 230100L
 #error "libc++ started supporting std::ranges::fold_left_first. Use it directly"
 #endif
 

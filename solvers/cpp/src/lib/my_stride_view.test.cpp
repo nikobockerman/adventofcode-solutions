@@ -7,7 +7,9 @@
 #include <string>
 #include <string_view>
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_stride >= 202207L
+// TODO: Remove when older than llvm 23 are no longer desired
+#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_stride >= 202207L && \
+  _LIBCPP_VERSION < 230100L
 #error "libc++ started supporting std::views::stride. Use it directly"
 #endif
 

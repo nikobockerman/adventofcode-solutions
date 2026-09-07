@@ -8,7 +8,9 @@
 #include <string>
 #include <tuple>
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_enumerate >= 202302L
+// TODO: Remove when older than llvm 23 are no longer desired
+#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_enumerate >= 202302L && \
+  _LIBCPP_VERSION < 230100L
 #error "libc++ started supporting std::views::enumerate. Use it directly"
 #endif
 
