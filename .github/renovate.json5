@@ -13,6 +13,7 @@
   conan: {
     enabled: true,
   },
+  configMigration: true,
   customDatasources: {
     // Tracks the version Homebrew ships (not upstream releases, which land
     // before Homebrew bottles exist), via https://formulae.brew.sh.
