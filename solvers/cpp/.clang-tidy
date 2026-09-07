@@ -13,7 +13,12 @@ Checks: >-
   performance-*,
   portability-*, -portability-avoid-pragma-once,
   readability-*, -readability-identifier-length,
-  -bugprone-exception-escape, -misc-include-cleaner, -modernize-use-trailing-return-type
+  -bugprone-exception-escape,
+  -google-readability-todo,
+  -misc-const-correctness,
+  -misc-include-cleaner,
+  -modernize-use-trailing-return-type,
+  -readability-trailing-comma
 CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: "true"
   cppcoreguidelines-macro-usage.AllowedRegexp: "^ASSERT_HAS_VALUE"
