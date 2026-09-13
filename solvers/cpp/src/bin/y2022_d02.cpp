@@ -43,7 +43,7 @@ constexpr auto battleScore(OpponentType opponent, OwnType own) -> unsigned {
     return scoreEven;
   }
 
-  auto iWin = [=] {
+  const auto iWin = [=] {
     switch (opponent.get()) {
       case Type::Paper:
         return own.get() == Type::Scissors;
@@ -86,11 +86,11 @@ constexpr auto parseOpponent(char move) {
 }
 
 constexpr auto parseBattleMarks(auto&& line) {
-  auto end = line.end();
+  const auto end = line.end();
   auto iter = line.begin();
-  auto opponentMark = *iter;
+  const auto opponentMark = *iter;
   ranges::advance(iter, 2, end);
-  auto meMark = *iter;
+  const auto meMark = *iter;
   if (iter == end) {
     throw std::runtime_error("Unpexpected line");
   }
@@ -103,7 +103,7 @@ constexpr auto getBattleMarks(auto&& range) {
 }
 
 constexpr auto sumBattleScores(auto&& range) -> uint64_t {
-  auto result = MyFoldLeftFirst(
+  const auto result = MyFoldLeftFirst(
     range | views::transform([](auto&& battle) { return battle.score(); }),
     std::plus());
   if (!result) {
@@ -115,7 +115,7 @@ constexpr auto sumBattleScores(auto&& range) -> uint64_t {
 }  // namespace
 
 auto solver::p1(std::string_view inputStr) -> Answer {
-  auto parseMe = [](char move) constexpr {
+  const auto parseMe = [](char move) constexpr {
     switch (move) {
       case 'X':
         return OwnType{Type::Rock};
@@ -162,7 +162,7 @@ constexpr auto winningType(Type opponent) {
 }  // namespace
 
 auto solver::p2(std::string_view inputStr) -> Answer {
-  auto parseMe = [](OpponentType opponent, char move) {
+  const auto parseMe = [](OpponentType opponent, char move) {
     switch (move) {
       case 'X':
         return OwnType{losingType(opponent.get())};
@@ -176,7 +176,7 @@ auto solver::p2(std::string_view inputStr) -> Answer {
   };
   return sumBattleScores(
     getBattleMarks(inputStr) | views::transform([&parseMe](auto marks) {
-      auto opponent = parseOpponent(marks.first);
+      const auto opponent = parseOpponent(marks.first);
       return Battle{opponent, parseMe(opponent, marks.second)};
     }));
 }

@@ -21,12 +21,12 @@ class Section {
 };
 
 constexpr auto getSection(auto&& range) -> Section {
-  auto values = range | views::split('-') | ranges::to<std::vector>();
+  const auto values = range | views::split('-') | ranges::to<std::vector>();
   return {convert<unsigned>(values.at(0)), convert<unsigned>(values.at(1))};
 }
 
 constexpr auto getSectionPair(auto&& line) {
-  auto pairs = line | views::split(',') | ranges::to<std::vector>();
+  const auto pairs = line | views::split(',') | ranges::to<std::vector>();
   return std::make_pair(getSection(pairs.at(0)), getSection(pairs.at(1)));
 }
 
@@ -46,8 +46,7 @@ constexpr auto areContained(auto& sectionPair) {
 }
 
 constexpr auto solve1(auto inputStr) {
-  auto pairs = getSectionPairs(inputStr);
-  return ranges::count_if(pairs,
+  return ranges::count_if(getSectionPairs(inputStr),
                           [](const auto& pair) { return areContained(pair); });
 }
 
@@ -67,8 +66,7 @@ constexpr auto areSeparate(auto& sectionPair) {
 constexpr auto overlap(auto& sectionPair) { return !areSeparate(sectionPair); }
 
 constexpr auto solve2(auto inputStr) {
-  auto pairs = getSectionPairs(inputStr);
-  return ranges::count_if(pairs,
+  return ranges::count_if(getSectionPairs(inputStr),
                           [](const auto& pair) { return overlap(pair); });
 }
 

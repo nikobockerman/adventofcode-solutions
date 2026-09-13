@@ -28,7 +28,7 @@ constexpr auto lowerCaseValue(char character) -> unsigned {
 
 constexpr auto isLowerCase(char character) {
   constexpr unsigned maxLowerCaseValue{'z' - 'a'};
-  auto value = lowerCaseValue(character);
+  const auto value = lowerCaseValue(character);
   return value <= maxLowerCaseValue;
 }
 
@@ -36,7 +36,7 @@ constexpr auto lowerCasePriority(char character) {
   constexpr unsigned minPriority{1};
   constexpr unsigned maxPriority{26};
 
-  auto result = lowerCaseValue(character) + minPriority;
+  const auto result = lowerCaseValue(character) + minPriority;
   if (result < minPriority || result > maxPriority) {
     throw std::runtime_error("Invalid value");
   }
@@ -49,7 +49,7 @@ constexpr auto upperCaseValue(char character) -> unsigned {
 
 constexpr auto isUpperCase(char character) {
   constexpr unsigned maxUpperCaseValue{'Z' - 'A'};
-  auto value = upperCaseValue(character);
+  const auto value = upperCaseValue(character);
   return value <= maxUpperCaseValue;
 }
 
@@ -57,7 +57,7 @@ constexpr auto upperCasePriority(char character) {
   constexpr unsigned minPriority{27};
   constexpr unsigned maxPriority{52};
 
-  auto result = upperCaseValue(character) + minPriority;
+  const auto result = upperCaseValue(character) + minPriority;
   if (result < minPriority || result > maxPriority) {
     throw std::runtime_error("Invalid value");
   }
@@ -75,10 +75,10 @@ constexpr auto priority(char sharedItem) -> unsigned {
 }
 
 constexpr auto sumScore(auto&& items) -> uint64_t {
-  auto result = MyFoldLeftFirst(items | views::transform([](auto character) {
-                                  return priority(character);
-                                }),
-                                std::plus());
+  const auto result = MyFoldLeftFirst(
+    items |
+      views::transform([](auto character) { return priority(character); }),
+    std::plus());
   if (!result) {
     throw std::runtime_error("No result");
   }
@@ -104,9 +104,9 @@ constexpr auto getSharedItem(auto&& rucksack) {
     throw std::runtime_error("Empty rucksack");
   }
 
-  auto [firstItems, secondItems] = getCompartments(rucksack);
-  auto first = vectorSet(std::move(firstItems));
-  auto second = vectorSet(std::move(secondItems));
+  const auto [firstItems, secondItems] = getCompartments(rucksack);
+  const auto first = vectorSet(std::move(firstItems));
+  const auto second = vectorSet(std::move(secondItems));
 
   auto intersection = std::vector<char>{};
   ranges::set_intersection(first, second, std::back_inserter(intersection));
@@ -130,13 +130,13 @@ auto solver::p1(std::string_view inputStr) -> Answer {
 namespace {
 
 constexpr auto getGroupBadgeItem(auto&& groupRuckSacks) -> char {
-  auto end = groupRuckSacks.end();
+  const auto end = groupRuckSacks.end();
   auto iter = groupRuckSacks.begin();
-  auto first = vectorSet(*iter);
+  const auto first = vectorSet(*iter);
   ranges::advance(iter, 1, end);
-  auto second = vectorSet(*iter);
+  const auto second = vectorSet(*iter);
   ranges::advance(iter, 1, end);
-  auto third = vectorSet(*iter);
+  const auto third = vectorSet(*iter);
 
   if (iter == end) {
     spdlog::debug("Invalid group size: {}", ranges::distance(groupRuckSacks));
@@ -155,7 +155,7 @@ constexpr auto getGroupBadgeItem(auto&& groupRuckSacks) -> char {
     throw std::runtime_error("Unexpected number of intersections");
   }
 
-  auto badge = intersection.at(0);
+  const auto badge = intersection.at(0);
   spdlog::debug("Group badge found: {}", badge);
   return badge;
 }

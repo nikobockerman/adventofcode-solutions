@@ -15,7 +15,6 @@ Checks: >-
   readability-*, -readability-identifier-length,
   -bugprone-exception-escape,
   -google-readability-todo,
-  -misc-const-correctness,
   -misc-include-cleaner,
   -modernize-use-trailing-return-type,
   -readability-trailing-comma

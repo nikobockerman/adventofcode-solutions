@@ -55,7 +55,7 @@ class Lock final {
  public:
   auto rotate(Rotation rotation) -> unsigned {
     auto zeros = rotation._steps / maxSteps;
-    auto steps = rotation._steps % maxSteps;
+    const auto steps = rotation._steps % maxSteps;
     if (rotation._dir == Direction::Left) {
       if (steps > _position) {
         if (_position > 0) {
@@ -91,17 +91,17 @@ auto parseRotations(const std::string_view inputStr) {
 
 auto solve(const std::string_view inputStr, bool includeZerosDuringRotations)
   -> uint64_t {
-  auto rotations = parseRotations(inputStr);
-  auto result = MyFoldLeftFirst(
-    rotations | views::transform([lock = Lock(), includeZerosDuringRotations](
-                                   auto&& rotation) mutable -> unsigned {
-      auto zerosDuringRotation = lock.rotate(rotation);
-      auto zeros = lock.position() == 0 ? 1U : 0U;
-      if (includeZerosDuringRotations) {
-        zeros += zerosDuringRotation;
-      }
-      return zeros;
-    }),
+  const auto result = MyFoldLeftFirst(
+    parseRotations(inputStr) |
+      views::transform([lock = Lock(), includeZerosDuringRotations](
+                         auto&& rotation) mutable -> unsigned {
+        const auto zerosDuringRotation = lock.rotate(rotation);
+        auto zeros = lock.position() == 0 ? 1U : 0U;
+        if (includeZerosDuringRotations) {
+          zeros += zerosDuringRotation;
+        }
+        return zeros;
+      }),
     std::plus{});
   if (!result) {
     throw std::runtime_error("No rotations");

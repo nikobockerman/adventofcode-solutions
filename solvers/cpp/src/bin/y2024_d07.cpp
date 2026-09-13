@@ -89,15 +89,15 @@ template <bool allowConcatenationOperator>
     const auto [eqResult, nextValue, nextIndex] = pq.top();
     pq.pop();
 
-    for (auto operator_ : operators) {
+    for (const auto operator_ : operators) {
       auto newEqResult = applyOperator<allowConcatenationOperator>(
         eqResult, nextValue, operator_);
       if (newEqResult > expectedResult) {
         continue;
       }
 
-      if (auto newNextInfo = getNextValueAndIndex(nextIndex, numbers)) {
-        auto [newNextValue, newNextIndex] = *newNextInfo;
+      if (const auto newNextInfo = getNextValueAndIndex(nextIndex, numbers)) {
+        const auto [newNextValue, newNextIndex] = *newNextInfo;
         pq.emplace(newEqResult, newNextValue, newNextIndex);
       } else if (newEqResult == expectedResult) {
         return true;
@@ -130,17 +130,18 @@ class PossibleEquation {
 
 template <bool allowConcatenationOperator>
 auto solve(std::string_view input) {
-  auto result = MyFoldLeftFirst(
+  const auto result = MyFoldLeftFirst(
     splitLinesUntilEmpty(input) | MyEnumerate |
       views::transform([](auto&& args) -> std::optional<uint64_t> {
-        auto [index, line] = args;
-        auto parts = line | views::split(':') | ranges::to<std::vector>();
-        auto testValue = convert<uint64_t>(parts.at(0));
-        auto values = parts.at(1) | views::drop(1) | views::split(' ') |
-                      views::transform(
-                        [](auto&& value) { return convert<uint64_t>(value); }) |
-                      ranges::to<std::vector>();
-        auto eq = PossibleEquation<allowConcatenationOperator>{
+        const auto [index, line] = args;
+        const auto parts = line | views::split(':') | ranges::to<std::vector>();
+        const auto testValue = convert<uint64_t>(parts.at(0));
+        const auto values = parts.at(1) | views::drop(1) | views::split(' ') |
+                            views::transform([](auto&& value) {
+                              return convert<uint64_t>(value);
+                            }) |
+                            ranges::to<std::vector>();
+        const auto eq = PossibleEquation<allowConcatenationOperator>{
           testValue, std::move(values)};
         if (eq.canBeMadeTrue()) {
           spdlog::info("Possible Equation: {} -> {}", index, testValue);

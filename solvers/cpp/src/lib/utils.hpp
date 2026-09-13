@@ -19,7 +19,7 @@ constexpr auto splitLinesUntilEmpty(auto&& range) {
 constexpr auto vectorSet(auto&& range) {
   auto vector = range | std::ranges::to<std::vector>();
   std::ranges::sort(vector);
-  auto ret = std::ranges::unique(vector);
+  const auto ret = std::ranges::unique(vector);
   vector.erase(ret.begin(), ret.end());
   return vector;
 }
