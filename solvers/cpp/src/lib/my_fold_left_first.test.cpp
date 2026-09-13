@@ -55,7 +55,7 @@ TEST(MyFoldLeftFirst, Multiple) {
   ASSERT_HAS_VALUE(result);
   EXPECT_EQ(*result, ExpectedResult);
 
-  auto iota = views::iota(1, End);
+  const auto iota = views::iota(1, End);
   result = MyFoldLeftFirst(iota.begin(), iota.end(), std::plus{});
   ASSERT_HAS_VALUE(result);
   EXPECT_EQ(*result, ExpectedResult);

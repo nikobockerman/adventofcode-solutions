@@ -28,15 +28,15 @@ class MyFoldLeftFirstFunction {
       return std::optional<RetVal>();
     }
 
-    auto init{*first};
+    const auto init{*first};
     return std::make_optional(std::ranges::fold_left(++first, last, init, fn));
   }
 
   template <std::ranges::input_range Rng, typename Fn>
   // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
   constexpr auto operator()(Rng&& rng, Fn fn) const {
-    auto cur = std::ranges::begin(rng);
-    auto end = std::ranges::end(rng);
+    const auto cur = std::ranges::begin(rng);
+    const auto end = std::ranges::end(rng);
     return (*this)(cur, end, fn);
   }
 };

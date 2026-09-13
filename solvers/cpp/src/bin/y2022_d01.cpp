@@ -49,11 +49,12 @@ auto solve2(std::string_view inputStr) -> uint64_t {
 
   constexpr std::size_t interestedSize{3};
 
-  auto pastInteresting = ranges::next(calorieSums.begin(), interestedSize);
+  const auto pastInteresting =
+    ranges::next(calorieSums.begin(), interestedSize);
   ranges::nth_element(calorieSums, pastInteresting, std::greater<>());
   spdlog::debug("Partitioned: {}", calorieSums);
 
-  auto result =
+  const auto result =
     MyFoldLeftFirst(calorieSums.begin(), pastInteresting, std::plus());
   if (!result) {
     throw std::runtime_error("No result");

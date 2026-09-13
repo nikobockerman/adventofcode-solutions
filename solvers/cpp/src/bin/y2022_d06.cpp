@@ -18,7 +18,7 @@ namespace {
 
 template <std::size_t windowSize>
 constexpr auto firstDistinctWindow(auto&& range) {
-  auto notStarts =
+  const auto notStarts =
     range | MySlide(windowSize) | views::take_while([](auto&& window) {
       auto vector = window | ranges::to<std::vector>();
       ranges::sort(vector);

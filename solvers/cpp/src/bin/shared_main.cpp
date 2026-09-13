@@ -28,8 +28,8 @@ auto processArgs(const std::span<const char*> args) {
     throw std::runtime_error(
       std::format("Invalid number of arguments: {}", args.size()));
   }
-  auto verbosity = convert<std::uint8_t>(std::string_view{args.at(1)});
-  auto part = convert<std::uint8_t>(std::string_view{args.at(2)});
+  const auto verbosity = convert<std::uint8_t>(std::string_view{args.at(1)});
+  const auto part = convert<std::uint8_t>(std::string_view{args.at(2)});
 
   if (verbosity > 2) {
     throw std::runtime_error(
@@ -51,7 +51,7 @@ auto processArgs(const std::span<const char*> args) {
 auto run(const std::span<const char*>& args) -> int {
   const auto part = processArgs(args);
 
-  auto stderr_logger = spdlog::stderr_color_mt("stderr");
+  const auto stderr_logger = spdlog::stderr_color_mt("stderr");
   spdlog::set_default_logger(stderr_logger);
 
   std::string inputStr;
@@ -67,7 +67,8 @@ auto run(const std::span<const char*>& args) -> int {
     }
   }
 
-  auto answer = part == Part::P1 ? solver::p1(inputStr) : solver::p2(inputStr);
+  const auto answer =
+    part == Part::P1 ? solver::p1(inputStr) : solver::p2(inputStr);
   std::print("{}\n", answer);
 
   return 0;
