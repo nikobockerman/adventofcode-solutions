@@ -4,11 +4,14 @@
 #include <gtest/gtest.h>
 
 #include <ranges>
-#include <span>
 #include <string>
+#include <vector>
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_slide >= 202202L
+#ifdef _LIBCPP_VERSION
+#include <version>  // NOLINT(misc-include-cleaner)
+#if defined(__cpp_lib_ranges_slide) && __cpp_lib_ranges_slide >= 202202L
 #error "libc++ started supporting std::views::slide. Use it directly"
+#endif
 #endif
 
 namespace ranges = std::ranges;

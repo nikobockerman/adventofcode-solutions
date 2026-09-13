@@ -3,12 +3,16 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <ranges>
 #include <string>
-#include <string_view>
+#include <vector>
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_stride >= 202207L
+#ifdef _LIBCPP_VERSION
+#include <version>  // NOLINT(misc-include-cleaner)
+#if defined(__cpp_lib_ranges_stride) && __cpp_lib_ranges_stride >= 202207L
 #error "libc++ started supporting std::views::stride. Use it directly"
+#endif
 #endif
 
 namespace ranges = std::ranges;

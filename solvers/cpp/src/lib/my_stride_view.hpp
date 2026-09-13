@@ -1,15 +1,18 @@
 #pragma once
 
 #include <ranges>
-#include <utility>
+#include <version>
 
-#if !defined(TEST_MY_STRIDE_VIEW) && __cpp_lib_ranges_stride >= 202207L
+#if !defined(TEST_MY_STRIDE_VIEW) && defined(__cpp_lib_ranges_stride) && \
+  __cpp_lib_ranges_stride >= 202207L
 
 inline constexpr auto MyStride = std::views::stride;
 
 #else
 
 #include <cstddef>
+#include <iterator>
+#include <utility>
 
 namespace internal {
 
