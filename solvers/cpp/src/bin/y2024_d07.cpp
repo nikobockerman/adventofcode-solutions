@@ -35,8 +35,11 @@ template <bool allowConcatenateOperator,
           size_t size = allowConcatenateOperator ? 3 : 2>
 consteval auto getOperators() -> std::array<const Operator, size> {
   if constexpr (allowConcatenateOperator) {
-    return std::array<const Operator, size>{Operator::Multiply, Operator::Plus,
-                                            Operator::Concatenate};
+    return std::array<const Operator, size>{
+      Operator::Multiply,
+      Operator::Plus,
+      Operator::Concatenate,
+    };
   }
   return std::array<const Operator, size>{Operator::Multiply, Operator::Plus};
 }
@@ -142,7 +145,9 @@ auto solve(std::string_view input) {
                             }) |
                             ranges::to<std::vector>();
         const auto eq = PossibleEquation<allowConcatenationOperator>{
-          testValue, std::move(values)};
+          testValue,
+          std::move(values),
+        };
         if (eq.canBeMadeTrue()) {
           spdlog::info("Possible Equation: {} -> {}", index, testValue);
           return eq.testResult();

@@ -48,7 +48,8 @@ auto parseRotation(auto&& str) -> Rotation {
   ranges::advance(stepsBegin, 1, str.end());
   return Rotation{
     ._dir = parseDirection(*str.begin()),
-    ._steps = convert<unsigned>(ranges::subrange(stepsBegin, str.end()))};
+    ._steps = convert<unsigned>(ranges::subrange(stepsBegin, str.end())),
+  };
 }
 
 class Lock final {

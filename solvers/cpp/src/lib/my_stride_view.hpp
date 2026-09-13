@@ -63,13 +63,19 @@ class MyStrideView : public std::ranges::view_interface<MyStrideView<Rng>> {
     : _base{std::views::all(std::move(rng))}, _n{n} {}
 
   [[nodiscard]] constexpr auto begin() const noexcept(noexcept(Iterator{
-    std::ranges::begin(_base), std::ranges::end(_base), _n}))
+    std::ranges::begin(_base),
+    std::ranges::end(_base),
+    _n,
+  }))
     requires std::ranges::range<const Base>
   {
     return Iterator{std::ranges::begin(_base), std::ranges::end(_base), _n};
   }
   [[nodiscard]] constexpr auto begin() noexcept(noexcept(Iterator{
-    std::ranges::begin(_base), std::ranges::end(_base), _n})) {
+    std::ranges::begin(_base),
+    std::ranges::end(_base),
+    _n,
+  })) {
     return Iterator{std::ranges::begin(_base), std::ranges::end(_base), _n};
   }
 

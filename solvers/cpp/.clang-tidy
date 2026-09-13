@@ -16,8 +16,7 @@ Checks: >-
   -bugprone-exception-escape,
   -google-readability-todo,
   -misc-include-cleaner,
-  -modernize-use-trailing-return-type,
-  -readability-trailing-comma
+  -modernize-use-trailing-return-type
 CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: "true"
   cppcoreguidelines-macro-usage.AllowedRegexp: "^ASSERT_HAS_VALUE"
