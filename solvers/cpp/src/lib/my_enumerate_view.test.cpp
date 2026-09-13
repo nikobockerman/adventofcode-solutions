@@ -3,10 +3,13 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <ranges>
-#include <span>
 #include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
+#include <version>
 
 // TODO: Remove when older than llvm 23 are no longer desired
 #if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_enumerate >= 202302L && \

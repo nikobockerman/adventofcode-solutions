@@ -1,10 +1,17 @@
+#include "answer.hpp"
+#include "convert.hpp"
 #include "my_fold_left_first.hpp"
 #include "solver.hpp"
 #include "utils.hpp"
 
 #include <spdlog/spdlog.h>
 
-#include <convert.hpp>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <ranges>
+#include <stdexcept>
+#include <string_view>
 
 namespace ranges = std::ranges;
 namespace views = std::views;

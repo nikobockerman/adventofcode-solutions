@@ -3,9 +3,12 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <vector>
+#include <version>
 
 // TODO: Remove when older than llvm 23 are no longer desired
 #if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_stride >= 202207L && \

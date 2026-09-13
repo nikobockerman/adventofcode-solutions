@@ -8,10 +8,12 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <format>
 #include <iterator>
 #include <ranges>
 #include <stdexcept>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace ranges = std::ranges;

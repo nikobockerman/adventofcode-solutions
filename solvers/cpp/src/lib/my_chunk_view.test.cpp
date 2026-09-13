@@ -4,9 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <ranges>
-#include <span>
 #include <string>
-#include <tuple>
+#include <vector>
 
 #if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_chunk >= 202202L
 #error "libc++ started supporting std::views::chunk. Use it directly"

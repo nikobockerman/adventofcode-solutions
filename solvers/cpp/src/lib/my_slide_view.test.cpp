@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <ranges>
-#include <span>
 #include <string>
+#include <vector>
 
 #if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_slide >= 202202L
 #error "libc++ started supporting std::views::slide. Use it directly"
