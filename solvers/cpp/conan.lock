@@ -5,7 +5,7 @@
         "gtest/1.18.0#e2507fc4efe2ec9e2db9e5c91eefab9f%1786446847.733"
     ],
     "build_requires": [
-        "cmake/4.4.2#8a0d360635c870b1d5c675489ee25074%1786458127.662"
+        "cmake/4.4.3#c5b4d075979c7cb5d9649861acad0efe%1788855208.145"
     ],
     "python_requires": [],
     "config_requires": []
