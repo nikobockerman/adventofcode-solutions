@@ -1,7 +1,7 @@
 [tools]
 "pipx:clang-format" = "23.1.0"
 "pipx:gersemi" = "0.28.1"
-conan = "2.31.2"
+conan = "2.32.0"
 sccache = "0.17.0"
 
 [env]
