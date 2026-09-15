@@ -1,14 +1,18 @@
 #pragma once
 
 #include <ranges>
+#include <version>
 
-#if !defined(TEST_MY_SLIDE_VIEW) && __cpp_lib_ranges_slide >= 202202L
+#if !defined(TEST_MY_SLIDE_VIEW) && defined(__cpp_lib_ranges_slide) && \
+  __cpp_lib_ranges_slide >= 202202L
 
 inline constexpr auto MySlide = std::views::slide;
 
 #else
 
 #include <cstddef>
+#include <iterator>
+#include <utility>
 
 namespace internal {
 

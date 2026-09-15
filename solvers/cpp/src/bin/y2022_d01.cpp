@@ -26,12 +26,11 @@ namespace {
 constexpr auto resolveCalorieSums(auto&& input) {
   return input | views::split("\n\n"sv) |
          views::transform([](auto calorieLines) {
-           return MyFoldLeftFirst(  // NOLINT(misc-include-cleaner)
-                    splitLinesUntilEmpty(calorieLines) |
-                      views::transform([](auto calorieLine) {
-                        return convert<unsigned>(calorieLine);
-                      }),
-                    std::plus())
+           return MyFoldLeftFirst(splitLinesUntilEmpty(calorieLines) |
+                                    views::transform([](auto calorieLine) {
+                                      return convert<unsigned>(calorieLine);
+                                    }),
+                                  std::plus())
              .value();
          });
 }

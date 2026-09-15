@@ -4,12 +4,14 @@
 #include <gtest/gtest.h>
 
 #include <ranges>
-#include <span>
 #include <string>
-#include <tuple>
+#include <vector>
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_chunk >= 202202L
+#ifdef _LIBCPP_VERSION
+#include <version>  // NOLINT(misc-include-cleaner)
+#if defined(__cpp_lib_ranges_chunk) && __cpp_lib_ranges_chunk >= 202202L
 #error "libc++ started supporting std::views::chunk. Use it directly"
+#endif
 #endif
 
 namespace ranges = std::ranges;

@@ -1,12 +1,18 @@
 #pragma once
 
 #include <ranges>
+#include <version>
 
-#if !defined(TEST_MY_CHUNK_VIEW) && __cpp_lib_ranges_chunk >= 202202L
+#if !defined(TEST_MY_CHUNK_VIEW) && defined(__cpp_lib_ranges_chunk) && \
+  __cpp_lib_ranges_chunk >= 202202L
 
 inline constexpr auto MyChunk = std::views::chunk;
 
 #else
+
+#include <cstddef>
+#include <iterator>
+#include <utility>
 
 namespace internal {
 

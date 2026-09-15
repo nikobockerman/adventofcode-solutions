@@ -8,10 +8,14 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <format>
 #include <iterator>
 #include <ranges>
 #include <stdexcept>
+#include <string>  // NOLINT(misc-include-cleaner)
 #include <string_view>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 namespace ranges = std::ranges;
@@ -195,14 +199,14 @@ constexpr auto loadParts(auto&& range) {
 
 [[nodiscard]] constexpr auto applyMoveOneByOne(Stage stage, const Move& move)
   -> Stage {
-  return ranges::fold_left(  // NOLINT(misc-include-cleaner)
-    views::iota(std::size_t{}, move.amount()), std::move(stage),
-    [&move](auto prev, auto) {
-      auto stack = applySingleMove(std::move(prev), move.indexFromStack(),
-                                   move.indexToStack());
-      spdlog::debug("Intermediate stage: {}", stack);
-      return stack;
-    });
+  return ranges::fold_left(views::iota(std::size_t{}, move.amount()),
+                           std::move(stage), [&move](auto prev, auto) {
+                             auto stack = applySingleMove(std::move(prev),
+                                                          move.indexFromStack(),
+                                                          move.indexToStack());
+                             spdlog::debug("Intermediate stage: {}", stack);
+                             return stack;
+                           });
 }
 
 auto solve1(auto inputStr) {

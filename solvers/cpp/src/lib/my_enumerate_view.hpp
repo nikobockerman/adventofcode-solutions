@@ -1,12 +1,18 @@
 #pragma once
 
 #include <ranges>
+#include <version>
 
-#if !defined(TEST_MY_ENUMERATE_VIEW) && __cpp_lib_ranges_enumerate >= 202302L
+#if !defined(TEST_MY_ENUMERATE_VIEW) && defined(__cpp_lib_ranges_enumerate) && \
+  __cpp_lib_ranges_enumerate >= 202302L
 
 inline constexpr auto MyEnumerate = std::views::enumerate;
 
 #else
+
+#include <iterator>
+#include <tuple>
+#include <utility>
 
 namespace internal {
 

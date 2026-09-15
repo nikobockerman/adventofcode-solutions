@@ -3,13 +3,18 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <ranges>
-#include <span>
 #include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
-#if defined(_LIBCPP_VERSION) && __cpp_lib_ranges_enumerate >= 202302L
+#ifdef _LIBCPP_VERSION
+#include <version>  // NOLINT(misc-include-cleaner)
+#if defined(__cpp_lib_ranges_enumerate) && __cpp_lib_ranges_enumerate >= 202302L
 #error "libc++ started supporting std::views::enumerate. Use it directly"
+#endif
 #endif
 
 namespace ranges = std::ranges;

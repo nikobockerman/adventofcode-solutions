@@ -1,17 +1,18 @@
 #pragma once
 
 #include <algorithm>
+#include <version>
 
-#if !defined(TEST_MY_FOLD_LEFT_FIRST) && __cpp_lib_ranges_fold >= 202207L
+#if !defined(TEST_MY_FOLD_LEFT_FIRST) && defined(__cpp_lib_ranges_fold) && \
+  __cpp_lib_ranges_fold >= 202207L
 
 inline constexpr auto MyFoldLeftFirst = std::ranges::fold_left_first;
 
 #else
 
-#include <functional>
-#include <iterator>
 #include <optional>
 #include <ranges>
+#include <type_traits>
 
 namespace internal {
 
