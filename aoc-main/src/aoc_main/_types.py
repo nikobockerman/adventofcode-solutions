@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, NewType, TypeIs
+from typing import Literal, NewType, TypeIs, get_args
 
 Year = NewType("Year", int)
 Day = NewType("Day", int)
@@ -15,8 +15,8 @@ class PartId:
 
 
 def is_part(part: int) -> TypeIs[Part]:
-    return part in (1, 2)
+    return part in get_args(Part.evaluate_value())  # type: ignore [call-arg]
 
 
 def is_verbosity(verbosity: int) -> TypeIs[Verbosity]:
-    return verbosity in (0, 1, 2)
+    return verbosity in get_args(Verbosity.evaluate_value())  # type: ignore [call-arg]

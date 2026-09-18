@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 _logger = _logging.logger
 
-PresetType = Literal["build", "configure", "workflow"]
+type PresetType = Literal["build", "configure", "workflow"]
 
 
 class CMakePresetError(Exception):

@@ -5,7 +5,7 @@ import re
 from collections.abc import Iterable, Mapping
 from enum import Enum
 from queue import Queue
-from typing import Literal, NewType, TypeIs, cast
+from typing import Literal, NewType, TypeIs, cast, get_args
 
 from attrs import define, frozen
 
@@ -15,13 +15,14 @@ _logger = get_logger()
 
 
 type _Category = Literal["x", "m", "a", "s"]
-_categories: frozenset[_Category] = frozenset(("x", "m", "a", "s"))
+_categories_set: frozenset[_Category] = frozenset(get_args(_Category.evaluate_value()))  # type: ignore [call-arg]
+_categories_list: list[_Category] = list(get_args(_Category.evaluate_value()))  # type: ignore [call-arg]
 
 _Part = NewType("_Part", Mapping[_Category, int])
 
 
 def is_category(category: str) -> TypeIs[_Category]:
-    return category in _categories
+    return category in _categories_set
 
 
 class _Comparison(Enum):
@@ -278,7 +279,7 @@ def _category_value_ranges_from_rule(
                 else [range(rule.value + 1, 4_000 + 1)]
             )
         )
-        for category in _categories
+        for category in _categories_list
     }
 
 
@@ -293,7 +294,9 @@ def _possible_category_value_ranges(
 
 def _construct_workflow_steps(workflow: _Workflow) -> list[_WorkflowStep]:
     result = list[_WorkflowStep]()
-    failure_limits: dict[_Category, list[range] | None] = dict.fromkeys(_categories)
+    failure_limits: dict[_Category, list[range] | None] = dict.fromkeys(
+        _categories_list
+    )
     for rule in workflow.rules:
         category_value_ranges = _category_value_ranges_from_rule(rule)
         applicable_category_value_ranges = _merge_category_value_ranges(
@@ -317,7 +320,7 @@ def p2(input_str: str) -> int:
 
     queue = Queue[_WorkflowStep]()
     queue.put_nowait(
-        _WorkflowStep({cat: [range(1, 4_000 + 1)] for cat in _categories}, "in")
+        _WorkflowStep({cat: [range(1, 4_000 + 1)] for cat in _categories_list}, "in")
     )
 
     workflow_step_cache = dict[str, list[_WorkflowStep]]()

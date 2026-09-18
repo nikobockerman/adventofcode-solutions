@@ -2,14 +2,16 @@ import inspect
 import logging
 import pathlib
 import sys
-from typing import TYPE_CHECKING, Literal, TypeIs
+from typing import TYPE_CHECKING, Literal, TypeIs, get_args
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+type _Part = Literal[1, 2]
 
-def is_part(n: int) -> TypeIs[Literal[1, 2]]:
-    return n in (1, 2)
+
+def _is_part(n: int) -> TypeIs[_Part]:
+    return n in get_args(_Part.evaluate_value())  # type: ignore [call-arg]
 
 
 def get_logger() -> logging.Logger:
@@ -21,7 +23,7 @@ def run(p1: Callable[[str], int], p2: Callable[[str], int]) -> None:
     verbosity, part = map(int, sys.argv[1:])
     level = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}[verbosity]
     logging.basicConfig(level=level)
-    assert is_part(part)
+    assert _is_part(part)
     input_str = sys.stdin.read().strip()
 
     match part:
