@@ -62,13 +62,12 @@
     },
     {
       description: "Datasources that publish no per-version timestamp cannot be aged",
-      matchDatasources: ["conan", "custom.homebrew", "git-refs"],
-
-      // Without this these are held indefinitely, since
-      // minimumReleaseAgeBehaviour defaults to timestamp-required. Conan Center
-      // does publish a timestamp per recipe revision, but only on a per-version
-      // URL the conan datasource does not read; conan.lock pins those revisions
-      // by content hash instead. formulae.brew.sh exposes no version timestamp.
+      matchDatasources: [
+        "conan",
+        "custom.homebrew",
+        "git-refs",
+        "github-runners",
+      ],
       minimumReleaseAge: null,
     },
     {
