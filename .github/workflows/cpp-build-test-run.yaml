@@ -43,7 +43,9 @@ jobs:
           matrix=$(python3 .github/scripts/generate-cpp-ci-config.py matrix \
             --homebrew-downloads-hash-macos "${HOMEBREW_HASH_MACOS}" \
             --homebrew-downloads-hash-ubuntu "${HOMEBREW_HASH_UBUNTU}")
-          echo "matrix=${matrix}" | tee -a "${GITHUB_OUTPUT}"
+          echo "matrix:"
+          echo "${matrix}" | jq
+          echo "matrix=${matrix}" >> "${GITHUB_OUTPUT}"
         shell: bash
 
   build-test-run:
