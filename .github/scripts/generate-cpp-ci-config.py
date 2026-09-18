@@ -4,30 +4,70 @@
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import os
 import re
 import shlex
 import sys
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, NamedTuple
+from typing import Final, Literal, get_args
 
 _REPOSITORY_ROOT: Final = Path(__file__).resolve().parents[2]
 _CPP_DIR: Final = _REPOSITORY_ROOT / "solvers" / "cpp"
 
 _GLIBCXX_DEBUG_FLAGS: Final = ("-D_GLIBCXX_DEBUG", "-D_GLIBCXX_DEBUG_PEDANTIC")
 
+type _OS = Literal["macos", "ubuntu"]
+type _Compiler = Literal["clang", "gcc"]
+type _CxxLib = Literal["libc++", "libstdc++"]
+type _BuildType = Literal["debug", "release", "sanitizers", "hardened"]
 
-class _MatrixEntry(NamedTuple):
+
+# Runner image hosting each operating system.
+@functools.cache
+def _runners() -> dict[_OS, str]:
+    return {"macos": "macos-15", "ubuntu": "ubuntu-24.04"}
+
+
+# Every scenario CI builds. The workflow obtains its job list from the `matrix`
+# subcommand rather than declaring one, so this table is the only place the set of
+# scenarios is written down and the two cannot drift apart.
+@functools.cache
+def _matrix() -> tuple[_MatrixEntry, ...]:
+    return (
+        _MatrixEntry("ubuntu", "clang", "libc++", "debug"),
+        _MatrixEntry("ubuntu", "clang", "libc++", "release"),
+        _MatrixEntry("ubuntu", "clang", "libc++", "sanitizers"),
+        _MatrixEntry("ubuntu", "clang", "libc++", "hardened"),
+        _MatrixEntry("ubuntu", "clang", "libstdc++", "debug"),
+        _MatrixEntry("ubuntu", "clang", "libstdc++", "release"),
+        _MatrixEntry("ubuntu", "gcc", "libstdc++", "debug"),
+        _MatrixEntry("ubuntu", "gcc", "libstdc++", "release"),
+        _MatrixEntry("macos", "clang", "libstdc++", "release"),
+    )
+
+
+@dataclass(frozen=True)
+class _MatrixEntry:
     """One C++ build scenario: which compiler, standard library and build type."""
 
-    os: str
-    compiler: str
-    cxx_lib: str
-    build_type: str
+    os: _OS
+    compiler: _Compiler
+    cxx_lib: _CxxLib
+    build_type: _BuildType
+
+    @property
+    def run_id(self) -> str:
+        return f"{self.os}-{self.compiler}-{self.cxx_lib}-{self.build_type}"
+
+    def __str__(self) -> str:
+        return self.run_id
 
 
-class _ConanProfile(NamedTuple):
+@dataclass(frozen=True)
+class _ConanProfile:
     """The Conan profile add-on layered on the auto-detected profile.
 
     Every field is what the profile *means*; `_render_profile` decides how it is
@@ -42,79 +82,51 @@ class _ConanProfile(NamedTuple):
     abi_tag: str = ""
 
     def __bool__(self) -> bool:
-        # A NamedTuple is a tuple, so an add-on with every field empty is still
-        # as long as it has fields and would otherwise be truthy. Iterating it
-        # covers whatever fields exist, so a new one needs nothing here.
-        return any(self)
+        return any((self.cxxflags, self.linkflags, self.abi_tag))
 
 
-# Runner image hosting each operating system.
-_RUNNERS: Final = {"macos": "macos-15", "ubuntu": "ubuntu-24.04"}
-
-# Every scenario CI builds. The workflow obtains its job list from the `matrix`
-# subcommand rather than declaring one, so this table is the only place the set of
-# scenarios is written down and the two cannot drift apart.
-_MATRIX: Final = (
-    _MatrixEntry("ubuntu", "clang", "libc++", "debug"),
-    _MatrixEntry("ubuntu", "clang", "libc++", "release"),
-    _MatrixEntry("ubuntu", "clang", "libc++", "sanitizers"),
-    _MatrixEntry("ubuntu", "clang", "libc++", "hardened"),
-    _MatrixEntry("ubuntu", "clang", "libstdc++", "debug"),
-    _MatrixEntry("ubuntu", "clang", "libstdc++", "release"),
-    _MatrixEntry("ubuntu", "gcc", "libstdc++", "debug"),
-    _MatrixEntry("ubuntu", "gcc", "libstdc++", "release"),
-    _MatrixEntry("macos", "clang", "libstdc++", "release"),
-)
-
-
-class ConfigurationError(ValueError):
+class _ConfigurationError(ValueError):
     """Raised when a matrix entry cannot be represented by the CI configuration."""
 
 
-class MissingEnvironmentError(ConfigurationError):
+class _MissingEnvironmentError(_ConfigurationError):
     """Raised when a generated configuration needs an unavailable environment value."""
 
     def __init__(self, name: str) -> None:
         super().__init__(f"Required environment variable is not set: {name}")
 
 
-class UnsupportedMatrixError(ConfigurationError):
+class _UnsupportedMatrixError(_ConfigurationError):
     """Raised when the workflow matrix specifies an unsupported build."""
 
     def __init__(self, matrix: _MatrixEntry) -> None:
-        super().__init__(f"Unsupported C++ CI matrix entry: {', '.join(matrix)}")
+        super().__init__(f"Unsupported C++ CI matrix entry: {matrix}")
 
 
 def _required_environment(name: str) -> str:
     value = os.environ.get(name)
     if value:
         return value
-    raise MissingEnvironmentError(name)
+    raise _MissingEnvironmentError(name)
 
 
-def _validate_matrix(args: argparse.Namespace) -> None:
+def _parse_matrix(args: argparse.Namespace) -> _MatrixEntry:
     matrix = _MatrixEntry(args.os, args.compiler, args.cxx_lib, args.build_type)
-    if matrix not in _MATRIX:
-        raise UnsupportedMatrixError(matrix)
+    if matrix not in _matrix():
+        raise _UnsupportedMatrixError(matrix)
+    return matrix
 
 
 def _github_include(
-    entry: _MatrixEntry, homebrew_hashes: dict[str, str]
+    entry: _MatrixEntry, homebrew_hashes: dict[_OS, str]
 ) -> dict[str, str]:
-    # Key names are read by the workflow's job name, `if:` conditions and step
-    # environments, so they follow GitHub's casing rather than Python's.
-    #
-    # `runId` identifies one matrix job among all of them, for uses such as
-    # per-scenario cache keys. Joining every field carries a new axis into it
-    # automatically; `_emit_matrix` checks that the results stay distinct, since
-    # joining can alias if an axis value ever contains the separator.
     return {
         "os": entry.os,
         "compiler": entry.compiler,
         "cxxLib": entry.cxx_lib,
         "buildType": entry.build_type,
-        "runId": "-".join(entry),
-        "runsOn": _RUNNERS[entry.os],
+        "runId": entry.run_id,
+        "runsOn": _runners()[entry.os],
         "homebrew-downloads-hash-from-prepare": homebrew_hashes[entry.os],
     }
 
@@ -124,13 +136,11 @@ def _profile_path() -> str:
     return "auto-cmake;${sourceDir}/conan-profile-ci"
 
 
-# A [conf] value is either one string or a list of flags; Conan spells the two
-# differently and the distinction has to survive as far as json.dumps.
-type _ConfValue = str | tuple[str, ...]
+type _ConanConfValue = str | tuple[str, ...]
 
 
-def _conf_entries(profile: _ConanProfile) -> list[tuple[str, _ConfValue]]:
-    entries: list[tuple[str, _ConfValue]] = []
+def _conan_conf_entries(profile: _ConanProfile) -> list[tuple[str, _ConanConfValue]]:
+    entries: list[tuple[str, _ConanConfValue]] = []
     if profile.abi_tag:
         entries.append(("user.aoc:abi", profile.abi_tag))
     if profile.cxxflags:
@@ -141,22 +151,15 @@ def _conf_entries(profile: _ConanProfile) -> list[tuple[str, _ConfValue]]:
     return entries
 
 
-def _render_profile(profile: _ConanProfile) -> str:
-    entries = _conf_entries(profile)
+def _render_conan_profile(profile: _ConanProfile) -> str:
+    entries = _conan_conf_entries(profile)
     if not entries:
         return "# This matrix entry needs no add-on to the auto-detected profile.\n"
 
-    # tools.info.package_id:confs names the confs Conan folds into package_id, so
-    # a dependency binary stops matching once the flags it was built with change.
-    # Conan matches each entry with re.match, which anchors at the start only,
-    # hence the "$". Deriving the names from the section above keeps a conf added
-    # there later from silently staying out of package_id.
-    patterns = [f"{re.escape(name)}$" for name, _ in entries]
-    # Conan reads a conf value back as a Python literal, so json.dumps is both a
-    # correct spelling and one that quotes and escapes every value the same way.
+    patterns = '", "'.join(re.escape(name) for name, _ in entries)
     lines = [
         "[conf]",
-        f"tools.info.package_id:confs={json.dumps(patterns)}",
+        f'tools.info.package_id:confs=["{patterns}"]',
         *(f"{name}={json.dumps(value)}" for name, value in entries),
     ]
     return "\n".join([*lines, ""])
@@ -336,15 +339,15 @@ def _clang_libstdcxx_configuration(
 
 
 def _toolchain_configuration(
-    args: argparse.Namespace,
+    entry: _MatrixEntry,
 ) -> tuple[dict[str, str], _ConanProfile]:
     homebrew_prefix = _required_environment("HOMEBREW_PREFIX")
     flags = ["-Wall", "-Wextra", "-Werror"]
     cache_variables: dict[str, str] = {
-        "CMAKE_BUILD_TYPE": "Release" if args.build_type == "release" else "Debug",
+        "CMAKE_BUILD_TYPE": "Release" if entry.build_type == "release" else "Debug",
     }
 
-    match args.compiler, args.cxx_lib, args.build_type:
+    match entry.compiler, entry.cxx_lib, entry.build_type:
         case "gcc", "libstdc++", "debug":
             return _native_gcc_configuration(
                 cache_variables, homebrew_prefix, flags, glibcxx_debug=True
@@ -362,7 +365,7 @@ def _toolchain_configuration(
                 cache_variables,
                 homebrew_prefix,
                 flags,
-                args.os,
+                entry.os,
                 sanitizers=True,
             )
         case "clang", "libc++", "debug" | "release":
@@ -370,21 +373,21 @@ def _toolchain_configuration(
                 cache_variables,
                 homebrew_prefix,
                 flags,
-                args.os,
+                entry.os,
                 sanitizers=False,
             )
         case "clang", "libstdc++", "debug" | "release":
             return _clang_libstdcxx_configuration(
-                cache_variables, homebrew_prefix, flags, args.os
+                cache_variables, homebrew_prefix, flags, entry.os
             )
         case _:
             raise AssertionError(
-                (args.os, args.compiler, args.cxx_lib, args.build_type)
+                (entry.os, entry.compiler, entry.cxx_lib, entry.build_type)
             )
 
 
-def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], _ConanProfile]:
-    cache_variables, profile = _toolchain_configuration(args)
+def _configuration(entry: _MatrixEntry) -> tuple[dict[str, str], _ConanProfile]:
+    cache_variables, profile = _toolchain_configuration(entry)
     # The add-on profile is always written, but pointing Conan at it only makes a
     # difference when it carries something: a matrix entry whose dependencies are
     # built exactly as Conan detects them keeps the auto-detected profile alone.
@@ -393,12 +396,12 @@ def _configuration(args: argparse.Namespace) -> tuple[dict[str, str], _ConanProf
     return cache_variables, profile
 
 
-def _write_environment(path: Path, args: argparse.Namespace) -> None:
+def _write_environment(path: Path, entry: _MatrixEntry) -> None:
     lines = [
         "# Generated by .github/scripts/generate-cpp-ci-config.py.",
-        f"# Matrix: {args.os} {args.compiler} {args.cxx_lib} {args.build_type}.",
+        f"# Matrix: {entry}",
     ]
-    if args.build_type == "sanitizers":
+    if entry.build_type == "sanitizers":
         lines.extend(
             [
                 f"export ASAN_OPTIONS={shlex.quote('detect_leaks=1')}",
@@ -420,21 +423,23 @@ def _parse_args() -> argparse.Namespace:
         "config", help="Write the CMake, environment and Conan files for one entry"
     )
     config.add_argument(
-        "--os", choices=sorted({entry.os for entry in _MATRIX}), required=True
+        "--os",
+        choices=sorted(get_args(_OS.evaluate_value())),  # pyright: ignore [reportCallIssue]
+        required=True,
     )
     config.add_argument(
         "--compiler",
-        choices=sorted({entry.compiler for entry in _MATRIX}),
+        choices=sorted(get_args(_Compiler.evaluate_value())),  # pyright: ignore [reportCallIssue]
         required=True,
     )
     config.add_argument(
         "--cxx-lib",
-        choices=sorted({entry.cxx_lib for entry in _MATRIX}),
+        choices=sorted(get_args(_CxxLib.evaluate_value())),  # pyright: ignore [reportCallIssue]
         required=True,
     )
     config.add_argument(
         "--build-type",
-        choices=sorted({entry.build_type for entry in _MATRIX}),
+        choices=sorted(get_args(_BuildType.evaluate_value())),  # pyright: ignore [reportCallIssue]
         required=True,
     )
     config.add_argument("--output-dir", default=_CPP_DIR, type=Path)
@@ -450,25 +455,27 @@ def _parse_args() -> argparse.Namespace:
 
 
 def _emit_matrix(args: argparse.Namespace) -> None:
-    homebrew_hashes = {
+    homebrew_hashes: dict[_OS, str] = {
         "macos": args.homebrew_downloads_hash_macos,
         "ubuntu": args.homebrew_downloads_hash_ubuntu,
     }
-    include = [_github_include(entry, homebrew_hashes) for entry in _MATRIX]
-    # Two jobs sharing a runId would quietly share one Conan cache bucket, each
-    # restoring the other's packages and rebuilding anyway. Nothing downstream
-    # would fail, so catch it here.
+    include = [_github_include(entry, homebrew_hashes) for entry in _matrix()]
+
+    # Ensure that each matrix entry has a unique runId.
     run_ids = {entry["runId"] for entry in include}
-    assert len(run_ids) == len(include), "runId values are not unique"
-    # One line, so the caller can assign it to a `$GITHUB_OUTPUT` variable.
+    if len(run_ids) != len(include):
+        msg = "runId values are not unique"
+        raise ValueError(msg)
+
+    # Output in one line for easy consumption in GitHub Actions.
     print(json.dumps({"include": include}))
 
 
 def _write_configuration(args: argparse.Namespace) -> int:
     try:
-        _validate_matrix(args)
-        cache_variables, conan_profile = _configuration(args)
-    except ConfigurationError as error:
+        matrix = _parse_matrix(args)
+        cache_variables, conan_profile = _configuration(matrix)
+    except _ConfigurationError as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
 
@@ -488,9 +495,9 @@ def _write_configuration(args: argparse.Namespace) -> int:
     (output_dir / "CMakeUserPresets.json").write_text(
         json.dumps(preset, indent=2) + "\n", encoding="utf-8"
     )
-    _write_environment(output_dir / "ci.env", args)
+    _write_environment(output_dir / "ci.env", matrix)
     (output_dir / "conan-profile-ci").write_text(
-        _render_profile(conan_profile), encoding="utf-8"
+        _render_conan_profile(conan_profile), encoding="utf-8"
     )
     return 0
 
@@ -504,4 +511,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
