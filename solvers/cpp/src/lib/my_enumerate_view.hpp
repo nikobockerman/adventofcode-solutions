@@ -42,20 +42,21 @@ class MyEnumerateView
         _count, *_cur);
     }
 
-    constexpr Iterator& operator++() noexcept(
-      noexcept(std::ranges::advance(_cur, 1)) && noexcept(++_count)) {
+    constexpr auto operator++() noexcept(noexcept(std::ranges::advance(_cur,
+                                                                       1)) &&
+                                         noexcept(++_count)) -> Iterator& {
       std::ranges::advance(_cur, 1);
       ++_count;
       return *this;
     }
     constexpr void operator++(int) noexcept(noexcept(++(*this))) { ++(*this); }
 
-    constexpr bool operator==(const Iterator& o) const
-      noexcept(noexcept(_cur == o._cur)) {
+    constexpr auto operator==(const Iterator& o) const
+      noexcept(noexcept(_cur == o._cur)) -> bool {
       return _cur == o._cur;
     }
-    constexpr bool operator==(std::default_sentinel_t /*unused*/) const
-      noexcept(noexcept(_cur == _end)) {
+    constexpr auto operator==(std::default_sentinel_t /*unused*/) const
+      noexcept(noexcept(_cur == _end)) -> bool {
       return _cur == _end;
     }
 

@@ -13,12 +13,12 @@ Checks: >-
   performance-*,
   portability-*, -portability-avoid-pragma-once,
   readability-*, -readability-identifier-length,
-  -bugprone-exception-escape, -modernize-use-trailing-return-type
+  -bugprone-exception-escape
 CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: "true"
   cppcoreguidelines-macro-usage.AllowedRegexp: "^ASSERT_HAS_VALUE"
   modernize-use-ranges.IncludeStyle: "google"
-  modernize-use-trailing-return-type.TransformLambdas: "all_except_auto"
+  modernize-use-trailing-return-type.TransformLambdas: "none"
   readability-function-cognitive-complexity.IgnoreMacros: true
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*"

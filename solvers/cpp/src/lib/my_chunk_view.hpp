@@ -44,21 +44,21 @@ class MyChunkView : public std::ranges::view_interface<MyChunkView<Rng>> {
       return std::ranges::subrange(_curChunkBegin, _curChunkEnd);
     }
 
-    constexpr Iterator& operator++() noexcept(
+    constexpr auto operator++() noexcept(
       noexcept(std::ranges::advance(_curChunkBegin, _n, _end)) &&
-      noexcept(std::ranges::advance(_curChunkEnd, _n, _end))) {
+      noexcept(std::ranges::advance(_curChunkEnd, _n, _end))) -> Iterator& {
       std::ranges::advance(_curChunkBegin, _n, _end);
       std::ranges::advance(_curChunkEnd, _n, _end);
       return *this;
     }
     constexpr void operator++(int) noexcept(noexcept(++(*this))) { ++(*this); }
 
-    constexpr bool operator==(const Iterator& o) const
-      noexcept(noexcept(_curChunkBegin == o._curChunkBegin)) {
+    constexpr auto operator==(const Iterator& o) const
+      noexcept(noexcept(_curChunkBegin == o._curChunkBegin)) -> bool {
       return _curChunkBegin == o._curChunkBegin;
     }
-    constexpr bool operator==(std::default_sentinel_t /*unused*/) const
-      noexcept(noexcept(_curChunkBegin == _end)) {
+    constexpr auto operator==(std::default_sentinel_t /*unused*/) const
+      noexcept(noexcept(_curChunkBegin == _end)) -> bool {
       return _curChunkBegin == _end;
     }
 
@@ -114,8 +114,8 @@ class MyChunkAdaptorClosure
 
 class MyChunkAdaptor {
  public:
-  constexpr internal::MyChunkAdaptorClosure operator()(
-    std::size_t n) const noexcept {
+  constexpr auto operator()(std::size_t n) const noexcept
+    -> internal::MyChunkAdaptorClosure {
     return internal::MyChunkAdaptorClosure{n};
   }
 };
