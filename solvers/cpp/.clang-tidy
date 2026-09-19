@@ -18,7 +18,7 @@ CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: "true"
   cppcoreguidelines-macro-usage.AllowedRegexp: "^ASSERT_HAS_VALUE"
   modernize-use-ranges.IncludeStyle: "google"
-  modernize-use-trailing-return-type.TransformLambdas: "none"
+  modernize-use-trailing-return-type.TransformLambdas: "all_except_auto"
   readability-function-cognitive-complexity.IgnoreMacros: true
 WarningsAsErrors: "*"
 HeaderFilterRegex: ".*"
