@@ -45,9 +45,9 @@ class MySlideView : public std::ranges::view_interface<MySlideView<Rng>> {
       return std::ranges::subrange(_curSlideBegin, _curSlideEnd);
     }
 
-    constexpr Iterator& operator++() noexcept(
+    constexpr auto operator++() noexcept(
       noexcept(std::ranges::advance(_curSlideBegin, 1)) &&
-      noexcept(std::ranges::advance(_curSlideEnd, 1))) {
+      noexcept(std::ranges::advance(_curSlideEnd, 1))) -> Iterator& {
       std::ranges::advance(_curSlideBegin, 1);
       if (_curSlideEnd != _end) {
         std::ranges::advance(_curSlideEnd, 1);
@@ -58,12 +58,12 @@ class MySlideView : public std::ranges::view_interface<MySlideView<Rng>> {
     }
     constexpr void operator++(int) noexcept(noexcept(++(*this))) { ++(*this); }
 
-    constexpr bool operator==(const Iterator& o) const
-      noexcept(noexcept(_curSlideBegin == o._curSlideBegin)) {
+    constexpr auto operator==(const Iterator& o) const
+      noexcept(noexcept(_curSlideBegin == o._curSlideBegin)) -> bool {
       return _curSlideBegin == o._curSlideBegin;
     }
-    constexpr bool operator==(
-      std::default_sentinel_t /*unused*/) const noexcept {
+    constexpr auto operator==(std::default_sentinel_t /*unused*/) const noexcept
+      -> bool {
       return _pastEnd;
     }
 
@@ -119,8 +119,8 @@ class MySlideAdaptorClosure
 
 class MySlideAdaptor {
  public:
-  constexpr internal::MySlideAdaptorClosure operator()(
-    std::size_t n) const noexcept {
+  constexpr auto operator()(std::size_t n) const noexcept
+    -> internal::MySlideAdaptorClosure {
     return internal::MySlideAdaptorClosure{n};
   }
 };

@@ -38,19 +38,20 @@ class MyStrideView : public std::ranges::view_interface<MyStrideView<Rng>> {
 
     constexpr auto operator*() const noexcept(noexcept(*_cur)) { return *_cur; }
 
-    constexpr Iterator& operator++() noexcept(
-      noexcept(std::ranges::advance(_cur, _n, _end))) {
+    constexpr auto operator++() noexcept(noexcept(std::ranges::advance(_cur, _n,
+                                                                       _end)))
+      -> Iterator& {
       std::ranges::advance(_cur, _n, _end);
       return *this;
     }
     constexpr void operator++(int) noexcept(noexcept(++(*this))) { ++*this; }
 
-    constexpr bool operator==(const Iterator& o) const
-      noexcept(noexcept(_cur == o._cur)) {
+    constexpr auto operator==(const Iterator& o) const
+      noexcept(noexcept(_cur == o._cur)) -> bool {
       return _cur == o._cur;
     }
-    constexpr bool operator==(std::default_sentinel_t /*unused*/) const
-      noexcept(noexcept(_cur == _end)) {
+    constexpr auto operator==(std::default_sentinel_t /*unused*/) const
+      noexcept(noexcept(_cur == _end)) -> bool {
       return _cur == _end;
     }
 
@@ -104,8 +105,8 @@ class MyStrideAdaptorClosure
 
 class MyStrideAdaptor {
  public:
-  constexpr internal::MyStrideAdaptorClosure operator()(
-    std::size_t n) const noexcept {
+  constexpr auto operator()(std::size_t n) const noexcept
+    -> internal::MyStrideAdaptorClosure {
     return internal::MyStrideAdaptorClosure{n};
   }
 };
