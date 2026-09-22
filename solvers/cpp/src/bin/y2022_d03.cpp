@@ -28,7 +28,7 @@ constexpr auto lowerCaseValue(char character) -> unsigned {
 
 constexpr auto isLowerCase(char character) {
   constexpr unsigned maxLowerCaseValue{'z' - 'a'};
-  auto value = lowerCaseValue(character);
+  const auto value = lowerCaseValue(character);
   return value <= maxLowerCaseValue;
 }
 
@@ -49,7 +49,7 @@ constexpr auto upperCaseValue(char character) -> unsigned {
 
 constexpr auto isUpperCase(char character) {
   constexpr unsigned maxUpperCaseValue{'Z' - 'A'};
-  auto value = upperCaseValue(character);
+  const auto value = upperCaseValue(character);
   return value <= maxUpperCaseValue;
 }
 
@@ -75,10 +75,10 @@ constexpr auto priority(char sharedItem) -> unsigned {
 }
 
 constexpr auto sumScore(auto&& items) -> uint64_t {
-  auto result = MyFoldLeftFirst(items | views::transform([](auto character) {
-                                  return priority(character);
-                                }),
-                                std::plus());
+  const auto result = MyFoldLeftFirst(
+    items |
+      views::transform([](auto character) { return priority(character); }),
+    std::plus());
   if (!result) {
     throw std::runtime_error("No result");
   }
@@ -105,8 +105,8 @@ constexpr auto getSharedItem(auto&& rucksack) {
   }
 
   auto [firstItems, secondItems] = getCompartments(rucksack);
-  auto first = vectorSet(std::move(firstItems));
-  auto second = vectorSet(std::move(secondItems));
+  const auto first = vectorSet(std::move(firstItems));
+  const auto second = vectorSet(std::move(secondItems));
 
   auto intersection = std::vector<char>{};
   ranges::set_intersection(first, second, std::back_inserter(intersection));
@@ -130,13 +130,13 @@ auto solver::p1(std::string_view inputStr) -> Answer {
 namespace {
 
 constexpr auto getGroupBadgeItem(auto&& groupRuckSacks) -> char {
-  auto end = groupRuckSacks.end();
+  const auto end = groupRuckSacks.end();
   auto iter = groupRuckSacks.begin();
-  auto first = vectorSet(*iter);
+  const auto first = vectorSet(*iter);
   ranges::advance(iter, 1, end);
-  auto second = vectorSet(*iter);
+  const auto second = vectorSet(*iter);
   ranges::advance(iter, 1, end);
-  auto third = vectorSet(*iter);
+  const auto third = vectorSet(*iter);
 
   if (iter == end) {
     spdlog::debug("Invalid group size: {}", ranges::distance(groupRuckSacks));

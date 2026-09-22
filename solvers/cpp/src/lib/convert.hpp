@@ -20,11 +20,11 @@ constexpr auto convert(const TRange& range) -> TResult {
   const auto size = std::ranges::size(range);
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   const auto* pastEnd = begin + size;
-  auto [ptr, ec]{std::from_chars(begin, pastEnd, value)};
+  const auto [ptr, ec]{std::from_chars(begin, pastEnd, value)};
   if (ec == std::errc()) {
     return value;
   }
-  auto inputValue = std::string{begin, pastEnd};
+  const auto inputValue = std::string{begin, pastEnd};
   if (ec == std::errc::invalid_argument) {
     throw std::runtime_error("Invalid argument: " + inputValue);
   }

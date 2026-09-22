@@ -34,7 +34,7 @@ class MySlideView : public std::ranges::view_interface<MySlideView<Rng>> {
       : _curSlideBegin{std::move(begin)},
         _curSlideEnd{_curSlideBegin},
         _end{std::move(end)} {
-      auto reachedN = std::ranges::advance(_curSlideEnd, n, _end) == 0;
+      const auto reachedN = std::ranges::advance(_curSlideEnd, n, _end) == 0;
       if (!reachedN) {
         _pastEnd = true;
       }

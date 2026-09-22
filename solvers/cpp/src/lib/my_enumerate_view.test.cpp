@@ -34,8 +34,8 @@ auto makeEnumeratedChar(size_t i, T&& v) {
 
 TEST(MyEnumerateView, BetweenPipes) {
   const std::string data{"123456789"};
-  auto processed = data | views::drop(1) | MyEnumerate | views::take(4) |
-                   ranges::to<Enumerated>();
+  const auto processed = data | views::drop(1) | MyEnumerate | views::take(4) |
+                         ranges::to<Enumerated>();
   ASSERT_EQ(processed.size(), 4);
   EXPECT_EQ(processed.at(0), makeEnumeratedChar(0, '2'));
   EXPECT_EQ(processed.at(1), makeEnumeratedChar(1, '3'));
@@ -45,20 +45,20 @@ TEST(MyEnumerateView, BetweenPipes) {
 
 TEST(MyEnumerateView, NoElements) {
   const std::string empty;
-  auto processed = empty | MyEnumerate | ranges::to<Enumerated>();
+  const auto processed = empty | MyEnumerate | ranges::to<Enumerated>();
   EXPECT_TRUE(processed.empty());
 }
 
 TEST(MyEnumerateView, SingleElement) {
   const std::string one{"1"};
-  auto processed = one | MyEnumerate | ranges::to<Enumerated>();
+  const auto processed = one | MyEnumerate | ranges::to<Enumerated>();
   ASSERT_EQ(processed.size(), 1);
   EXPECT_EQ(processed.at(0), makeEnumeratedChar(0, '1'));
 }
 
 TEST(MyEnumerateView, ManyElements) {
   const std::string data{"12345"};
-  auto processed = data | MyEnumerate | ranges::to<Enumerated>();
+  const auto processed = data | MyEnumerate | ranges::to<Enumerated>();
   ASSERT_EQ(processed.size(), 5);
   EXPECT_EQ(processed.at(0), makeEnumeratedChar(0, '1'));
   EXPECT_EQ(processed.at(1), makeEnumeratedChar(1, '2'));

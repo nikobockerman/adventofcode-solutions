@@ -104,11 +104,11 @@ constexpr auto countStacks(auto&& stackIdLine) -> std::size_t {
 constexpr auto crateCharIndex(auto stackIndex) { return 1 + (4 * stackIndex); }
 
 constexpr auto loadStage(auto&& linesView) -> Stage {
-  auto lines = linesView | ranges::to<std::vector>();
-  auto stackCount = countStacks(lines.back());
+  const auto lines = linesView | ranges::to<std::vector>();
+  const auto stackCount = countStacks(lines.back());
   spdlog::debug("Stack count: {}", stackCount);
 
-  auto crateLines =
+  const auto crateLines =
     lines | views::reverse | views::drop(1) | ranges::to<std::vector>();
 
   return views::iota(std::size_t{}, stackCount) |
@@ -127,7 +127,7 @@ constexpr auto loadStage(auto&& linesView) -> Stage {
 }
 
 constexpr auto parseMove(auto&& line) {
-  auto parts =
+  const auto parts =
     line | views::split(" "sv) | views::drop(1) | MyStride(2) | views::take(3) |
     views::transform([](auto&& value) { return convert<std::size_t>(value); }) |
     ranges::to<std::vector>();
@@ -160,7 +160,7 @@ constexpr auto loadParts(auto&& range) {
 
 [[nodiscard]] constexpr auto applySingleMove(auto prevStage, auto indexFrom,
                                              auto indexTo) -> Stage {
-  auto& fromStack = prevStage.at(indexFrom);
+  const auto& fromStack = prevStage.at(indexFrom);
   if (fromStack.empty()) {
     throw std::runtime_error("Moving from empty stack");
   }
@@ -212,7 +212,7 @@ constexpr auto loadParts(auto&& range) {
 auto solve1(auto inputStr) {
   auto [stage, moves] = loadParts(inputStr);
   spdlog::info("Initial stage: {}", stage);
-  auto finalStage =
+  const auto finalStage =
     ranges::fold_left(moves, std::move(stage), [](auto prev, const auto& move) {
       spdlog::debug("Performing move ({}); Stage: {}", move, prev);
       auto next = applyMoveOneByOne(std::move(prev), move);
@@ -258,7 +258,7 @@ namespace {
 constexpr auto solve2(auto inputStr) {
   auto [stage, moves] = loadParts(inputStr);
   spdlog::info("Initial stage: {}", stage);
-  auto finalStage =
+  const auto finalStage =
     ranges::fold_left(moves, std::move(stage), [](auto prev, const auto& move) {
       spdlog::debug("Performing move ({}); Stage: {}", move, prev);
       auto next = applyMoveInSingle(std::move(prev), move);
