@@ -43,7 +43,7 @@ constexpr auto battleScore(OpponentType opponent, OwnType own) -> unsigned {
     return scoreEven;
   }
 
-  auto iWin = [=] {
+  auto iWin = [=] -> bool {
     switch (opponent.get()) {
       case Type::Paper:
         return own.get() == Type::Scissors;
@@ -115,7 +115,7 @@ constexpr auto sumBattleScores(auto&& range) -> uint64_t {
 }  // namespace
 
 auto solver::p1(std::string_view inputStr) -> Answer {
-  auto parseMe = [](char move) constexpr {
+  auto parseMe = [](char move) constexpr -> OwnType {
     switch (move) {
       case 'X':
         return OwnType{Type::Rock};
@@ -162,7 +162,7 @@ constexpr auto winningType(Type opponent) {
 }  // namespace
 
 auto solver::p2(std::string_view inputStr) -> Answer {
-  auto parseMe = [](OpponentType opponent, char move) {
+  auto parseMe = [](OpponentType opponent, char move) -> OwnType {
     switch (move) {
       case 'X':
         return OwnType{losingType(opponent.get())};
