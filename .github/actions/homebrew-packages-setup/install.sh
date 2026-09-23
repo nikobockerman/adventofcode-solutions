@@ -15,15 +15,22 @@ if [[ "${INPUT_CACHE_MODE}" == "prepare" && "${GITHUB_EVENT_NAME}" == "pull_requ
   skipInstalls=true
 fi
 
-calculateDownloadsHash() {
+listDownloads() {
   brewCache=$(brew --cache)
   brewDownloads=${brewCache}/downloads
-  downloads=$(ls "${brewDownloads}/" 2>/dev/null || true)
-  downloadsHash=$(echo "${downloads}" | sha256sum | cut -d ' ' -f 1)
-  echo "${downloadsHash}"
+  ls "${brewDownloads}/" 2>/dev/null || true
 }
 
-initialDownloadsHash=$(calculateDownloadsHash)
+calculateHash() {
+  sha256sum - | cut -d ' ' -f 1
+}
+
+echo "::group::List initial brew downloads"
+initialDownloads=$(listDownloads)
+echo "${initialDownloads}"
+echo "::endgroup::"
+
+initialDownloadsHash=$(echo "${initialDownloads}" | calculateHash)
 if [[ "${CACHE_HIT}" == "true" && "${INPUT_DOWNLOADS_HASH_FROM_PREPARE}" != "${initialDownloadsHash}" ]]; then
   echo -n "::error::Cache restored with exact key match but calculated downloads hash doesn't match"
   echo -n " 'downloads-hash-from-prepare' input value. This should never happen."
@@ -56,8 +63,13 @@ if [[ "${skipInstalls}" == "false" ]]; then
   fi
   echo "::endgroup::"
 
+  echo "::group::List downloads after install/upgrade/cleanup"
+  downloads=$(listDownloads)
+  echo "${downloads}"
+  echo "::endgroup::"
+
   echo "::group::Check changes to downloaded contents"
-  downloadsHash=$(calculateDownloadsHash)
+  downloadsHash=$(echo "${downloads}" | calculateHash)
   echo "downloadsHash=${downloadsHash}"
   if [[ "${initialDownloadsHash}" = "${downloadsHash}" ]]; then
     downloadsChanged=false
