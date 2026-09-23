@@ -1,0 +1,15 @@
+name: Validate runner
+description: Validate proper runner
+
+runs:
+  using: composite
+  steps:
+    - env:
+        # renovate: datasource=github-runners depName=macos
+        RUNNER_MACOS_VERSION: "15"
+        # renovate: datasource=github-runners depName=ubuntu
+        RUNNER_UBUNTU_VERSION: "24.04"
+      run: |
+        # Validate runner
+        "${GITHUB_ACTION_PATH}/validate-runner.sh"
+      shell: bash
