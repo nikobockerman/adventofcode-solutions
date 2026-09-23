@@ -8,21 +8,23 @@ on:
       pull_request_number:
         description: "Pull request number"
         required: true
-permissions: {}
+permissions:
+  actions: write
+  contents: read
 
 jobs:
-  resolve-pr-number:
-    name: Resolve PR number
-    outputs:
-      pr_number: ${{ steps.resolve.outputs.pr_number }}
-    permissions:
-      actions: read
+  cleanup:
+    name: Cleanup caches
     runs-on: ubuntu-24.04
     steps:
-      - env:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - id: resolve
+
+        env:
           EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
           INPUT_PR_NUMBER: ${{ github.event.inputs.pull_request_number }}
-        id: resolve
         run: |
           # Resolve PR number
           prNumber="${EVENT_PR_NUMBER:-${INPUT_PR_NUMBER}}"
@@ -37,16 +39,6 @@ jobs:
           } | tee -a "${GITHUB_OUTPUT}"
         shell: bash
 
-  cleanup:
-    name: Cleanup caches
-    needs: resolve-pr-number
-    permissions:
-      actions: write
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
       - name: Restore mise tools
         uses: ./.github/actions/mise-project-setup
         with:
@@ -57,6 +49,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           MISE_TASK: "github:cache:remove-for-pr"
-          PR_NUMBER: ${{ needs.resolve-pr-number.outputs.pr_number }}
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
         run: mise run "${MISE_TASK}"
         shell: bash
