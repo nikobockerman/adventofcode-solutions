@@ -95,14 +95,6 @@
       automerge: true,
     },
     {
-      // Temporary until better tooling is in place to ensure update applies to
-      // all relevant places
-      description: "Disable automerge for GHA runners",
-      matchDatasources: ["github-runners"],
-
-      automerge: false,
-    },
-    {
       description: "Don't pin requires-python in pyproject.toml files",
       matchDepTypes: ["requires-python"],
       matchPackageNames: ["python"],
