@@ -22,7 +22,7 @@ jobs:
   # Every check that also needs a uv virtual environment
   checks:
     name: Run checks
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:

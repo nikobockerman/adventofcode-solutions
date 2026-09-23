@@ -17,7 +17,7 @@ jobs:
       pr_number: ${{ steps.resolve.outputs.pr_number }}
     permissions:
       actions: read
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     steps:
       - env:
           EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -42,7 +42,7 @@ jobs:
     needs: resolve-pr-number
     permissions:
       actions: write
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
