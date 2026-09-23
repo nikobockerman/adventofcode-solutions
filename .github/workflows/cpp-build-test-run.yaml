@@ -28,6 +28,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Validate runner
+        uses: ./.github/actions/validate-runner
+
       - name: Setup tools through mise
         uses: ./.github/actions/mise-project-setup
         with:
@@ -67,6 +70,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: true
+
+      - name: Validate runner
+        uses: ./.github/actions/validate-runner
 
       - name: Setup homebrew packages
         uses: ./.github/actions/homebrew-packages-setup
