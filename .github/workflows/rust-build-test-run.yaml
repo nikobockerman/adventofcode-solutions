@@ -10,29 +10,43 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
+  matrix:
+    name: Resolve build matrix
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate runner
+        uses: ./.github/actions/validate-runner
+
+      - name: Setup tools through mise
+        uses: ./.github/actions/mise-project-setup
+        with:
+          directory: .
+
+      - id: matrix
+        name: Generate build matrix
+        run: |
+          matrix=$(python3 .github/scripts/generate-rust-ci-config.py matrix)
+          echo "matrix:"
+          echo "${matrix}" | jq
+          echo "matrix=${matrix}" >> "${GITHUB_OUTPUT}"
+        shell: bash
+
   build-test-run:
     strategy:
       fail-fast: false
-      matrix:
-        profile:
-          - dev
-          - release
-          - test
-        runner:
-          - ubuntu-24.04
-          - macos-15
-        include:
-          - clippy: false
-          - run: true
-          - test: false
-          - profile: dev
-            clippy: true
-          - profile: test
-            run: false
-            test: true
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
 
-    name: ${{ matrix.runner }} - ${{ matrix.profile }} - Build + test + run
-    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.runId }} - Build + test + run
+    needs: matrix
+    runs-on: ${{ matrix.runsOn }}
     timeout-minutes: 30
 
     defaults:
