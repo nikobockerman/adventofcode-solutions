@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Generate the C++ CI build matrix and the configuration for one matrix entry."""
 
-from __future__ import annotations
-
 import argparse
 import functools
 import json
