@@ -2,7 +2,7 @@
 "pipx:clang-format" = "23.1.1"
 "pipx:gersemi" = "0.29.1"
 conan = "2.32.0"
-sccache = "0.17.0"
+sccache = "0.18.0"
 
 [env]
 SCCACHE_CLIENT_SIDE = "true"
