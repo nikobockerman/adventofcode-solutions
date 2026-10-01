@@ -8,7 +8,7 @@ runs:
         # renovate: datasource=github-runners depName=macos
         RUNNER_MACOS_VERSION: "15"
         # renovate: datasource=github-runners depName=ubuntu
-        RUNNER_UBUNTU_VERSION: "24.04"
+        RUNNER_UBUNTU_VERSION: "26.04"
       run: |
         # Validate runner
         "${GITHUB_ACTION_PATH}/validate-runner.sh"
