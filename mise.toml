@@ -6,7 +6,7 @@ uv = "0.12.15"
 # Common tools
 "npm:pyright" = "1.1.414"
 "pipx:shellcheck-gha" = "0.1.2"
-prettier = "3.9.6"
+prettier = "3.9.7"
 ruff = "0.16.8"
 shellcheck = "0.11.0"
 shfmt = "3.14.1"
