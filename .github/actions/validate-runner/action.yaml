@@ -6,7 +6,7 @@ runs:
   steps:
     - env:
         # renovate: datasource=github-runners depName=macos
-        RUNNER_MACOS_VERSION: "15"
+        RUNNER_MACOS_VERSION: "26"
         # renovate: datasource=github-runners depName=ubuntu
         RUNNER_UBUNTU_VERSION: "24.04"
       run: |
