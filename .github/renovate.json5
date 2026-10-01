@@ -30,11 +30,11 @@
   lockFileMaintenance: {
     enabled: true,
   },
-  // Every update here is automerged, so this delay is the only thing standing
-  // between a poisoned release and main. Renovate recommends 14 days when
-  // automerging third-party dependencies. Vulnerability fixes are exempt
-  // (vulnerabilityAlerts defaults to minimumReleaseAge:null), and any update can
-  // be pulled early from the Dependency Dashboard.
+  // Every non-breaking update here is automerged, so this delay is the only
+  // thing standing between a poisoned release and main. Renovate recommends
+  // 14 days when automerging third-party dependencies. Vulnerability fixes are
+  // exempt (vulnerabilityAlerts defaults to minimumReleaseAge:null), and any
+  // update can be pulled early from the Dependency Dashboard.
   //
   // Also covers the functional cases: mise errors when installing a very fresh
   // release (https://github.com/jdx/mise/issues/2314) and CPython prebuilt
@@ -57,7 +57,6 @@
         "replacement",
         "rollback",
       ],
-
       minimumReleaseAge: null,
     },
     {
@@ -74,7 +73,6 @@
       description: "Mise package settings",
       matchPackageNames: ["jdx/mise"],
 
-      automerge: true,
       prPriority: -1, // Lowest priority
       schedule: ["* 0-13 * * 4"], // Thursday, midnight through working day
       // mise uses CalVer (YEAR.MONTH.COUNTER), not SemVer. Collapse the
@@ -83,7 +81,7 @@
       separateMinorPatch: false, // override repo-wide separateMinorPatch:true for mise
     },
     {
-      description: "Automerge all updates",
+      description: "Automerge all non-breaking updates",
       matchUpdateTypes: [
         "major",
         "minor",
@@ -91,6 +89,7 @@
         "digest",
         "lockFileMaintenance",
       ],
+      matchIsBreaking: false,
 
       automerge: true,
     },
